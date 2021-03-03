@@ -1,0 +1,19 @@
+Package: wikiTools
+Type: Package
+Version: 0.0.1
+Date: 2021-02-28
+Title: Tools for Wikidata and Wikipedia
+Description: Magage information from Wikidata and Wikipedia.
+License: GPL-2 | GPL-3
+Depends: R (>= 3.5.0)
+Imports: WikidataQueryServiceR (>= 1.0.0), WikidataR (>= 1.4.0)
+Suggests: knitr, rmarkdown, lavaan, shiny
+VignetteBuilder: knitr
+NeedsCompilation: no
+Author: Modesto Escobar <modesto@usal.es>,
+  David Barrios <metal@usal.es>,
+  Carlos Prieto <cprietos@usal.es>,
+  Cristina Calvo <cristinacalvolopez@usal.es>.
+Maintainer: Modesto Escobar <modesto@usal.es>
+Roxygen: list(markdown=TRUE)
+RoxygenNote: 7.1.1
