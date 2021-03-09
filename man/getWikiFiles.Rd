@@ -11,7 +11,9 @@ getWikiFiles(X, language = c("es", "en", "fr"), directory = "./", maxtime = 0)
 
 \item{language}{The language of the Wikipedia page version. This should consist of an ISO language code (default = "en").}
 
-\item{path}{Directory where to export the files to.}
+\item{directory}{Directory where to export the files to.}
+
+\item{maxtime}{In case you want to apply a random waiting between consecutive searches.}
 }
 \value{
 It returns a vector of errors, if any. All pictures are download into the selected directory (NULL= no errors).
@@ -26,22 +28,14 @@ All the errors (not found pages) are reported as outcomes (NULL= no errors). The
 \examples{
 ## Not run: 
 
-## In case you want to download a file directly from an URL:
+## In case you want to download the Wikipage of a person:
 
-# dta <- data.frame(name = "Data", url = "https://sociocav.usal.es/me/Stata/example.dta")
-# getFiles(dta, path = "./")
-
-##  You can can also combine this function with getWikidata (among others).
-## In case you want to download a picture of a person:
-
-# A <- data.frame(name= getWikidata("Rembrandt")$label, url=getWikidata("Rembrandt")$pics)
-# getFiles(A, path = "./", ext = "png")
+# getWikiFiles("Rembrandt", dir = "./")
 
 ## Or the pics of multiple authors: 
 
-# B <- getWikidata(c("Monet", "Renoir", "Caillebotte"))
-# data <- data.frame(name = B$label, url = B$pics)
-# getFiles(data, path = "./", ext = NULL)
+# B <- c("Monet", "Renoir", "Caillebotte")
+# getWikiFiles(B, dir = "./", language="fr")
 
 ## End(Not run)
 }

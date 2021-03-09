@@ -2,9 +2,19 @@
 # Sat Feb 27 23:56:26 2021 ------------------------------
 
 #validUrl -----
-validUrl <- function(url_in,t=2){
-  con <- url(url_in)
-  check <- suppressWarnings(try(open.connection(con,open="rt",timeout=t),silent=T)[1])
+#' Find if an URL link is valid.
+#'
+#' @param url A vector of URLs.
+#' @param time The timeout (in seconds) to be used for each connection. Default = 2.
+#' @details This function checks if a URL exists on the Internet.
+#' @return A boolean value of TRUE or FALSE.
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
+#' @examples
+#' validUrl(url="https://es.wikipedia.org/wiki/Weber,_Max", time=2)
+#' @export
+validUrl <- function(url, time=2){
+  con <- url(url)
+  check <- suppressWarnings(try(open.connection(con,open="rt",timeout=time),silent=T)[1])
   suppressWarnings(try(close.connection(con),silent=T))
   ifelse(is.null(check),TRUE,FALSE)
 }
