@@ -63,6 +63,43 @@ urltoFrame <- function(url){
   paste0('<iframe src="',url, '" width="100%" height="100%" frameborder="0" marginwidth="0", margingheight="0"></iframe>')
 }
 
+#cc ----
+#' Converts a text separated by commas into a character vector.
+#' @param text Text to be separated.
+#' @param sep A character of separation. It must be a blank. If it is another character, trailing blanks are suppressed.
+#' @details Returns inside the text are omitted.
+#' @return A vector of the split segments of the text.
+#' @examples
+#' ## A text with three names separated with commas is converted into a vector of length 3.
+#' cc("Pablo Picasso, Diego Velazquez, Salvador Dali")
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
+#' @export
+cc <- function(text, sep=",") {
+  if(!sep==" ") {
+    text <- gsub(paste0("[ ]*", sep,"[ ]*"), sep, text)
+    text <- gsub("\\n[ ]*", "", text)
+  }
+  else text <- gsub("\\n","", text)
+  strsplit(text,sep)[[1]]
+}
+
+#preName ----
+#' Reverse the order of the first and last names of every element of a vector.
+#' @param X A vector of names with format "name, prename".
+#' @details This function reverses the order of the first and last names of the items: i.e., "Weber, Max" turns into "Max Weber".
+#' @return Another vector with its elements changed.
+#' @examples
+#' ## To reconvert a single name:
+#' preName("Weber, Max")
+
+#' ## It is possible to work with several items, as in here:
+#' A <- c("Weber, Max", "Descartes, Rene", "Locke, John")
+#' preName(A)
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
+#' @export
+preName <- function(X) {sub("(^.*),\\s*(.*$)","\\2 \\1", X)}
+
+
 
 # nametoWikiURL----
 #' Create the Wikipedia URL of a name or entry.
@@ -133,6 +170,7 @@ nametoWikiFrame <- function(name, language="en") {
   paste0('<iframe src="https://',language,'.m.wikipedia.org/wiki/',gsub(" ","_",name),'" width="100%" height="100%" frameborder="0" marginwidth="0", margingheight="0"></iframe>')
 }
 
+
 # searchWiki----
 #' Find if there is a Wikipedia page of a name(s) in the selected language. 
 #'
@@ -172,57 +210,6 @@ searchWiki <- function(name, language=c("en", "es", "fr", "it", "de", "pt", "ca"
   }
   return(errores)
 }
-
-
-# getWikiFiles---- 
-#' Downloads a list of Wikipedia pages in a specified path of the computer, and return a vector of the no-found names (if any).
-#' @param X A vector of Wikipedia's entry).
-#' @param language The language of the Wikipedia page version. This should consist of an ISO language code (default = "en").
-#' @param path Directory where to export the files to.
-#' @details This function allows download a set of Wikipedia pages into a directory of the local computer. 
-#' All the errors (not found pages) are reported as outcomes (NULL= no errors). The files are donwload into your chosen directory.
-#' @return It returns a vector of errors, if any. All pictures are download into the selected directory (NULL= no errors).
-#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
-#' @examples 
-#' ## Not run: 
-#' 
-#' ## In case you want to download a file directly from an URL:
-#' 
-#' # dta <- data.frame(name = "Data", url = "https://sociocav.usal.es/me/Stata/example.dta")
-#' # getFiles(dta, path = "./")
-#' 
-#' ##  You can can also combine this function with getWikidata (among others).
-#' ## In case you want to download a picture of a person:
-#' 
-#' # A <- data.frame(name= getWikidata("Rembrandt")$label, url=getWikidata("Rembrandt")$pics)
-#' # getFiles(A, path = "./", ext = "png")
-#' 
-#' ## Or the pics of multiple authors: 
-#' 
-#' # B <- getWikidata(c("Monet", "Renoir", "Caillebotte"))
-#' # data <- data.frame(name = B$label, url = B$pics)
-#' # getFiles(data, path = "./", ext = NULL)
-#' 
-#' ## End(Not run)
-#' @export
-getWikiFiles <- function(X, language=c("es", "en", "fr"), directory="./", maxtime=0) {
-  if(substring(directory,nchar(directory))!="/" & substring(directory,nchar(directory))!="\\") directory=paste0(directory,"/")
-  errores <- NULL
-  for (I in X){
-    person <- gsub(" ", "_", I)
-    url <-paste("https://",language,".wikipedia.org/wiki/",person,sep="")
-    file <- paste0(directory, person,".html")
-    oldw <- getOption("warn")
-    options(warn = -1)
-    E <- tryCatch(download.file(url,destfile=file, quiet=TRUE),error = function(e) person)
-    if (E!=0) errores <- c(errores, E)
-    options(warn = oldw)
-    Sys.sleep(runif(1, min=0, max=maxtime))
-  }
-  return(errores)
-}
-
-
 
 # getWikiInf ----
 #' Create a data.frame with Q's and descriptions of a vector of names.
@@ -343,6 +330,51 @@ X <- sapply(namesVector,getWiki)
 return(transM(X)) 
 }
 
+
+#filext ----
+
+#' Extract the extension of a file
+#'
+#' @param fn Character vector with the files whose extensions are to be extracted.
+#' @details This function extracts the extension of a vector of file names. 
+#' @return A character vector of extension names.
+#' @examples
+#' ## For a single item:
+#' filext("Albert Einstein.jpg")
+
+#' ## You can do the same for a vector:
+#' A <- c("Hillary Duff.png", "Britney Spears,jpg", "Avril Lavigne.tiff")
+#' filext( (getWikidata(A))$pics)
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
+#' @export
+filext <- function (fn) {
+  splitted    <- strsplit(x=fn, split='/')[[1]]   
+  fn          <- splitted [length(splitted)]
+  ext         <- ''
+  splitted    <- strsplit(x=fn, split='\\.')[[1]]
+  l           <-length (splitted)
+  if (l > 1 && sum(splitted[1:(l-1)] != ''))  ext <-splitted [l] 
+  ext
+}
+
+
+#readFile -----
+#' Reads a plain text file.
+#' @param file Path and name of the file to be read.
+#' @param encoding A character string describing the encoding format, i.e. UTF-8.
+#' @details This function allows to read a plain text file.
+#' @return Returns a character string.
+#' @examples
+#' webfile<- "https://sociocav.usal.es/me/file.txt"
+#' 
+#' file <- readFile(file = webfile)
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
+#' @export
+readFile <- function(file, encoding="UTF-8") {
+  note <- readChar(file, 1e+9)
+  iconv(note, from=encoding)
+}
+
 # getFiles ----
 #' Downloads a list of files in a specified path of the computer, and return a vector of the no-found names (if any).
 #' @param lista A list or data frame of files' URLs to be download (See details).
@@ -384,91 +416,54 @@ getFiles <- function(lista, path="./", ext=NULL) {
     if(is.null(ext)) ext <- filext(url) 
     file=paste0(path,sub("/","-",name),".",ext)
     if(!is.na(url) & !file.exists(file)) {
-       oldw <- getOption("warn")
-       options(warn = -1)
-       E <- tryCatch(download.file(url, destfile=file, quiet=TRUE, mode="wb"),error = function(e) name)
-       if (E!=0) errores <- c(errores, E)
-       options(warn = oldw)
+      oldw <- getOption("warn")
+      options(warn = -1)
+      E <- tryCatch(download.file(url, destfile=file, quiet=TRUE, mode="wb"),error = function(e) name)
+      if (E!=0) errores <- c(errores, E)
+      options(warn = oldw)
     } 
   }
-    return(errores)
+  return(errores)
 }
 
-#readFile -----
-#' Reads a plain text file.
-#' @param file Path and name of the file to be read.
-#' @param encoding A character string describing the encoding format, i.e. UTF-8.
-#' @details This function allows to read a plain text file.
-#' @return Returns a character string.
-#' @examples
-#' webfile<- "https://sociocav.usal.es/me/file.txt"
+# getWikiFiles---- 
+#' Downloads a list of Wikipedia pages in a specified path of the computer, and return a vector of the no-found names (if any).
+#' @param X A vector of Wikipedia's entry).
+#' @param language The language of the Wikipedia page version. This should consist of an ISO language code (default = "en").
+#' @param directory Directory where to export the files to.
+#' @param maxtime In case you want to apply a random waiting between consecutive searches.
+#' @details This function allows download a set of Wikipedia pages into a directory of the local computer. 
+#' All the errors (not found pages) are reported as outcomes (NULL= no errors). The files are donwload into your chosen directory.
+#' @return It returns a vector of errors, if any. All pictures are download into the selected directory (NULL= no errors).
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
+#' @examples 
+#' ## Not run: 
 #' 
-#' file <- readFile(file = webfile)
-#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
+#' ## In case you want to download the Wikipage of a person:
+#' 
+#' # getWikiFiles("Rembrandt", dir = "./")
+#' 
+#' ## Or the pics of multiple authors: 
+#' 
+#' # B <- c("Monet", "Renoir", "Caillebotte")
+#' # getWikiFiles(B, dir = "./", language="fr")
+#' 
+#' ## End(Not run)
 #' @export
-readFile <- function(file, encoding="UTF-8") {
-  note <- readChar(file, 1e+9)
-  iconv(note, from=encoding)
-}
-
-#filext ----
-
-#' Extract the extension of a file
-#'
-#' @param fn Character vector with the files whose extensions are to be extracted.
-#' @details This function extracts the extension of a vector of file names. 
-#' @return A character vector of extension names.
-#' @examples
-#' ## For a single item:
-#' filext("Albert Einstein.jpg")
-
-#' ## You can do the same for a vector:
-#' A <- c("Hillary Duff.png", "Britney Spears,jpg", "Avril Lavigne.tiff")
-#' filext( (getWikidata(A))$pics)
-#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
-#' @export
-filext <- function (fn) {
-  splitted    <- strsplit(x=fn, split='/')[[1]]   
-  fn          <- splitted [length(splitted)]
-  ext         <- ''
-  splitted    <- strsplit(x=fn, split='\\.')[[1]]
-  l           <-length (splitted)
-  if (l > 1 && sum(splitted[1:(l-1)] != ''))  ext <-splitted [l] 
-  ext
-}
-
-#preName ----
-#' Reverse the order of the first and last names of every element of a vector.
-#' @param X A vector of names with format "name, prename".
-#' @details This function reverses the order of the first and last names of the items: i.e., "Weber, Max" turns into "Max Weber".
-#' @return Another vector with its elements changed.
-#' @examples
-#' ## To reconvert a single name:
-#' preName("Weber, Max")
-
-#' ## It is possible to work with several items, as in here:
-#' A <- c("Weber, Max", "Descartes, Rene", "Locke, John")
-#' preName(A)
-#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
-#' @export
-preName <- function(X) {sub("(^.*),\\s*(.*$)","\\2 \\1", X)}
-
-#cc ----
-#' Converts a text separated by commas into a character vector.
-#' @param text Text to be separated.
-#' @param sep A character of separation. It must be a blank. If it is another character, trailing blanks are suppressed.
-#' @details Returns inside the text are omitted.
-#' @return A vector of the split segments of the text.
-#' @examples
-#' ## A text with three names separated with commas is converted into a vector of length 3.
-#' cc("Pablo Picasso, Diego Velazquez, Salvador Dali")
-#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
-#' @export
-cc <- function(text, sep=",") {
-  if(!sep==" ") {
-    wordlist <- gsub(paste0("[ ]*",sep,"[ ]*"),sep,wordlist)
-    wordlist <- gsub("\\n[ ]*","",wordlist)
+getWikiFiles <- function(X, language=c("es", "en", "fr"), directory="./", maxtime=0) {
+  if(substring(directory,nchar(directory))!="/" & substring(directory,nchar(directory))!="\\") directory=paste0(directory,"/")
+  errores <- NULL
+  for (I in X){
+    person <- gsub(" ", "_", I)
+    url <-paste("https://",language,".wikipedia.org/wiki/",person,sep="")
+    file <- paste0(directory, person,".html")
+    oldw <- getOption("warn")
+    options(warn = -1)
+    E <- tryCatch(download.file(url,destfile=file, quiet=TRUE),error = function(e) person)
+    if (E!=0) errores <- c(errores, E)
+    options(warn = oldw)
+    Sys.sleep(runif(1, min=0, max=maxtime))
   }
-  else wordlist <- gsub("\\n","",wordlist)
-  strsplit(wordlist,sep)[[1]]
+  return(errores)
 }
+
