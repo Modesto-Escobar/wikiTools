@@ -1,6 +1,70 @@
 #### Modesto Escobar
 # Sat Feb 27 23:56:26 2021 ------------------------------
 
+#validUrl -----
+validUrl <- function(url_in,t=2){
+  con <- url(url_in)
+  check <- suppressWarnings(try(open.connection(con,open="rt",timeout=t),silent=T)[1])
+  suppressWarnings(try(close.connection(con),silent=T))
+  ifelse(is.null(check),TRUE,FALSE)
+}
+
+# urltoHtml ----
+#' Convert a Wikipedia URL to an HTML link
+#' @param url Character vector of URLs.
+#' @param text A vector with name of the correspondent title of the url (See details).
+#' @details This function converts an available URL direction to the corresponding HTML link, i.e., "https://es.wikipedia.org/wiki/Socrates" changes into "<a href='https://es.wikipedia.org/wiki/Socrates', target='_blank'>Socrates</a>".
+#` It is possible to change the showing name of the link directly using the argument text. When not specified, it is extracted directly from the URL.
+#' @return A character vector of HTML links for the given urls.
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
+#' @examples
+#' ## When you have a single URL:
+#' 
+#' urlHtml("https://es.wikipedia.org/wiki/Socrates", text = "Socrates")
+#' 
+#' ## It is possible to work with several items:
+#' 
+#' A <- c("https://es.wikipedia.org/wiki/Socrates", 
+#'        "https://es.wikipedia.org/wiki/Plato", 
+#'        "https://es.wikipedia.org/wiki/Aristotle")
+#' urltoHtml (A, text = c("Socrates", "Plato", "Aristotle"))
+#' 
+#' ## And  you can also directly extract the info from nametoWikiURL():
+#' 
+#' urltoHtml(nametoWikiURL("Plato", "en"), "Plato" )
+#' urltoHtml(nametoWikiURL(c("Plato", "Socrates", "Aristotle"), language="en"), 
+#'           c("Plato", "Socrates", "Aristotle"))
+#' @export
+urltoHtml <- function(url, text=NULL) {
+  if (is.null(text)) text <- url
+  else text <- sub("./","", url)
+  paste0("<a href=\'",url, "\', target= \'_blank\'>", text, "</a>")
+}
+
+# urltoFrame----
+#' Convert an URL link to an HTML iframe.
+#' @param url Character vector of URLs.
+#' @details This function converts an available URL direction to the corresponding HTML iframe, i.e., "https://es.wikipedia.org/wiki/Socrates" changes into "<a href='https://es.wikipedia.org/wiki/Socrates', target='_blank'>Socrates</a>".
+#' @return A character vector of HTML iframe for the given urls.
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
+#' @examples
+#' ## When you have a single URL:
+#' 
+#' urltoFrame("https://es.wikipedia.org/wiki/Socrates")
+#' 
+#' ## It is possible to work with a vector of URL to obtain another vector of html frames:
+#' 
+#' A <- c("https://es.wikipedia.org/wiki/Socrates", 
+#'        "https://es.wikipedia.org/wiki/Plato", 
+#'        "https://es.wikipedia.org/wiki/Aristotle")
+#' urltoHtml (A)
+#' @export
+urltoFrame <- function(url){
+  paste0('<iframe src="',url, '" width="100%" height="100%" frameborder="0" marginwidth="0", margingheight="0"></iframe>')
+}
+
+
+# nametoWikiURL----
 #' Create the Wikipedia URL of a name or entry.
 #' @param name A vector consisting of one or more Wikipedia's entry (i.e., topic or person).
 #' @param language The language of the Wikipedia page version. This should consist of an ISO language code (default = "en").
@@ -23,28 +87,30 @@ nametoWikiURL <- function (name, language="en") {
   paste0("https://", language, ".wikipedia.org/wiki/", gsub(" ","_",name))
 }
 
+# nametoWikiHtml----
 #' Create the Wikipedia link of a name or entry.
 #' @param name A vector consisting of one or more Wikipedia's entry (i.e., topic or person).
 #' @param language The language of the Wikipedia page version. This should consist of an ISO language code (default = "en").
 #' @return A character vector of names' links.
-#' @details This function adds the Wikipedia's html link to a entry or name, i.e., "Max Weber" converts into "<a href='https://es.wikipedia.org/wiki/Max_Weber', target='_blank'>Max Weber</a>". It also manages different the languages of Wikipedia thru the abbreviated two-letter language parameter, i.e., "en" = "english".
+#' @details This function adds the Wikipedia's html link to a entry or name, i.e., "Max Weber" converts into "<a href='https://es.wikipedia.org/wiki/Max_Weber', target='_blank'>Max Weber</a>". It also manages different the languages of Wikipedia through the abbreviated two-letter language parameter, i.e., "en" = "english".
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @examples
 #' ## When extracting a single item;
-#' nametoWikiText("Computer", language = "en")
+#' nametoWikiHtml("Computer", language = "en")
 #' 
 #' ## When extracting two objetcs;
 #' A <- c("Computer", "Operating system")
-#' nametoWikiText(A)
+#' nametoWikiHtml(A)
 
 ## Same when three or more items;
 #' B <- c("Socrates", "Plato","Aristotle" )
-#' nametoWikiText(B)
+#' nametoWikiHtml(B)
 #' @export
-nametoWikiText <- function(name, language="en"){
+nametoWikiHtml <- function(name, language="en"){
   paste0("<a href=\'https://", language, ".wikipedia.org/wiki/", gsub(" ","_",name), "', target=\'_blank\'>", name, "</a>")
 }
 
+# nametoWikiFrame----
 #' Convert names into a Wikipedia's iframe
 #' @param name A vector consisting of one or more Wikipedia's entry (i.e., topic or person).
 #' @param language The language of the Wikipedia page version. This should consist of an ISO language code (default = "en").
@@ -53,54 +119,42 @@ nametoWikiText <- function(name, language="en"){
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @examples
 #' ## When extracting a single item;
-#' nametoWiki("Computer", language = "en")
+#' nametoWikiFrame("Computer", language = "en")
 #' 
 #' ## When extracting two objetcs;
 #' A <- c("Computer", "Operating system")
-#' nametoWiki(A)
+#' nametoWikiFrame(A)
 #' 
 #' ## Same when three or more items;
 #' B <- c("Socrates", "Plato", "Aristotle")
-#' nametoWiki(B)
+#' nametoWikiFrame(B)
 #' @export
-nametoWiki <- function(name, language="en") {
+nametoWikiFrame <- function(name, language="en") {
   paste0('<iframe src="https://',language,'.m.wikipedia.org/wiki/',gsub(" ","_",name),'" width="100%" height="100%" frameborder="0" marginwidth="0", margingheight="0"></iframe>')
 }
 
-
-urltoText <- function(url, text=NULL) {
-  if (is.null(text)) text <- url
-  paste0("<a href=\'",url, "\', target= \'_blank\'>", text, "</a>")
-}
-
-
-urltoInfo <- function(url){
-  paste0('<iframe src="',url, '" width="100%" height="100%" frameborder="0" marginwidth="0", margingheight="0"></iframe>')
-}
-
-
-
-preName <- function(X) sub("(^.*),\\s*(.*$)","\\2 \\1", X)
-
-
-errorWiki <- function(X, language=c("es", "en", "fr"), directory="./", maxtime=0) {
-  errores <- NULL
-  for (I in X){
-    person <- gsub(" ", "_", I)
-    url <-paste("https://",language,".wikipedia.org/wiki/",person,sep="")
-    file <- paste0(directory, person,".html")
-    oldw <- getOption("warn")
-    options(warn = -1)
-    E <- tryCatch(download.file(url,destfile=file, quiet=TRUE),error = function(e) person)
-    if (E!=0) errores <- c(errores, E)
-    options(warn = oldw)
-    Sys.sleep(runif(1, min=0, max=maxtime))
-  }
-  return(errores)
-}
-
-
-
+# searchWiki----
+#' Find if there is a Wikipedia page of a name(s) in the selected language. 
+#'
+#' @param name A vector consisting of one or more Wikipedia's entry (i.e., topic or person).
+#' @param language The language of the Wikipedia page version. This should consist of an ISO language code.
+#' @param all If all, all the languages are checked. If false, once a term is found, there is no search of others, so it's faster.
+#' @param maxtime In case you want to apply a random waiting between consecutive searches.
+#' @details This function checks any page or entry in order to find if it has a Wikipedia page in a given language. 
+#' It manages the different the languages of Wikipedia thru the two-letters abbreviated language parameter, i.e, "en" = "english". It is possible to check multiple languages in order of preference; in this case, only the first available language will appear as TRUE.
+#' @return A Boolean data frame of TRUE or FALSE.
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
+#' @examples
+#' ## When you want to check an entry in a single language:
+#' searchWiki("Manuel Vilas", language = "es")
+#'
+#' ## When you want to check an entry in several languages:
+#' searchWiki("Manuel Vilas", language = c( "en", "es", "fr", "it", "de", "pt", "ca"))
+#'
+## When you want to check several entries and languages:
+#' A<-c("Manuel Vilas", "Julia Navarro", "Rosa Montero")
+#' searchWiki(A, language = c("en", "es", "fr", "it", "de", "pt", "ca"), all=TRUE)
+#' @export
 searchWiki <- function(name, language=c("en", "es", "fr", "it", "de", "pt", "ca"), all=FALSE, maxtime=0) {
   errores <- data.frame(es=logical(), en=logical(), fr=logical(), it=logical(), 
                         de=logical(), pt=logical(), ca=logical())[,language, drop=FALSE]
@@ -119,40 +173,74 @@ searchWiki <- function(name, language=c("en", "es", "fr", "it", "de", "pt", "ca"
   return(errores)
 }
 
-valid_url <- function(url_in,t=2){
-  con <- url(url_in)
-  check <- suppressWarnings(try(open.connection(con,open="rt",timeout=t),silent=T)[1])
-  suppressWarnings(try(close.connection(con),silent=T))
-  ifelse(is.null(check),TRUE,FALSE)
+
+# getWikiFiles---- 
+#' Downloads a list of Wikipedia pages in a specified path of the computer, and return a vector of the no-found names (if any).
+#' @param X A vector of Wikipedia's entry).
+#' @param language The language of the Wikipedia page version. This should consist of an ISO language code (default = "en").
+#' @param path Directory where to export the files to.
+#' @details This function allows download a set of Wikipedia pages into a directory of the local computer. 
+#' All the errors (not found pages) are reported as outcomes (NULL= no errors). The files are donwload into your chosen directory.
+#' @return It returns a vector of errors, if any. All pictures are download into the selected directory (NULL= no errors).
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
+#' @examples 
+#' ## Not run: 
+#' 
+#' ## In case you want to download a file directly from an URL:
+#' 
+#' # dta <- data.frame(name = "Data", url = "https://sociocav.usal.es/me/Stata/example.dta")
+#' # getFiles(dta, path = "./")
+#' 
+#' ##  You can can also combine this function with getWikidata (among others).
+#' ## In case you want to download a picture of a person:
+#' 
+#' # A <- data.frame(name= getWikidata("Rembrandt")$label, url=getWikidata("Rembrandt")$pics)
+#' # getFiles(A, path = "./", ext = "png")
+#' 
+#' ## Or the pics of multiple authors: 
+#' 
+#' # B <- getWikidata(c("Monet", "Renoir", "Caillebotte"))
+#' # data <- data.frame(name = B$label, url = B$pics)
+#' # getFiles(data, path = "./", ext = NULL)
+#' 
+#' ## End(Not run)
+#' @export
+getWikiFiles <- function(X, language=c("es", "en", "fr"), directory="./", maxtime=0) {
+  if(substring(directory,nchar(directory))!="/" & substring(directory,nchar(directory))!="\\") directory=paste0(directory,"/")
+  errores <- NULL
+  for (I in X){
+    person <- gsub(" ", "_", I)
+    url <-paste("https://",language,".wikipedia.org/wiki/",person,sep="")
+    file <- paste0(directory, person,".html")
+    oldw <- getOption("warn")
+    options(warn = -1)
+    E <- tryCatch(download.file(url,destfile=file, quiet=TRUE),error = function(e) person)
+    if (E!=0) errores <- c(errores, E)
+    options(warn = oldw)
+    Sys.sleep(runif(1, min=0, max=maxtime))
+  }
+  return(errores)
 }
 
 
-readfile <- function(file, encoding="UTF-8") {
-  note <- readChar(file, 1e+9)
-  iconv(note, from=encoding)
-}
 
-cc <- function(wordlist) {
-  wordlist <- gsub("[ ]*,[ ]*",",",wordlist)
-  strsplit(wordlist,',')[[1]]
-}
-
-
+# getWikiInf ----
 #' Create a data.frame with Q's and descriptions of a vector of names.
 #' @param names A vector consisting of one or more Wikidata's entry (i.e., topic or person).
 #' @param number Take the number occurrence in case there are several equal names in Wikidata.
 #' @param language The language of the Wikipedia page version. This should consist of an ISO language code (default = "en").
 #' @return A data frame with name, Q, label and description of the names.
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @examples
 #' ## Obtaining information in English Wikidata
 #' names <- c("Douglas Adams", "Picasso")
-#' information <- getWikiQ(names)
+#' information <- getWikiInf(names)
 #'
 #' ## Obtaining information in Spanish Wikidata
-#' informacion <- getWikiQ(names)
+#' informacion <- getWikiInf(names)
 #' @export
 #' @importFrom WikidataR find_item
-getWikiQ <- function(names, number=1, language="en"){
+getWikiInf <- function(names, number=1, language="en"){
   get <-function(name, number=1, language="en"){
     i <- find_item(name, language=language)
     if(length(i)>=number) {
@@ -167,18 +255,32 @@ getWikiQ <- function(names, number=1, language="en"){
   return(D)
 }
 
-getWikidata <- function(namesVector) {
-preCode <- 'SELECT ?label ?sexLabel ?birthdate ?birthplaceLabel ?deathdate ?deathplaceLabel ?citizenshipLabel
-(GROUP_CONCAT(DISTINCT ?pic;separator="|")     as ?pics)
-(GROUP_CONCAT(DISTINCT ?ocLabel;separator="|") as ?occupation)
-(GROUP_CONCAT(DISTINCT ?moLabel;separator="|") as ?movement)
-(GROUP_CONCAT(DISTINCT ?geLabel;separator="|") as ?genres)
-(GROUP_CONCAT(DISTINCT ?inLabel;separator="|") as ?influencedby)
-(GROUP_CONCAT(DISTINCT ?in;separator="|")      as ?influencedbyQ)  # AS Qxxxx
-(GROUP_CONCAT(DISTINCT ?noLabel;separator="|") as ?notablework)
-(GROUP_CONCAT(DISTINCT ?no;separator="|")      as ?notableworkQ)   # As Qxxxx
-WHERE {
-  BIND(wd:'
+# getWikiData ----
+#' Create a data.frame with Wikidata of a vector of names.
+#' @param names A vector consisting of one or more Wikidata's entry (i.e., topic or person).
+#' @return A data frame with personal information of the names.
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
+#' @examples
+#' ## Obtaining information in English Wikidata
+#' names <- c("Douglas Adams", "Picasso")
+#' information <- getWikiData(names)
+#'
+#' ## Obtaining information in Spanish Wikidata
+#' informacion <- getWikiData(names)
+#' @export
+#' @importFrom WikidataQueryServiceR query_wikidata
+getWikiData <- function(namesVector) {
+   preCode <- 'SELECT ?label ?sexLabel ?birthdate ?birthplaceLabel ?deathdate ?deathplaceLabel ?citizenshipLabel
+     (GROUP_CONCAT(DISTINCT ?pic;separator="|")     as ?pics)
+     (GROUP_CONCAT(DISTINCT ?ocLabel;separator="|") as ?occupation)
+     (GROUP_CONCAT(DISTINCT ?moLabel;separator="|") as ?movement)
+     (GROUP_CONCAT(DISTINCT ?geLabel;separator="|") as ?genres)
+     (GROUP_CONCAT(DISTINCT ?inLabel;separator="|") as ?influencedby)
+     (GROUP_CONCAT(DISTINCT ?in;separator="|")      as ?influencedbyQ)  # AS Qxxxx
+     (GROUP_CONCAT(DISTINCT ?noLabel;separator="|") as ?notablework)
+     (GROUP_CONCAT(DISTINCT ?no;separator="|")      as ?notableworkQ)   # As Qxxxx
+     WHERE {
+     BIND(wd:'
   
   postCode <- ' AS ?entity)
     ?entity rdfs:label ?label
@@ -206,38 +308,73 @@ WHERE {
     OPTIONAL {?entity wdt:P800 ?no.
               ?no rdfs:label ?noLabel.
               FILTER((LANG(?noLabel)) = "en")}
-}
-GROUP BY ?label ?sexLabel ?birthdate ?birthplaceLabel ?deathdate ?deathplaceLabel ?citizenshipLabel
-'
+    }
+    GROUP BY ?label ?sexLabel ?birthdate ?birthplaceLabel ?deathdate ?deathplaceLabel ?citizenshipLabel
+    '
 
-getWiki <-function(nombre, pre=preCode, post=postCode){
-  i <- find_item(nombre)
-  if(length(i)>0) {
-    i <- i[[1]]$id
-    x <- paste0(pre, i, post)
-    X <- suppressMessages(query_wikidata(x)[1,]) 
-  }
-  else X <- data.frame(label=nombre, sexLabel=NA, birthdate=NA, birthplaceLabel=NA, 
+  getWiki <-function(nombre, pre=preCode, post=postCode){
+    i <- find_item(nombre)
+    if(length(i)>0) {
+      Q <- i[[1]]$id
+      x <- paste0(pre, Q, post)
+      X <- suppressMessages(query_wikidata(x)[1,])
+      X <- cbind(Q, X)
+      X$birthdate <- as.numeric(format(as.POSIXct(X$birthdate, origin="1960-01-01"), "%Y"))
+      X$deathdate <- as.numeric(format(as.POSIXct(X$deathdate, origin="1960-01-01"), "%Y"))
+    }
+    else X <- data.frame(Q=NA, label=nombre, sexLabel=NA, birthdate=NA, birthplaceLabel=NA, 
                          deathdate=NA,deathplaceLabel=NA,citizenshipLabel=NA,
                          pics=NA, occupation=NA,movement=NA,genres=NA, 
                          influenceddby=NA, influencebyQ=NA,notablework=NA, notableworkQ=NA,
-                       stringsAsFactors = FALSE)
-  return(X)
-}
+                        stringsAsFactors = FALSE)
+    return(X)
+  }
 
 
-transM <- function(X) {
-  dimensions <- dim(X)
-  x <- unlist(X)
-  m <- as.data.frame(matrix(x, nrow=dimensions[2], ncol=dimensions[1], byrow=TRUE), stringsAsFactors=FALSE)
-  colnames(m) <- rownames(X)
-  return(m)
-}
+  transM <- function(X) {
+    dimensions <- dim(X)
+    x <- unlist(X)
+    m <- as.data.frame(matrix(x, nrow=dimensions[2], ncol=dimensions[1], byrow=TRUE), stringsAsFactors=FALSE)
+    colnames(m) <- rownames(X)
+    return(m)
+  }
 
 X <- sapply(namesVector,getWiki)
 return(transM(X)) 
 }
 
+# getFiles ----
+#' Downloads a list of files in a specified path of the computer, and return a vector of the no-found names (if any).
+#' @param lista A list or data frame of files' URLs to be download (See details).
+#' @param path Directory to export the files to.
+#' @param ext Select desired extension of the files. Default= NULL.
+#' @details This function allows download a file of files directly into your directory. 
+#' This function needs a preexistent data frame of names and pictures' URL. It must be a list (or data.frame) with two values: "name" (specifying the names of the files) and "url" (containing the urls to the files to download). This links can be obtained thru \code{\link[tweetCoin]{getWikidata}} function or other alternative sources. 
+#' All the errors are reported as outcomes (NULL= no errors). The files are donwload into your chosen directory.
+#' @return It returns a vector of errors, if any. All pictures are download into the selected directory (NULL= no errors).
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
+#' @examples 
+#' ## Not run: 
+#' 
+#' ## In case you want to download a file directly from an URL:
+#' 
+#' # dta <- data.frame(name = "Data", url = "https://sociocav.usal.es/me/Stata/example.dta")
+#' # getFiles(dta, path = "./")
+#' 
+#' ##  You can can also combine this function with getWikidata (among others).
+#' ## In case you want to download a picture of a person:
+#' 
+#' # A <- data.frame(name= getWikidata("Rembrandt")$label, url=getWikidata("Rembrandt")$pics)
+#' # getFiles(A, path = "./", ext = "png")
+#' 
+#' ## Or the pics of multiple authors: 
+#' 
+#' # B <- getWikidata(c("Monet", "Renoir", "Caillebotte"))
+#' # data <- data.frame(name = B$label, url = B$pics)
+#' # getFiles(data, path = "./", ext = NULL)
+#' 
+#' ## End(Not run)
+#' @export
 getFiles <- function(lista, path="./", ext=NULL) {
   errores <- NULL
   path <- ifelse(substr(path,nchar(path),nchar(path))!="/",paste0(path,"/"),path)
@@ -257,7 +394,39 @@ getFiles <- function(lista, path="./", ext=NULL) {
     return(errores)
 }
 
+#readFile -----
+#' Reads a plain text file.
+#' @param file Path and name of the file to be read.
+#' @param encoding A character string describing the encoding format, i.e. UTF-8.
+#' @details This function allows to read a plain text file.
+#' @return Returns a character string.
+#' @examples
+#' webfile<- "https://sociocav.usal.es/me/file.txt"
+#' 
+#' file <- readFile(file = webfile)
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
+#' @export
+readFile <- function(file, encoding="UTF-8") {
+  note <- readChar(file, 1e+9)
+  iconv(note, from=encoding)
+}
 
+#filext ----
+
+#' Extract the extension of a file
+#'
+#' @param fn Character vector with the files whose extensions are to be extracted.
+#' @details This function extracts the extension of a vector of file names. 
+#' @return A character vector of extension names.
+#' @examples
+#' ## For a single item:
+#' filext("Albert Einstein.jpg")
+
+#' ## You can do the same for a vector:
+#' A <- c("Hillary Duff.png", "Britney Spears,jpg", "Avril Lavigne.tiff")
+#' filext( (getWikidata(A))$pics)
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
+#' @export
 filext <- function (fn) {
   splitted    <- strsplit(x=fn, split='/')[[1]]   
   fn          <- splitted [length(splitted)]
@@ -268,5 +437,38 @@ filext <- function (fn) {
   ext
 }
 
+#preName ----
+#' Reverse the order of the first and last names of every element of a vector.
+#' @param X A vector of names with format "name, prename".
+#' @details This function reverses the order of the first and last names of the items: i.e., "Weber, Max" turns into "Max Weber".
+#' @return Another vector with its elements changed.
+#' @examples
+#' ## To reconvert a single name:
+#' preName("Weber, Max")
 
+#' ## It is possible to work with several items, as in here:
+#' A <- c("Weber, Max", "Descartes, Rene", "Locke, John")
+#' preName(A)
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
+#' @export
+preName <- function(X) {sub("(^.*),\\s*(.*$)","\\2 \\1", X)}
 
+#cc ----
+#' Converts a text separated by commas into a character vector.
+#' @param text Text to be separated.
+#' @param sep A character of separation. It must be a blank. If it is another character, trailing blanks are suppressed.
+#' @details Returns inside the text are omitted.
+#' @return A vector of the split segments of the text.
+#' @examples
+#' ## A text with three names separated with commas is converted into a vector of length 3.
+#' cc("Pablo Picasso, Diego Velazquez, Salvador Dali")
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
+#' @export
+cc <- function(text, sep=",") {
+  if(!sep==" ") {
+    wordlist <- gsub(paste0("[ ]*",sep,"[ ]*"),sep,wordlist)
+    wordlist <- gsub("\\n[ ]*","",wordlist)
+  }
+  else wordlist <- gsub("\\n","",wordlist)
+  strsplit(wordlist,sep)[[1]]
+}
