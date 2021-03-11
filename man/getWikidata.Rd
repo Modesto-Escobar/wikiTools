@@ -4,7 +4,7 @@
 \alias{getWikiData}
 \title{Create a data.frame with Wikidata of a vector of names.}
 \usage{
-getWikiData(namesVector)
+getWikiData(names)
 }
 \arguments{
 \item{names}{A vector consisting of one or more Wikidata's entry (i.e., topic or person).}

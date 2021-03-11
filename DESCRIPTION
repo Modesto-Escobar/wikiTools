@@ -4,7 +4,7 @@ Version: 0.0.1
 Date: 2021-02-28
 Title: Tools for Wikidata and Wikipedia
 Description: Magage information from Wikidata and Wikipedia.
-License: GPL-2 | GPL-3
+License: GPL-3 + file LICENSE
 Depends: R (>= 3.5.0)
 Imports: WikidataQueryServiceR (>= 1.0.0), WikidataR (>= 1.4.0)
 Suggests: knitr, rmarkdown, lavaan, shiny

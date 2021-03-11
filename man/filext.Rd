@@ -22,8 +22,7 @@ This function extracts the extension of a vector of file names.
 ## For a single item:
 filext("Albert Einstein.jpg")
 ## You can do the same for a vector:
-A <- c("Hillary Duff.png", "Britney Spears,jpg", "Avril Lavigne.tiff")
-filext( (getWikidata(A))$pics)
+filext(c("Hillary Duff.png", "Britney Spears.jpg", "Avril Lavigne.tiff"))
 }
 \author{
 Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See \url{https://sociocav.usal.es/blog/modesto-escobar/}

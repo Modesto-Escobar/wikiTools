@@ -30,7 +30,7 @@ validUrl <- function(url, time=2){
 #' @examples
 #' ## When you have a single URL:
 #' 
-#' urlHtml("https://es.wikipedia.org/wiki/Socrates", text = "Socrates")
+#' urltoHtml("https://es.wikipedia.org/wiki/Socrates", text = "Socrates")
 #' 
 #' ## It is possible to work with several items:
 #' 
@@ -211,7 +211,7 @@ searchWiki <- function(name, language=c("en", "es", "fr", "it", "de", "pt", "ca"
     for (L in language){
       person <- gsub(" ", "_", I)
       url <-URLencode(paste("https://",L,".wikipedia.org/wiki/",person,sep=""))
-      if (valid_url(url)) {
+      if (validUrl(url)) {
         errores[I,L] <- TRUE
         if (!all) break
       }
@@ -266,7 +266,7 @@ getWikiInf <- function(names, number=1, language="en"){
 #' informacion <- getWikiData(names)
 #' @export
 #' @importFrom WikidataQueryServiceR query_wikidata
-getWikiData <- function(namesVector) {
+getWikiData <- function(names) {
    preCode <- 'SELECT ?label ?sexLabel ?birthdate ?birthplaceLabel ?deathdate ?deathplaceLabel ?citizenshipLabel
      (GROUP_CONCAT(DISTINCT ?pic;separator="|")     as ?pics)
      (GROUP_CONCAT(DISTINCT ?ocLabel;separator="|") as ?occupation)
@@ -336,7 +336,7 @@ getWikiData <- function(namesVector) {
     return(m)
   }
 
-X <- sapply(namesVector,getWiki)
+X <- sapply(names,getWiki)
 return(transM(X)) 
 }
 
@@ -353,18 +353,20 @@ return(transM(X))
 #' filext("Albert Einstein.jpg")
 
 #' ## You can do the same for a vector:
-#' A <- c("Hillary Duff.png", "Britney Spears,jpg", "Avril Lavigne.tiff")
-#' filext( (getWikidata(A))$pics)
+#' filext(c("Hillary Duff.png", "Britney Spears.jpg", "Avril Lavigne.tiff"))
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @export
 filext <- function (fn) {
-  splitted    <- strsplit(x=fn, split='/')[[1]]   
-  fn          <- splitted [length(splitted)]
-  ext         <- ''
-  splitted    <- strsplit(x=fn, split='\\.')[[1]]
-  l           <-length (splitted)
-  if (l > 1 && sum(splitted[1:(l-1)] != ''))  ext <-splitted [l] 
-  ext
+  extract <-function(X){
+   splitted    <- strsplit(x=X, split='/')[[1]]   
+   fn          <- splitted [length(splitted)]
+   ext         <- ''
+   splitted    <- strsplit(x=fn, split='\\.')[[1]]
+   l           <-length (splitted)
+   if (l > 1 && sum(splitted[1:(l-1)] != ''))  ext <-splitted [l] 
+   ext
+  }
+  sapply(fn, extract)
 }
 
 
@@ -460,6 +462,8 @@ getFiles <- function(lista, path="./", ext=NULL) {
 #' 
 #' ## End(Not run)
 #' @export
+#' @importFrom utils download.file URLencode
+#' @importFrom stats runif
 getWikiFiles <- function(X, language=c("es", "en", "fr"), directory="./", maxtime=0) {
   if(substring(directory,nchar(directory))!="/" & substring(directory,nchar(directory))!="\\") directory=paste0(directory,"/")
   errores <- NULL

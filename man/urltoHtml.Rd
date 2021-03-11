@@ -23,7 +23,7 @@ This function converts an available URL direction to the corresponding HTML link
 \examples{
 ## When you have a single URL:
 
-urlHtml("https://es.wikipedia.org/wiki/Socrates", text = "Socrates")
+urltoHtml("https://es.wikipedia.org/wiki/Socrates", text = "Socrates")
 
 ## It is possible to work with several items:
 
