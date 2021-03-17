@@ -267,54 +267,67 @@ getWikiInf <- function(names, number=1, language="en"){
 #' @export
 #' @importFrom WikidataQueryServiceR query_wikidata
 getWikiData <- function(names) {
-   preCode <- 'SELECT ?label ?sexLabel ?birthdate ?birthplaceLabel ?deathdate ?deathplaceLabel ?citizenshipLabel
+  petition <-function(q){
+    chaine <- paste0('SELECT ?entityLabel ?entityDescription ?sexLabel ?birthdate ?birthplaceLabel ?birthcountryLabel ?deathdate ?deathplaceLabel ?deathcountryLabel
      (GROUP_CONCAT(DISTINCT ?pic;separator="|")     as ?pics)
      (GROUP_CONCAT(DISTINCT ?ocLabel;separator="|") as ?occupation)
      (GROUP_CONCAT(DISTINCT ?moLabel;separator="|") as ?movement)
      (GROUP_CONCAT(DISTINCT ?geLabel;separator="|") as ?genres)
      (GROUP_CONCAT(DISTINCT ?inLabel;separator="|") as ?influencedby)
-     (GROUP_CONCAT(DISTINCT ?in;separator="|")      as ?influencedbyQ)  # AS Qxxxx
+     (GROUP_CONCAT(DISTINCT ?in;separator="|")      as ?influencedbyQ)
      (GROUP_CONCAT(DISTINCT ?noLabel;separator="|") as ?notablework)
-     (GROUP_CONCAT(DISTINCT ?no;separator="|")      as ?notableworkQ)   # As Qxxxx
+     (GROUP_CONCAT(DISTINCT ?no;separator="|")      as ?notableworkQ)
      WHERE {
-     BIND(wd:'
-  
-  postCode <- ' AS ?entity)
-    ?entity rdfs:label ?label
+     BIND(wd:',q,' AS ?entity)
     SERVICE wikibase:label {bd:serviceParam wikibase:language "en"}
-    FILTER(LANG(?label) = "en")
-    OPTIONAL {?entity wdt:P21  ?sex}
-    OPTIONAL {?entity wdt:P569 ?birthdate}
-    OPTIONAL {?entity wdt:P19  ?birthplace}
-    OPTIONAL {?entity wdt:P570 ?deathdate}
-    OPTIONAL {?entity wdt:P20  ?deathplace}
-    OPTIONAL {?entity wdt:P27  ?citizenship}
-    OPTIONAl {?entity wdt:P18  ?pic.} 
-    OPTIONAL {?entity wdt:P106 ?oc.
-              ?oc rdfs:label ?ocLabel.
-              FILTER((LANG(?ocLabel)) = "en")}
-    OPTIONAL {?entity wdt:P135 ?mo.
-              ?mo rdfs:label ?moLabel.
-              FILTER((LANG(?moLabel)) = "en")}
-    OPTIONAL {?entity wdt:P136 ?ge.
-              ?ge rdfs:label ?geLabel.
-              FILTER((LANG(?moLabel)) = "en")}
-    OPTIONAL {?entity wdt:P737 ?in.
-              ?in rdfs:label ?inLabel.
-              FILTER((LANG(?inLabel)) = "en")}
-    OPTIONAL {?entity wdt:P800 ?no.
-              ?no rdfs:label ?noLabel.
-              FILTER((LANG(?noLabel)) = "en")}
+    {
+      SELECT ?birthdate (COUNT(?refP569) AS ?cP569)
+      WHERE {
+        OPTIONAL {wd:',q,' wdt:P569 ?birthdate.}
+        OPTIONAL {wd:',q,' p:P569 [ps:P569 ?birthdate; prov:wasDerivedFrom [(pr:P248|pr:P854|pr:P143) ?refP569]].}
+      } GROUP BY ?birthdate ORDER BY DESC(?cP569) LIMIT 1
     }
-    GROUP BY ?label ?sexLabel ?birthdate ?birthplaceLabel ?deathdate ?deathplaceLabel ?citizenshipLabel
-    '
-
-  getWiki <-function(nombre, pre=preCode, post=postCode){
+    {
+      SELECT ?birthplace ?birthcountry ?starttime1 (COUNT(?refP19) AS ?cP19)
+      WHERE {
+        OPTIONAL {wd:',q,' wdt:P19 ?birthplace.
+                 ?birthplace p:P17 [ps:P17 ?birthcountry; pq:P580* ?starttime1; ].}
+        OPTIONAL {wd:',q,' p:P19 [ps:P19 ?birthplace; prov:wasDerivedFrom [(pr:P248|pr:P854|pr:P143) ?refP19]].}
+      } GROUP BY ?birthplace ?birthcountry ?starttime1 ORDER BY DESC(?cP19) DESC(?starttime1) LIMIT 1
+    }
+    {
+      SELECT ?deathdate (COUNT(?refP570) AS ?cP570)
+      WHERE {
+        OPTIONAL {wd:',q,' wdt:P570 ?deathdate.}
+        OPTIONAL {wd:',q,' p:P570 [ps:P570 ?deathdate; prov:wasDerivedFrom [(pr:P248|pr:P854|pr:P143) ?refP570]].}
+      } GROUP BY ?deathdate ORDER BY DESC(?cP570) LIMIT 1
+    }
+    {
+      SELECT ?deathplace ?deathcountry ?starttime2 (COUNT(?refP20) AS ?cP20)
+      WHERE {
+        OPTIONAL {wd:',q,' wdt:P20 ?deathplace.
+                 ?deathplace p:P17 [ps:P17 ?deathcountry; pq:P580* ?starttime2; ].}
+        OPTIONAL {wd:',q,' p:P20 [ps:P20 ?deathplace; prov:wasDerivedFrom [(pr:P248|pr:P854|pr:P143) ?refP20]].}
+      } GROUP BY ?deathplace ?deathcountry ?starttime2 ORDER BY DESC(?cP20) DESC(?starttime2) LIMIT 1
+    }
+    OPTIONAL {?entity wdt:P21  ?sex.}
+    OPTIONAl {?entity wdt:P18  ?pic.} 
+    OPTIONAL {?entity wdt:P106 ?oc. ?oc rdfs:label ?ocLabel. FILTER(LANG(?ocLabel) = "en")}
+    OPTIONAL {?entity wdt:P135 ?mo. ?mo rdfs:label ?moLabel. FILTER(LANG(?moLabel) = "en")} 
+    OPTIONAL {?entity wdt:P136 ?ge. ?ge rdfs:label ?geLabel. FILTER(LANG(?geLabel) = "en")}
+    OPTIONAL {?entity wdt:P737 ?in. ?in rdfs:label ?inLabel. FILTER(LANG(?inLabel) = "en")}
+    OPTIONAL {?entity wdt:P800 ?no. ?no rdfs:label ?noLabel. FILTER(LANG(?noLabel) = "en")}
+    }
+   GROUP BY ?entityLabel ?entityDescription ?sexLabel ?birthdate ?birthplaceLabel ?birthcountryLabel ?deathdate ?deathplaceLabel ?deathcountryLabel 
+')
+    return(chaine)
+  }
+  
+  getWiki <-function(nombre){
     i <- find_item(nombre)
     if(length(i)>0) {
       Q <- i[[1]]$id
-      x <- paste0(pre, Q, post)
-      X <- suppressMessages(query_wikidata(x)[1,])
+      X <- suppressMessages(query_wikidata(petition(Q)))
       X <- cbind(Q, X)
       X$birthdate <- as.numeric(format(as.POSIXct(X$birthdate, origin="1960-01-01"), "%Y"))
       X$deathdate <- as.numeric(format(as.POSIXct(X$deathdate, origin="1960-01-01"), "%Y"))
