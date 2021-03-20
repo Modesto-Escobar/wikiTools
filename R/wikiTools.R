@@ -255,7 +255,8 @@ getWikiInf <- function(names, number=1, language="en"){
 # getWikiData ----
 #' Create a data.frame with Wikidata of a vector of names.
 #' @param names A vector consisting of one or more Wikidata's entry (i.e., topic or person).
-#' @return A data frame with personal information of the names.
+#' @param csv A file name to save the results, in which case the only return is a message with the name of the saved file.
+#' @return A data frame with personal information of the names or a csv file with the information separated by semicolons.
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @examples
 #' ## Obtaining information in English Wikidata
@@ -266,7 +267,8 @@ getWikiInf <- function(names, number=1, language="en"){
 #' informacion <- getWikiData(names)
 #' @export
 #' @importFrom WikidataQueryServiceR query_wikidata
-getWikiData <- function(names) {
+#' @importFrom utils write.csv2
+getWikiData <- function(names, csv=NULL) {
   petition <-function(q){
     chaine <- paste0('SELECT ?entityLabel ?entityDescription ?sexLabel ?birthdate ?birthplaceLabel ?birthcountryLabel ?deathdate ?deathplaceLabel ?deathcountryLabel
      (GROUP_CONCAT(DISTINCT ?pic;separator="|")     as ?pics)
@@ -329,14 +331,21 @@ getWikiData <- function(names) {
       Q <- i[[1]]$id
       X <- suppressMessages(query_wikidata(petition(Q)))
       X <- cbind(Q, X)
-      X$birthdate <- as.numeric(format(as.POSIXct(X$birthdate, origin="1960-01-01"), "%Y"))
-      X$deathdate <- as.numeric(format(as.POSIXct(X$deathdate, origin="1960-01-01"), "%Y"))
+      bcb <- !is.na(X$birthdate) && substring(X$birthdate,1,1)=="-"
+      bcd <- !is.na(X$deathdate) && substring(X$deathdate,1,1)=="-"
+      X$birthdate <- sub("^-","",X$birthdate)
+      X$deathdate <- sub("^-","",X$deathdate)
+      X$birthdate <- as.numeric(format(as.POSIXct(X$birthdate, origin="1960-01-01", optional=TRUE), "%Y"))
+      X$deathdate <- as.numeric(format(as.POSIXct(X$deathdate, origin="1960-01-01", optional=TRUE), "%Y"))
+      if(bcb) X$birthdate <- -X$birthdate
+      if(bcd) X$deathdate <- -X$deathdate
     }
-    else X <- data.frame(Q=NA, label=nombre, sexLabel=NA, birthdate=NA, birthplaceLabel=NA, 
-                         deathdate=NA,deathplaceLabel=NA,citizenshipLabel=NA,
-                         pics=NA, occupation=NA,movement=NA,genres=NA, 
-                         influenceddby=NA, influencebyQ=NA,notablework=NA, notableworkQ=NA,
-                        stringsAsFactors = FALSE)
+    else X <- data.frame(Q=NA, entityLabel=nombre, entityDescription =NA, sexLabel=NA, 
+                         birthdate=NA, birthplaceLabel=NA, birthcountryLabel=NA,
+                         deathdate=NA, deathplaceLabel=NA, deathcountryLabel=NA,
+                         pics=NA, occupation=NA, movement=NA, genres=NA, 
+                         influencedby=NA, influencebyQ=NA, notablework=NA, notableworkQ=NA,
+                         stringsAsFactors = FALSE)
     return(X)
   }
 
@@ -350,7 +359,12 @@ getWikiData <- function(names) {
   }
 
 X <- sapply(names,getWiki)
-return(transM(X)) 
+if(is.null(csv)) return(transM(X)) 
+else {
+  if(filext(csv)=="") csv <- paste0(csv,".csv")
+  write.csv2(transM(X), file=csv, row.names=FALSE)
+  print(paste0("The file ", csv, " has been saved."))
+  }
 }
 
 

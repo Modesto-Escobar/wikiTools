@@ -4,13 +4,15 @@
 \alias{getWikiData}
 \title{Create a data.frame with Wikidata of a vector of names.}
 \usage{
-getWikiData(names)
+getWikiData(names, csv = NULL)
 }
 \arguments{
 \item{names}{A vector consisting of one or more Wikidata's entry (i.e., topic or person).}
+
+\item{csv}{A file name to save the results, in which case the only return is a message with the name of the saved file.}
 }
 \value{
-A data frame with personal information of the names.
+A data frame with personal information of the names or a csv file with the information separated by semicolons.
 }
 \description{
 Create a data.frame with Wikidata of a vector of names.
