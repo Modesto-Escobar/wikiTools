@@ -9,7 +9,7 @@ getFiles(lista, path = "./", ext = NULL)
 \arguments{
 \item{lista}{A list or data frame of files' URLs to be download (See details).}
 
-\item{path}{Directory to export the files to.}
+\item{path}{Directory where to export the files.}
 
 \item{ext}{Select desired extension of the files. Default= NULL.}
 }

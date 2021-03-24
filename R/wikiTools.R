@@ -255,6 +255,7 @@ getWikiInf <- function(names, number=1, language="en"){
 # getWikiData ----
 #' Create a data.frame with Wikidata of a vector of names.
 #' @param names A vector consisting of one or more Wikidata's entry (i.e., topic or person).
+#' @param language The language of the Wikipedia page version. This should consist of an ISO language code (default = "en").
 #' @param csv A file name to save the results, in which case the only return is a message with the name of the saved file.
 #' @return A data frame with personal information of the names or a csv file with the information separated by semicolons.
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
@@ -268,7 +269,7 @@ getWikiInf <- function(names, number=1, language="en"){
 #' @export
 #' @importFrom WikidataQueryServiceR query_wikidata
 #' @importFrom utils write.csv2
-getWikiData <- function(names, csv=NULL) {
+getWikiData <- function(names, language="en", csv=NULL) {
   petition <-function(q){
     chaine <- paste0('SELECT ?entityLabel ?entityDescription ?sexLabel ?birthdate ?birthplaceLabel ?birthcountryLabel ?deathdate ?deathplaceLabel ?deathcountryLabel
      (GROUP_CONCAT(DISTINCT ?pic;separator="|")     as ?pics)
@@ -326,7 +327,7 @@ getWikiData <- function(names, csv=NULL) {
   }
   
   getWiki <-function(nombre){
-    i <- find_item(nombre)
+    i <- find_item(nombre, language=language, limit=1)
     if(length(i)>0) {
       Q <- i[[1]]$id
       X <- suppressMessages(query_wikidata(petition(Q)))
@@ -417,7 +418,7 @@ readFile <- function(file, encoding="UTF-8") {
 # getFiles ----
 #' Downloads a list of files in a specified path of the computer, and return a vector of the no-found names (if any).
 #' @param lista A list or data frame of files' URLs to be download (See details).
-#' @param path Directory to export the files to.
+#' @param path Directory where to export the files.
 #' @param ext Select desired extension of the files. Default= NULL.
 #' @details This function allows download a file of files directly into your directory. 
 #' This function needs a preexistent data frame of names and pictures' URL. It must be a list (or data.frame) with two values: "name" (specifying the names of the files) and "url" (containing the urls to the files to download). This links can be obtained thru \code{\link[tweetCoin]{getWikidata}} function or other alternative sources. 

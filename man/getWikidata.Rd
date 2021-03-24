@@ -4,10 +4,12 @@
 \alias{getWikiData}
 \title{Create a data.frame with Wikidata of a vector of names.}
 \usage{
-getWikiData(names, csv = NULL)
+getWikiData(names, language = "en", csv = NULL)
 }
 \arguments{
 \item{names}{A vector consisting of one or more Wikidata's entry (i.e., topic or person).}
+
+\item{language}{The language of the Wikipedia page version. This should consist of an ISO language code (default = "en").}
 
 \item{csv}{A file name to save the results, in which case the only return is a message with the name of the saved file.}
 }
