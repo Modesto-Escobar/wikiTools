@@ -1,5 +1,5 @@
 #### wiki_utils.R
-#### Ángel F. Zazo <angelzazo@usal.es>
+#### Angel F. Zazo <angelzazo@usal.es>
 #### 2021-11-09
 
 # General headers
@@ -12,8 +12,9 @@ my_headers <- c(accept = 'application/json',
 #' @param f The original function
 #' @param n Number of allowed events within a period
 #' @param period Length (in seconds) of measurement period
-#' @author Ángel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
+#' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
 #' @seealso ratelimitr
+#' @importFrom ratelimitr limit_rate rate
 limit_requester <- function(f, n, period) {
   return(ratelimitr::limit_rate(f, ratelimitr::rate(n = n, period = period)))
 }
@@ -26,8 +27,9 @@ limit_requester <- function(f, n, period) {
 #' @param repetition_on_error On errors, the pause time in seconds to repeat the request (the request is repeated a maximum of ntimes). A zero value (default) does not repeat the request: Null is returned.
 #' @param ntimes On errors, the maximun number of times the query is launched if repetition_on_error is not zero (default 2)
 #' @return The response in JSON format or NULL on errors.
-#' @author Ángel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
-#' @import httr functions
+#' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
+#' @importFrom httr GET content add_headers stop_for_status
+#' @importFrom jsonlite fromJSON
 Wikimedia_query <- function(query, project='en.wikipedia.org', headers = my_headers, ntimes = 2) {
   url = paste('https://', project, "/w/api.php", sep = '')
   nt <- 1
@@ -66,8 +68,8 @@ Wikimedia_query <- function(query, project='en.wikipedia.org', headers = my_head
 #' Retrieve responses in JSON format from Wikidata Query Service (WDQS)
 #' @param sparql_query A string with the query in SPARQL language.
 #' @return A JSON response. Please check httr::stop_for_status(response)
-#' @author Ángel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
-#' @import httr functions
+#' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
+#' @importFrom httr GET user_agent add_headers
 #' @note For short queries GET method is better, POST for long ones. Only GET queries as cached.
 req_WDQS <- function(sparql_query) {
   httr::GET(  # 
@@ -87,7 +89,9 @@ req_WDQS_rated <- limit_requester(req_WDQS, n=30, period=60)
 #' Retrieve responses in JSON format from Wikidata Query Service (WDQS)
 #' @param sparql_query A string with the query in SPARQL language.
 #' @return A JSON response or NULL on errors.
-#' @author Ángel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
+#' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
+#' @importFrom httr stop_for_status content 
+#' @importFrom jsonlite fromJSON
 Wikidata_sparql_query <- function(sparql_query) {
   tryCatch(
     {
@@ -110,7 +114,7 @@ Wikidata_sparql_query <- function(sparql_query) {
 #' @param project Wikimedia project, defaults "en.wikipedia.org"
 #' @return A vector with the firts element to 1 if exists the Wikidata item and if not a
 #'         disambiguation page, the second element de normalized forma of article, and the third the wikidata item. If errors, the firts element is set to 0 and the third is the explication of error.
-#' @author Ángel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
+#' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
 #' @examples 
 #' GetWikidataitem('Max Planck', project='es.wikipedia.org')
 #' [1] "1"          "Max Planck" "Q9021"
@@ -175,7 +179,8 @@ GetWikidataitem <- function(article = '', project = 'en.wikipedia.org') {
 #' @param article Article target
 #' @param project Wikimedia project, defaults "en.wikipedio.org"
 #' @return A list with the firts element the target of all redirections, or NULL on error.
-#' @author Ángel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
+#' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
+#' @importFrom purrr map_chr
 Wikimedia_get_redirects <- function(article, project = "en.wikipedia.org") {
   if ((article == '') | (project == '')) {
     return(NULL)
@@ -240,7 +245,8 @@ Wikimedia_get_redirects <- function(article, project = "en.wikipedia.org") {
 #' @param lang Wikipedia languages to search if the person has a page, use "|" to split languages
 #' @return If the article of the person exists, a vector with four elements: the firts one set to 1, the second de article label normalized, the third de Wikidata id, and fourth a data frame with URL to Wikipedias (lang, label, URL)
 #'         If the article of the person does not exist, the firts element is set to 0 and the third is the explication of error.
-#' @author Ángel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
+#' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
+#' @importFrom purrr map_dfr map_chr
 Wikimedia_person_exists <- function(article, project="en.wikipedia.org",
                                     langs="en|es|fr|de|it|pt|ca") {
   ret <- GetWikidataitem(article, project)
@@ -281,8 +287,8 @@ Wikimedia_person_exists <- function(article, project="en.wikipedia.org",
 #' Search Wikidata Query Service (WDQS) to know the number of Wikidata entities with P106 property (occupation) set to Qoc.
 #' @param Qoc The Wikidata entity of the occupation
 #' @return The number of entities with that occupation (integer)
-#' @author Ángel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
-#' @example 
+#' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
+#' @examples
 #' Wikidata_occupationCount('Q2526255') # Film director
 #' [1] 67371
 #' 
@@ -300,8 +306,8 @@ Wikidata_occupationCount <- function(Qoc='') {
 #' Retrieve responses in JSON format from Wikimedia metrics API
 #' @param url The URL with the query
 #' @return A JSON response. Please check httr::stop_for_status(response)
-#' @author Ángel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
-#' @import httr functions
+#' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
+#' @importFrom httr GET user_agent add_headers
 #' @note Used in Wikimedia_page_views
 req_wikimedia_metrics <- function(url) {
   httr::GET(
@@ -327,7 +333,9 @@ req_wikimedia_metrics_rated <- limit_requester(req_wikimedia_metrics, n=50, peri
 #' @param granularity  Time unit for the response data: daily, monthly (default)
 #' @param include_redirects Boolean to include redirection to the article page (defaults: False)
 #' @return The number of visits
-#' @author Ángel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
+#' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
+#' @importFrom httr stop_for_status content
+#' @importFrom jsonlite fromJSON
 Wikimedia_page_views <- function(article, project = "en.wikipedia.org",
                                   start, end, access = "all-access",
                                   agent = "user", granularity = "monthly",
@@ -360,12 +368,12 @@ Wikimedia_page_views <- function(article, project = "en.wikipedia.org",
 # ------
 #' Wikidata_wikipedias
 #' For an occupation, obtains all Wikidata entity of the people with that ocupation, also the
-#' number of wikipedias witch article they have, and the URL of those wikipedias (sep ="\t")
+#' number of wikipedias witch article they have, and the URL of those wikipedias (sep = tab)
 #' Run queries splitting with offset and chunk.
 #' @param Qoc The Wikidata entity of the occupation
 #' @param chunk The chunk to split intermediate results with the aim of reduce the limit 60 seconds processig time.
 #' @return A list with Wikidata entity, the number of wikipedias and the URL
-#' @author Ángel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
+#' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
 Wikidata_Wikipedias <- function(Qoc, chunk=10000) {
   if (Qoc == '') return(NULL)
   nq <- Wikidata_occupationCount(Qoc)
@@ -407,8 +415,10 @@ Wikidata_Wikipedias <- function(Qoc, chunk=10000) {
 #' @param infotype The type of information to request: articleinfo, prose, links
 #' @param links_in_redirects If infotype==links, if redirects are included or not
 #' @return The number of visits
-#' @author Ángel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
+#' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
 #' @note Is important that the article be don't a redirection: with "prose" infotype the function gets information of the target article, but with "articleinfo" and "links" the information is about the redirection.
+#' @importFrom httr stop_for_status content
+#' @importFrom jsonlite fromJSON
 wmflabs_get_info <- function(article, infotype = "articleinfo", project = "en.wikipedia.org",
                             links_in_count_redirects = FALSE) {
   d <- list()

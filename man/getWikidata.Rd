@@ -25,7 +25,7 @@ names <- c("Douglas Adams", "Picasso")
 information <- getWikiData(names)
 
 ## Obtaining information in Spanish Wikidata
-informacion <- getWikiData(names)
+informacion <- getWikiData(names, language="es")
 }
 \author{
 Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See \url{https://sociocav.usal.es/blog/modesto-escobar/}

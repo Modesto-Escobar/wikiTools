@@ -46,8 +46,7 @@ validUrl <- function(url, time=2){
 #'           c("Plato", "Socrates", "Aristotle"))
 #' @export
 urltoHtml <- function(url, text=NULL) {
-  if (is.null(text)) text <- url
-  else text <- sub("./","", url)
+  if (is.null(text)) text <- sub("https?:/{0,2}","", url)
   paste0("<a href=\'",url, "\', target= \'_blank\'>", text, "</a>")
 }
 
@@ -265,7 +264,7 @@ getWikiInf <- function(names, number=1, language="en"){
 #' information <- getWikiData(names)
 #'
 #' ## Obtaining information in Spanish Wikidata
-#' informacion <- getWikiData(names)
+#' informacion <- getWikiData(names, language="es")
 #' @export
 #' @importFrom WikidataQueryServiceR query_wikidata
 #' @importFrom utils write.csv2
@@ -509,3 +508,152 @@ getWikiFiles <- function(X, language=c("es", "en", "fr"), directory="./", maxtim
   return(errores)
 }
 
+#extractWiki----
+#' Extract the first paragraph of a Wikipedia article with a maximum of characters.
+#' @param names A vector of names, whose entries have to be extracted.
+#' @param language A vector of Wikipedia's languages to look for. If the article is not found in the language of the first element, it search for the followings,.
+#' @param plain If TRUE, the results are delivered in plain format.
+#' @examples
+#' ## Obtaining information in English Wikidata
+#' names <- c("Douglas Adams", "Picasso")
+#' information <- extractWiki(names)
+#' information$html <- get_template_for_maps(information, title="entityLabel", text="entityDescription")
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
+#' @importFrom jsonlite fromJSON
+#' @export
+extractWiki <- function(names, language=c("en", "es", "fr", "de", "it"), plain=FALSE, maximum=1000) {
+  extract <- function(name, language=c("en", "es"), plain=FALSE, maximum=1000) {
+    name <- URLencode(name)
+    json <- list(query=list(pages=-1))
+    explain <- ifelse(plain, "&explaintext", "")
+    for(I in 1:length(language)) {
+      json <- jsonlite::fromJSON(paste0("https://", language[I], ".wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro", explain,"&redirects=1&titles=",name))
+      if(names(json$query$pages)!="-1") break
+    }
+    ascii <- json[["query"]][["pages"]][[1]][["extract"]]
+    ascii <- gsub("\\[.*?\\]","", ascii)
+    if(!plain) ascii <- gsub("(.{150}</p>).*","\\1", ascii)
+    else if(nchar(ascii)>maximum) ascii <- paste0(substr(ascii, 1, maximum), "...")
+    return(ascii)
+  }
+  return(sapply(names, extract, language=language, plain=plain, maximum=maximum))
+}
+
+# get_template ----
+#' Create a drop-down vignette for nodes from different items (for galleries).
+#' @param data data frame which contains the data.
+#' @param title column name which contains the first tittle of the vignette.
+#' @param title2 column name which contains the secondary title of the vignette.
+#' @param text column name which contains the main text of the vignette.
+#' @param img column name which contains the names of the image files.
+#' @param wiki column name which contains the wiki URL for the vignette.
+#' @param width length of the vignette's width.
+#' @param color color of the vignette's strip (It also could be a column name which contains colors).
+#' @param cex number indicating the amount by which plotting text should be scaled relative to the default.
+#' @examples
+#' ## Obtaining information in English Wikidata
+#' names <- c("Douglas Adams", "Picasso")
+#' information <- getWikiData(names)
+#' information$html <- get_template(information, title="entityLabel", text="entityDescription")
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
+#' @export
+get_template <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wiki=NULL, width=300, color="#135dcd", cex=1){
+  return(get_template_(data, title, title2, text, img, wiki, width, c(6,12), color, cex))
+}
+
+#get_template_for_maps----
+#' Create a drop-down vignette for nodes from different items (for maps).
+#' @param data data frame which contains the data.
+#' @param title column name which contains the first tittle of the vignette.
+#' @param title2 column name which contains the secondary title of the vignette.
+#' @param text column name which contains the main text of the vignette.
+#' @param img column name which contains the names of the image files.
+#' @param wiki column name which contains the wiki URL for the vignette.
+#' @param color color of the vignette's strip (It also could be a column name which contains colors).
+#' @param cex number indicating the amount by which plotting text should be scaled relative to the default.
+#' @examples
+#' ## Obtaining information in English Wikidata
+#' names <- c("Douglas Adams", "Picasso")
+#' information <- getWikiData(names)
+#' information$html <- get_template_for_maps(information, title="entityLabel", text="entityDescription")
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
+#' @export
+get_template_for_maps <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wiki=NULL, color="#cbdefb", cex=1){
+  return(get_template_(data, title, title2, text, img, wiki, NULL, c(13,19), color, cex))
+}
+
+get_template_ <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wiki=NULL, width=NULL, padding=NULL, color=NULL, cex=1) {
+  if(length(color)){
+    if(length(data[[color]])){
+      color <- data[[color]]
+    }
+    color <- paste0('background-color:',color,';')
+  }else{
+    color <- ""
+  }
+  if(length(width)){
+    width <- paste0(" width: ",width,"px;")
+  }else{
+    width <- ""
+  }
+  if(length(padding)){
+    margin <- paste0("margin:",paste0(-padding,"px",collapse=" "),";")
+    padding <- paste0("padding:",paste0(padding,"px",collapse=" "),";")
+  }else{
+    padding <- ""
+    margin <- ""
+  }
+  data[["template"]] <- paste0('<div style="font-size:',cex,'em;',margin,width,'">')
+  borderRadius <- 'border-radius:12px 12px 0 0;'
+  if(is.character(img) && length(data[[img]])){
+    for(i in (1:nrow(data))){
+      if(file.exists(data[[i,img]])){
+        data[i,img] <- paste0("data:",mime(data[[i,img]]),";base64,",base64encode(data[[i,img]]))
+      }
+    }
+    data[["template"]] <- paste0(data[["template"]],'<img style="width:100%;',borderRadius,'" src="',data[[img]],'"/>')
+    borderRadius <- ''
+  }
+  if(is.character(title) && length(data[[title]])){
+    data[["template"]] <- paste0(data[["template"]],'<h2 style="font-size:2em;',color,padding,'margin-top:-3px;',borderRadius,'">',data[[title]],'</h2>')
+  }
+  data[["template"]] <- paste0(data[["template"]],'<div style="',padding,'">')
+  if(is.character(title2) && length(data[[title2]])){
+    data[["template"]] <- paste0(data[["template"]],'<h3>', data[[title2]],'</h3>')
+  }
+  if(is.character(text) && length(data[[text]])){
+    data[["template"]] <- paste0(data[["template"]],'<p>',data[[text]],'</p>')
+  }else{
+    data[["template"]] <- paste0(data[["template"]],'<p></p>')
+  }
+  if(is.character(wiki) && length(data[[wiki]])){
+    data[["template"]] <- paste0(data[["template"]],'<h3><img style="width:20px;vertical-align:bottom;margin-right:10px;" src="https://www.wikipedia.org/portal/wikipedia.org/assets/img/Wikipedia-logo-v2.png"/>Wikipedia: <a target="_blank" href="',data[[wiki]],'">',wiki,'</a></h3>')
+  }
+  data[["template"]] <- paste0(data[["template"]],'</div></div>')
+  return(data[["template"]])
+}
+
+base64encode <- function(filename) {
+  to.read = file(filename, "rb")
+  fsize <- file.size(filename)
+  sbit <- readBin(to.read, raw(), n = fsize, endian = "little")
+  close(to.read)
+  b64c <- "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+  shfts <- c(18,12,6,0)
+  sand <- function(n,s) bitwAnd(bitwShiftR(n,s),63)+1
+  slft <- function(p,n) bitwShiftL(as.integer(p),n)
+  subs <- function(s,n) substring(s,n,n)
+  npad <- ( 3 - length(sbit) %% 3) %% 3
+  sbit <- c(sbit,as.raw(rep(0,npad)))
+  pces <- lapply(seq(1,length(sbit),by=3),function(ii) sbit[ii:(ii+2)])
+  encv <- paste0(sapply(pces,function(p) paste0(sapply(shfts,function(s)(subs(b64c,sand(slft(p[1],16)+slft(p[2],8)+slft(p[3],0),s)))))),collapse="")
+  if (npad > 0) substr(encv,nchar(encv)-npad+1,nchar(encv)) <- paste0(rep("=",npad),collapse="")
+  return(encv)
+}
+
+mime <- function(name) {
+  mimemap <- c(jpeg = "image/jpeg", jpg = "image/jpeg", png = "image/png", svg = "image/svg", gif = "image/gif")
+  ext <- sub("^.*\\.","",name)
+  mime <- unname(mimemap[ext])
+  return(mime)
+}
