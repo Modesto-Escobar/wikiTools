@@ -40,7 +40,7 @@ Create a drop-down vignette for nodes from different items (for galleries).
 }
 \examples{
 ## Obtaining information in English Wikidata
-names <- c("Douglas Adams", "Picasso")
+names <- c("William Shakespeare", "Pablo Picasso")
 information <- getWikiData(names)
 information$html <- get_template(information, title="entityLabel", text="entityDescription")
 }

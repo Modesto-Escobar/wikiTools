@@ -196,11 +196,11 @@ nametoWikiFrame <- function(name, language="en") {
 #' searchWiki("Manuel Vilas", language = "es")
 #'
 #' ## When you want to check an entry in several languages:
-#' searchWiki("Manuel Vilas", language = c( "en", "es", "fr", "it", "de", "pt", "ca"))
+#' searchWiki("Manuel Vilas", language = c( "en", "es", "fr", "it", "de", "pt", "ca"), all=TRUE)
 #'
 ## When you want to check several entries and languages:
 #' A<-c("Manuel Vilas", "Julia Navarro", "Rosa Montero")
-#' searchWiki(A, language = c("en", "es", "fr", "it", "de", "pt", "ca"), all=TRUE)
+#' searchWiki(A, language = c("en", "es", "fr", "it", "de", "pt", "ca"), all=FALSE)
 #' @export
 searchWiki <- function(name, language=c("en", "es", "fr", "it", "de", "pt", "ca"), all=FALSE, maxtime=0) {
   errores <- data.frame(es=logical(), en=logical(), fr=logical(), it=logical(), 
@@ -229,11 +229,11 @@ searchWiki <- function(name, language=c("en", "es", "fr", "it", "de", "pt", "ca"
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @examples
 #' ## Obtaining information in English Wikidata
-#' names <- c("Douglas Adams", "Picasso")
+#' names <- c("William Shakespeare", "Pablo Picasso")
 #' information <- getWikiInf(names)
 #'
 #' ## Obtaining information in Spanish Wikidata
-#' informacion <- getWikiInf(names)
+#' informacion <- getWikiInf(names, language="es")
 #' @export
 #' @importFrom WikidataR find_item
 getWikiInf <- function(names, number=1, language="en"){
@@ -260,11 +260,10 @@ getWikiInf <- function(names, number=1, language="en"){
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @examples
 #' ## Obtaining information in English Wikidata
-#' names <- c("Douglas Adams", "Picasso")
-#' information <- getWikiData(names)
-#'
+#' names <- c("William Shakespeare", "Pablo Picasso")
+#' info <- getWikiData(names)
 #' ## Obtaining information in Spanish Wikidata
-#' informacion <- getWikiData(names, language="es")
+#' d <- getWikiData(names, language="es")
 #' @export
 #' @importFrom WikidataQueryServiceR query_wikidata
 #' @importFrom utils write.csv2
@@ -420,7 +419,7 @@ readFile <- function(file, encoding="UTF-8") {
 #' @param path Directory where to export the files.
 #' @param ext Select desired extension of the files. Default= NULL.
 #' @details This function allows download a file of files directly into your directory. 
-#' This function needs a preexistent data frame of names and pictures' URL. It must be a list (or data.frame) with two values: "name" (specifying the names of the files) and "url" (containing the urls to the files to download). This links can be obtained thru \code{\link[tweetCoin]{getWikidata}} function or other alternative sources. 
+#' This function needs a preexistent data frame of names and pictures' URL. It must be a list (or data.frame) with two values: "name" (specifying the names of the files) and "url" (containing the urls to the files to download).. 
 #' All the errors are reported as outcomes (NULL= no errors). The files are donwload into your chosen directory.
 #' @return It returns a vector of errors, if any. All pictures are download into the selected directory (NULL= no errors).
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
@@ -513,11 +512,12 @@ getWikiFiles <- function(X, language=c("es", "en", "fr"), directory="./", maxtim
 #' @param names A vector of names, whose entries have to be extracted.
 #' @param language A vector of Wikipedia's languages to look for. If the article is not found in the language of the first element, it search for the followings,.
 #' @param plain If TRUE, the results are delivered in plain format.
+#' @param maximum Number maximum of characters to be included when the paragraph is too large.
 #' @examples
 #' ## Obtaining information in English Wikidata
-#' names <- c("Douglas Adams", "Picasso")
-#' information <- extractWiki(names)
-#' information$html <- get_template_for_maps(information, title="entityLabel", text="entityDescription")
+#' names <- c("William Shakespeare", "Pablo Picasso")
+#' info <- getWikiInf(names)
+#' info$text <- extractWiki(info$label)
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @importFrom jsonlite fromJSON
 #' @export
@@ -552,7 +552,7 @@ extractWiki <- function(names, language=c("en", "es", "fr", "de", "it"), plain=F
 #' @param cex number indicating the amount by which plotting text should be scaled relative to the default.
 #' @examples
 #' ## Obtaining information in English Wikidata
-#' names <- c("Douglas Adams", "Picasso")
+#' names <- c("William Shakespeare", "Pablo Picasso")
 #' information <- getWikiData(names)
 #' information$html <- get_template(information, title="entityLabel", text="entityDescription")
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
@@ -573,9 +573,9 @@ get_template <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wik
 #' @param cex number indicating the amount by which plotting text should be scaled relative to the default.
 #' @examples
 #' ## Obtaining information in English Wikidata
-#' names <- c("Douglas Adams", "Picasso")
-#' information <- getWikiData(names)
-#' information$html <- get_template_for_maps(information, title="entityLabel", text="entityDescription")
+#' names <- c("William Shakespeare", "Pablo Picasso")
+#' info <- getWikiData(names)
+#' info$html <- get_template_for_maps(info, title="entityLabel", text="entityDescription")
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @export
 get_template_for_maps <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wiki=NULL, color="#cbdefb", cex=1){

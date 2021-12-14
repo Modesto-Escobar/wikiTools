@@ -21,11 +21,10 @@ Create a data.frame with Wikidata of a vector of names.
 }
 \examples{
 ## Obtaining information in English Wikidata
-names <- c("Douglas Adams", "Picasso")
-information <- getWikiData(names)
-
+names <- c("William Shakespeare", "Pablo Picasso")
+info <- getWikiData(names)
 ## Obtaining information in Spanish Wikidata
-informacion <- getWikiData(names, language="es")
+d <- getWikiData(names, language="es")
 }
 \author{
 Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See \url{https://sociocav.usal.es/blog/modesto-escobar/}

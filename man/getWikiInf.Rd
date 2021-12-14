@@ -21,11 +21,11 @@ Create a data.frame with Q's and descriptions of a vector of names.
 }
 \examples{
 ## Obtaining information in English Wikidata
-names <- c("Douglas Adams", "Picasso")
+names <- c("William Shakespeare", "Pablo Picasso")
 information <- getWikiInf(names)
 
 ## Obtaining information in Spanish Wikidata
-informacion <- getWikiInf(names)
+informacion <- getWikiInf(names, language="es")
 }
 \author{
 Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See \url{https://sociocav.usal.es/blog/modesto-escobar/}

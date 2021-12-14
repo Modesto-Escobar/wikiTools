@@ -7,9 +7,7 @@ Description: Magage information from Wikidata and Wikipedia.
 License: GPL-3 + file LICENSE
 Depends: R (>= 3.5.0)
 Encoding: UTF-8
-Imports: WikidataQueryServiceR (>= 1.0.0), WikidataR (>= 1.4.0)
-Suggests: knitr, rmarkdown, lavaan, shiny
-VignetteBuilder: knitr
+Imports: WikidataQueryServiceR (>= 1.0.0), WikidataR (>= 1.4.0), httr, jsonlite, purrr, ratelimitr
 NeedsCompilation: no
 Author: Modesto Escobar <modesto@usal.es>,
   Ángel Zazo <angelzazo@usal.es>,

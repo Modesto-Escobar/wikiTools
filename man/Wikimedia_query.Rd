@@ -20,8 +20,6 @@ Wikimedia_query(
 \item{headers}{A vector with aditional query headers for the request.}
 
 \item{ntimes}{On errors, the maximun number of times the query is launched if repetition_on_error is not zero (default 2)}
-
-\item{repetition_on_error}{On errors, the pause time in seconds to repeat the request (the request is repeated a maximum of ntimes). A zero value (default) does not repeat the request: Null is returned.}
 }
 \value{
 The response in JSON format or NULL on errors.

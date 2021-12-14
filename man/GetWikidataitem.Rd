@@ -24,14 +24,10 @@ Automatically resolvs redirects.
 }
 \examples{
 GetWikidataitem('Max Planck', project='es.wikipedia.org')
-[1] "1"          "Max Planck" "Q9021"
 
 GetWikidataitem('Max')
-[1] "0"          "Max"        "disambiguation"
 
 GetWikidataitem('Cervante')
-[1] "0"        "Cervante" "missing"
-
 }
 \author{
 Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca

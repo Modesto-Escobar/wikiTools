@@ -15,21 +15,22 @@ my_headers <- c(accept = 'application/json',
 #' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
 #' @seealso ratelimitr
 #' @importFrom ratelimitr limit_rate rate
+#' @export
 limit_requester <- function(f, n, period) {
   return(ratelimitr::limit_rate(f, ratelimitr::rate(n = n, period = period)))
 }
 
 #' Wikimedia_query
 #' Use httr package to retrieve responses in JSON format about an article from Wikimedia API.
-#' @param project The Wikimedia project to search.
 #' @param query A list with de (key, values) pairs with the search.
+#' @param project The Wikimedia project to search.
 #' @param headers A vector with aditional query headers for the request.
-#' @param repetition_on_error On errors, the pause time in seconds to repeat the request (the request is repeated a maximum of ntimes). A zero value (default) does not repeat the request: Null is returned.
 #' @param ntimes On errors, the maximun number of times the query is launched if repetition_on_error is not zero (default 2)
 #' @return The response in JSON format or NULL on errors.
 #' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
 #' @importFrom httr GET content add_headers stop_for_status
 #' @importFrom jsonlite fromJSON
+#' @export
 Wikimedia_query <- function(query, project='en.wikipedia.org', headers = my_headers, ntimes = 2) {
   url = paste('https://', project, "/w/api.php", sep = '')
   nt <- 1
@@ -71,6 +72,7 @@ Wikimedia_query <- function(query, project='en.wikipedia.org', headers = my_head
 #' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
 #' @importFrom httr GET user_agent add_headers
 #' @note For short queries GET method is better, POST for long ones. Only GET queries as cached.
+#' @export
 req_WDQS <- function(sparql_query) {
   httr::GET(  # 
     url = 'https://query.wikidata.org/sparql',
@@ -80,19 +82,20 @@ req_WDQS <- function(sparql_query) {
   )
 }
 
-#' req_WDQS_rated
-#' The ratelimitr version of req_WDQS_rate, See
-#' See https://www.mediawiki.org/wiki/Wikidata_Query_Service/User_Manual#SPARQL_endpoint
-req_WDQS_rated <- limit_requester(req_WDQS, n=30, period=60)
 
 #' Wikidata_sparql_query
 #' Retrieve responses in JSON format from Wikidata Query Service (WDQS)
+#' #' req_WDQS_rated
+#' The ratelimitr version of req_WDQS_rate.
+#' See https://www.mediawiki.org/wiki/Wikidata_Query_Service/User_Manual#SPARQL_endpoint
 #' @param sparql_query A string with the query in SPARQL language.
 #' @return A JSON response or NULL on errors.
 #' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
 #' @importFrom httr stop_for_status content 
 #' @importFrom jsonlite fromJSON
+#' @export
 Wikidata_sparql_query <- function(sparql_query) {
+  req_WDQS_rated <- limit_requester(req_WDQS, n=30, period=60)
   tryCatch(
     {
       r <- req_WDQS_rated(sparql_query)
@@ -117,14 +120,11 @@ Wikidata_sparql_query <- function(sparql_query) {
 #' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
 #' @examples 
 #' GetWikidataitem('Max Planck', project='es.wikipedia.org')
-#' [1] "1"          "Max Planck" "Q9021"
 #' 
 #' GetWikidataitem('Max')
-#' [1] "0"          "Max"        "disambiguation"
 #' 
 #' GetWikidataitem('Cervante')
-#' [1] "0"        "Cervante" "missing"
-#' 
+#' @export
 GetWikidataitem <- function(article = '', project = 'en.wikipedia.org') {
   if ((article == '') | (project == '')) {
     return(c(0, '', "No article or project present"))
@@ -181,6 +181,7 @@ GetWikidataitem <- function(article = '', project = 'en.wikipedia.org') {
 #' @return A list with the firts element the target of all redirections, or NULL on error.
 #' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
 #' @importFrom purrr map_chr
+#' @export
 Wikimedia_get_redirects <- function(article, project = "en.wikipedia.org") {
   if ((article == '') | (project == '')) {
     return(NULL)
@@ -242,11 +243,12 @@ Wikimedia_get_redirects <- function(article, project = "en.wikipedia.org") {
 #' that person in the languages indicated in param lang
 #' @param article Article to search
 #' @param project Wikimedia project, defaults "en.wikipedia.org"
-#' @param lang Wikipedia languages to search if the person has a page, use "|" to split languages
+#' @param langs Wikipedia languages to search if the person has a page, use "|" to split languages
 #' @return If the article of the person exists, a vector with four elements: the firts one set to 1, the second de article label normalized, the third de Wikidata id, and fourth a data frame with URL to Wikipedias (lang, label, URL)
 #'         If the article of the person does not exist, the firts element is set to 0 and the third is the explication of error.
 #' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
 #' @importFrom purrr map_dfr map_chr
+#' @export
 Wikimedia_person_exists <- function(article, project="en.wikipedia.org",
                                     langs="en|es|fr|de|it|pt|ca") {
   ret <- GetWikidataitem(article, project)
@@ -290,8 +292,7 @@ Wikimedia_person_exists <- function(article, project="en.wikipedia.org",
 #' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
 #' @examples
 #' Wikidata_occupationCount('Q2526255') # Film director
-#' [1] 67371
-#' 
+#' @export
 Wikidata_occupationCount <- function(Qoc='') {
   if (Qoc == '')
     return(NULL)
@@ -309,6 +310,7 @@ Wikidata_occupationCount <- function(Qoc='') {
 #' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
 #' @importFrom httr GET user_agent add_headers
 #' @note Used in Wikimedia_page_views
+#' @export
 req_wikimedia_metrics <- function(url) {
   httr::GET(
     url = url,
@@ -317,14 +319,14 @@ req_wikimedia_metrics <- function(url) {
   )
 }
 
-#' req_wikimeida_metrics_rated
-#' The limitratedr version of req_wikimedia_metrics.
-# Limit is 100 req/s, we limit 50 req/s.
-req_wikimedia_metrics_rated <- limit_requester(req_wikimedia_metrics, n=50, period=1) 
+
+
 
 #' Wikimedia_page_views
 #' Return the number of views one article has in a Wikimedia project in a date interval (see granularity). Optionally include redirections to the article page.
-#' 
+#' req_wikimeida_metrics_rated
+#' The limitratedr version of req_wikimedia_metrics.
+#  Limit is 100 req/s, we limit 50 req/s.
 #' @param article The article to search
 #' @param project The Wikimedia project, defaults en.wikipedia.org
 #' @param start,end First and last day to include (format YYYYMMDD or YYYYMMDDHH)
@@ -336,10 +338,12 @@ req_wikimedia_metrics_rated <- limit_requester(req_wikimedia_metrics, n=50, peri
 #' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
 #' @importFrom httr stop_for_status content
 #' @importFrom jsonlite fromJSON
+#' @export
 Wikimedia_page_views <- function(article, project = "en.wikipedia.org",
                                   start, end, access = "all-access",
                                   agent = "user", granularity = "monthly",
                                   include_redirects = FALSE) {
+  req_wikimedia_metrics_rated <- limit_requester(req_wikimedia_metrics, n=50, period=1) 
   article <- gsub(" ", "_", article)
   url <- "https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article"
   url <- paste(url, project, access, agent, article, granularity, start, end, sep="/", collapse = "")
@@ -374,6 +378,8 @@ Wikimedia_page_views <- function(article, project = "en.wikipedia.org",
 #' @param chunk The chunk to split intermediate results with the aim of reduce the limit 60 seconds processig time.
 #' @return A list with Wikidata entity, the number of wikipedias and the URL
 #' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
+#' @importFrom utils tail
+#' @export
 Wikidata_Wikipedias <- function(Qoc, chunk=10000) {
   if (Qoc == '') return(NULL)
   nq <- Wikidata_occupationCount(Qoc)
@@ -408,46 +414,43 @@ Wikidata_Wikipedias <- function(Qoc, chunk=10000) {
   return(d)
 }
 
-#' wmflabs_get_info
+#' wmflabs_get_allinfo
 #' Obtains information about an article in the Wikimedia project in JSON format, or NULL on error.
 #' @param article The article to search
 #' @param project The Wikimedia project, defaults en.wikipedia.org
-#' @param infotype The type of information to request: articleinfo, prose, links
-#' @param links_in_redirects If infotype==links, if redirects are included or not
+#' @param links_in_count_redirects If infotype==links, if redirects are included or not
 #' @return The number of visits
 #' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
 #' @note Is important that the article be don't a redirection: with "prose" infotype the function gets information of the target article, but with "articleinfo" and "links" the information is about the redirection.
 #' @importFrom httr stop_for_status content
 #' @importFrom jsonlite fromJSON
-wmflabs_get_info <- function(article, infotype = "articleinfo", project = "en.wikipedia.org",
-                            links_in_count_redirects = FALSE) {
-  d <- list()
-  if (infotype == "links" & links_in_count_redirects) {
-    for (art in Wikimedia_get_redirects(article, project)) {
-      b <- wmflabs_get_info(article = art, infotype = "links", project = project,
-                            links_in_count_redirects = FALSE)
-      if ("links_in_count" %in% names(d))
-        d["links_in_count"] <-  d["links_in_count"][[1]] + b["links_in_count"][[1]]
-      else
-        d <- b
-    }
-  }
-  else {
-    url <- 'https://xtools.wmflabs.org/api/page/'
-    url <- paste(url, infotype, project, article, sep="/", collapse = "")
-    r <- req_wikimedia_metrics_rated(url)
-    httr::stop_for_status(r)
-    content <- httr::content(r, as = "text", encoding = "UTF-8")
-    d <- jsonlite::fromJSON(content, simplifyVector = FALSE)
-  }
-  return(d)
-}
-
-#' wmflabs_get_allinfo
-#' obtains info about infotype = (articleinfo | prose | links) about an article in the
-#' wikimedia project
+#' @export
 wmflabs_get_allinfo <- function(article, project = "en.wikipedia.org",
-                                                    links_in_count_redirects = FALSE){
+                                                    links_in_count_redirects = FALSE) {
+  req_wikimedia_metrics_rated <- limit_requester(req_wikimedia_metrics, n=50, period=1)
+  wmflabs_get_info <- function(article, infotype = "articleinfo", project = "en.wikipedia.org",
+                               links_in_count_redirects = FALSE) {
+    d <- list()
+    if (infotype == "links" & links_in_count_redirects) {
+      for(art in Wikimedia_get_redirects(article, project)) {
+        b <- wmflabs_get_info(article = art, infotype = "links", project = project,
+                              links_in_count_redirects = FALSE)
+        if ("links_in_count" %in% names(d))
+          d["links_in_count"] <-  d["links_in_count"][[1]] + b["links_in_count"][[1]]
+        else
+          d <- b
+      }
+    }
+    else {
+      url <- 'https://xtools.wmflabs.org/api/page/'
+      url <- paste(url, infotype, project, article, sep="/", collapse = "")
+      r <- req_wikimedia_metrics_rated(url)
+      httr::stop_for_status(r)
+      content <- httr::content(r, as = "text", encoding = "UTF-8")
+      d <- jsonlite::fromJSON(content, simplifyVector = FALSE)
+    }
+    return(d)
+  }
   # first: articleinfo
   r <- wmflabs_get_info(article, infotype = 'articleinfo', project = project)
   # Error in response

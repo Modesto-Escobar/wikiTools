@@ -21,7 +21,7 @@ Downloads a list of files in a specified path of the computer, and return a vect
 }
 \details{
 This function allows download a file of files directly into your directory.
-This function needs a preexistent data frame of names and pictures' URL. It must be a list (or data.frame) with two values: "name" (specifying the names of the files) and "url" (containing the urls to the files to download). This links can be obtained thru \code{\link[tweetCoin]{getWikidata}} function or other alternative sources.
+This function needs a preexistent data frame of names and pictures' URL. It must be a list (or data.frame) with two values: "name" (specifying the names of the files) and "url" (containing the urls to the files to download)..
 All the errors are reported as outcomes (NULL= no errors). The files are donwload into your chosen directory.
 }
 \examples{

@@ -18,7 +18,7 @@ Wikimedia_person_exists(
 
 \item{project}{Wikimedia project, defaults "en.wikipedia.org"}
 
-\item{lang}{Wikipedia languages to search if the person has a page, use "|" to split languages}
+\item{langs}{Wikipedia languages to search if the person has a page, use "|" to split languages}
 }
 \value{
 If the article of the person exists, a vector with four elements: the firts one set to 1, the second de article label normalized, the third de Wikidata id, and fourth a data frame with URL to Wikipedias (lang, label, URL)

@@ -19,8 +19,6 @@ Search Wikidata Query Service (WDQS) to know the number of Wikidata entities wit
 }
 \examples{
 Wikidata_occupationCount('Q2526255') # Film director
-[1] 67371
-
 }
 \author{
 Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca

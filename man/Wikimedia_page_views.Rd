@@ -3,7 +3,9 @@
 \name{Wikimedia_page_views}
 \alias{Wikimedia_page_views}
 \title{Wikimedia_page_views
-Return the number of views one article has in a Wikimedia project in a date interval (see granularity). Optionally include redirections to the article page.}
+Return the number of views one article has in a Wikimedia project in a date interval (see granularity). Optionally include redirections to the article page.
+req_wikimeida_metrics_rated
+The limitratedr version of req_wikimedia_metrics.}
 \usage{
 Wikimedia_page_views(
   article,
@@ -37,6 +39,8 @@ The number of visits
 \description{
 Wikimedia_page_views
 Return the number of views one article has in a Wikimedia project in a date interval (see granularity). Optionally include redirections to the article page.
+req_wikimeida_metrics_rated
+The limitratedr version of req_wikimedia_metrics.
 }
 \author{
 Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca

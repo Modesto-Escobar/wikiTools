@@ -3,7 +3,10 @@
 \name{Wikidata_sparql_query}
 \alias{Wikidata_sparql_query}
 \title{Wikidata_sparql_query
-Retrieve responses in JSON format from Wikidata Query Service (WDQS)}
+Retrieve responses in JSON format from Wikidata Query Service (WDQS)
+#' req_WDQS_rated
+The ratelimitr version of req_WDQS_rate.
+See https://www.mediawiki.org/wiki/Wikidata_Query_Service/User_Manual#SPARQL_endpoint}
 \usage{
 Wikidata_sparql_query(sparql_query)
 }
@@ -16,6 +19,9 @@ A JSON response or NULL on errors.
 \description{
 Wikidata_sparql_query
 Retrieve responses in JSON format from Wikidata Query Service (WDQS)
+#' req_WDQS_rated
+The ratelimitr version of req_WDQS_rate.
+See https://www.mediawiki.org/wiki/Wikidata_Query_Service/User_Manual#SPARQL_endpoint
 }
 \author{
 Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca

@@ -17,15 +17,17 @@ extractWiki(
 \item{language}{A vector of Wikipedia's languages to look for. If the article is not found in the language of the first element, it search for the followings,.}
 
 \item{plain}{If TRUE, the results are delivered in plain format.}
+
+\item{maximum}{Number maximum of characters to be included when the paragraph is too large.}
 }
 \description{
 Extract the first paragraph of a Wikipedia article with a maximum of characters.
 }
 \examples{
 ## Obtaining information in English Wikidata
-names <- c("Douglas Adams", "Picasso")
-information <- extractWiki(names)
-information$html <- get_template_for_maps(information, title="entityLabel", text="entityDescription")
+names <- c("William Shakespeare", "Pablo Picasso")
+info <- getWikiInf(names)
+info$text <- extractWiki(info$label)
 }
 \author{
 Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See \url{https://sociocav.usal.es/blog/modesto-escobar/}

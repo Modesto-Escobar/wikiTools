@@ -3,8 +3,7 @@
 \name{wmflabs_get_allinfo}
 \alias{wmflabs_get_allinfo}
 \title{wmflabs_get_allinfo
-obtains info about infotype = (articleinfo | prose | links) about an article in the
-wikimedia project}
+Obtains information about an article in the Wikimedia project in JSON format, or NULL on error.}
 \usage{
 wmflabs_get_allinfo(
   article,
@@ -12,8 +11,23 @@ wmflabs_get_allinfo(
   links_in_count_redirects = FALSE
 )
 }
+\arguments{
+\item{article}{The article to search}
+
+\item{project}{The Wikimedia project, defaults en.wikipedia.org}
+
+\item{links_in_count_redirects}{If infotype==links, if redirects are included or not}
+}
+\value{
+The number of visits
+}
 \description{
 wmflabs_get_allinfo
-obtains info about infotype = (articleinfo | prose | links) about an article in the
-wikimedia project
+Obtains information about an article in the Wikimedia project in JSON format, or NULL on error.
+}
+\note{
+Is important that the article be don't a redirection: with "prose" infotype the function gets information of the target article, but with "articleinfo" and "links" the information is about the redirection.
+}
+\author{
+Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
 }
