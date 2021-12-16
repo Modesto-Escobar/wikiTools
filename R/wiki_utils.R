@@ -432,7 +432,8 @@ wmflabs_get_allinfo <- function(article, project = "en.wikipedia.org",
                                links_in_count_redirects = FALSE) {
     d <- list()
     if (infotype == "links" & links_in_count_redirects) {
-      for(art in Wikimedia_get_redirects(article, project)) {
+      arts <- Wikimedia_get_redirects(article, project)
+      for(art in arts) {
         b <- wmflabs_get_info(article = art, infotype = "links", project = project,
                               links_in_count_redirects = FALSE)
         if ("links_in_count" %in% names(d))
@@ -460,11 +461,11 @@ wmflabs_get_allinfo <- function(article, project = "en.wikipedia.org",
     return(NULL)
   }
   # Second: prose
-  b <- wmflabs_get_info(art, infotype = "prose", project = project)
+  b <- wmflabs_get_info(article, infotype = "prose", project = project)
   for (n in names(b))
     r[n] <- b[n]
   # Third: links
-  c <- wmflabs_get_info(art, infotype = "links", project = project,
+  c <- wmflabs_get_info(article, infotype = "links", project = project,
                         links_in_count_redirects = links_in_count_redirects)
   for (n in names(c))
     r[n] <- c[n]

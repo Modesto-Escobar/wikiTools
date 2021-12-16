@@ -261,9 +261,9 @@ getWikiInf <- function(names, number=1, language="en"){
 #' @examples
 #' ## Obtaining information in English Wikidata
 #' names <- c("William Shakespeare", "Pablo Picasso")
-#' info <- getWikiData(names)
+#' # info <- getWikiData(names)
 #' ## Obtaining information in Spanish Wikidata
-#' d <- getWikiData(names, language="es")
+#' # d <- getWikiData(names, language="es")
 #' @export
 #' @importFrom WikidataQueryServiceR query_wikidata
 #' @importFrom utils write.csv2
@@ -574,8 +574,8 @@ get_template <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wik
 #' @examples
 #' ## Obtaining information in English Wikidata
 #' names <- c("William Shakespeare", "Pablo Picasso")
-#' info <- getWikiData(names)
-#' info$html <- get_template_for_maps(info, title="entityLabel", text="entityDescription")
+#' # info <- getWikiData(names)
+#' # info$html <- get_template_for_maps(info, title="entityLabel", text="entityDescription")
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @export
 get_template_for_maps <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wiki=NULL, color="#cbdefb", cex=1){

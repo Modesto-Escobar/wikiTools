@@ -38,8 +38,8 @@ Create a drop-down vignette for nodes from different items (for maps).
 \examples{
 ## Obtaining information in English Wikidata
 names <- c("William Shakespeare", "Pablo Picasso")
-info <- getWikiData(names)
-info$html <- get_template_for_maps(info, title="entityLabel", text="entityDescription")
+# info <- getWikiData(names)
+# info$html <- get_template_for_maps(info, title="entityLabel", text="entityDescription")
 }
 \author{
 Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See \url{https://sociocav.usal.es/blog/modesto-escobar/}
