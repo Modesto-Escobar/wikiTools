@@ -35,10 +35,13 @@ It manages the different the languages of Wikipedia thru the two-letters abbrevi
 searchWiki("Manuel Vilas", language = "es")
 
 ## When you want to check an entry in several languages:
+\dontrun{
 searchWiki("Manuel Vilas", language = c( "en", "es", "fr", "it", "de", "pt", "ca"), all=TRUE)
-
+}
+\dontrun{
 A<-c("Manuel Vilas", "Julia Navarro", "Rosa Montero")
 searchWiki(A, language = c("en", "es", "fr", "it", "de", "pt", "ca"), all=FALSE)
+}
 }
 \author{
 Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See \url{https://sociocav.usal.es/blog/modesto-escobar/}

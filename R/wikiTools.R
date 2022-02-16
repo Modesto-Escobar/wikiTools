@@ -196,11 +196,14 @@ nametoWikiFrame <- function(name, language="en") {
 #' searchWiki("Manuel Vilas", language = "es")
 #'
 #' ## When you want to check an entry in several languages:
+#' \dontrun{
 #' searchWiki("Manuel Vilas", language = c( "en", "es", "fr", "it", "de", "pt", "ca"), all=TRUE)
-#'
+#' }
 ## When you want to check several entries and languages:
+#' \dontrun{
 #' A<-c("Manuel Vilas", "Julia Navarro", "Rosa Montero")
 #' searchWiki(A, language = c("en", "es", "fr", "it", "de", "pt", "ca"), all=FALSE)
+#' }
 #' @export
 searchWiki <- function(name, language=c("en", "es", "fr", "it", "de", "pt", "ca"), all=FALSE, maxtime=0) {
   errores <- data.frame(es=logical(), en=logical(), fr=logical(), it=logical(), 
@@ -233,7 +236,9 @@ searchWiki <- function(name, language=c("en", "es", "fr", "it", "de", "pt", "ca"
 #' information <- getWikiInf(names)
 #'
 #' ## Obtaining information in Spanish Wikidata
+#' \dontrun{
 #' informacion <- getWikiInf(names, language="es")
+#' }
 #' @export
 #' @importFrom WikidataR find_item
 getWikiInf <- function(names, number=1, language="en"){
@@ -260,10 +265,12 @@ getWikiInf <- function(names, number=1, language="en"){
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @examples
 #' ## Obtaining information in English Wikidata
+#' \dontrun{
 #' names <- c("William Shakespeare", "Pablo Picasso")
-#' # info <- getWikiData(names)
+#' info <- getWikiData(names)
 #' ## Obtaining information in Spanish Wikidata
-#' # d <- getWikiData(names, language="es")
+#' d <- getWikiData(names, language="es")
+#' }
 #' @export
 #' @importFrom WikidataQueryServiceR query_wikidata
 #' @importFrom utils write.csv2
@@ -552,9 +559,11 @@ extractWiki <- function(names, language=c("en", "es", "fr", "de", "it"), plain=F
 #' @param cex number indicating the amount by which plotting text should be scaled relative to the default.
 #' @examples
 #' ## Obtaining information in English Wikidata
+#' \dontrun{
 #' names <- c("William Shakespeare", "Pablo Picasso")
 #' information <- getWikiData(names)
 #' information$html <- get_template(information, title="entityLabel", text="entityDescription")
+#' }
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @export
 get_template <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wiki=NULL, width=300, color="#135dcd", cex=1){
@@ -573,9 +582,11 @@ get_template <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wik
 #' @param cex number indicating the amount by which plotting text should be scaled relative to the default.
 #' @examples
 #' ## Obtaining information in English Wikidata
+#' \dontrun{
 #' names <- c("William Shakespeare", "Pablo Picasso")
-#' # info <- getWikiData(names)
-#' # info$html <- get_template_for_maps(info, title="entityLabel", text="entityDescription")
+#' info <- getWikiData(names)
+#' info$html <- get_template_for_maps(info, title="entityLabel", text="entityDescription")
+#' }
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @export
 get_template_for_maps <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wiki=NULL, color="#cbdefb", cex=1){
