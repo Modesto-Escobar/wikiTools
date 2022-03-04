@@ -32,15 +32,15 @@ All the errors are reported as outcomes (NULL= no errors). The files are donwloa
 # dta <- data.frame(name = "Data", url = "https://sociocav.usal.es/me/Stata/example.dta")
 # getFiles(dta, path = "./")
 
-##  You can can also combine this function with getWikidata (among others).
+##  You can can also combine this function with getWikiData (among others).
 ## In case you want to download a picture of a person:
 
-# A <- data.frame(name= getWikidata("Rembrandt")$label, url=getWikidata("Rembrandt")$pics)
+# A <- data.frame(name= getWikiData("Rembrandt")$label, url=getWikiData("Rembrandt")$pics)
 # getFiles(A, path = "./", ext = "png")
 
 ## Or the pics of multiple authors: 
 
-# B <- getWikidata(c("Monet", "Renoir", "Caillebotte"))
+# B <- getWikiData(c("Monet", "Renoir", "Caillebotte"))
 # data <- data.frame(name = B$label, url = B$pics)
 # getFiles(data, path = "./", ext = NULL)
 

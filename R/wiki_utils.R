@@ -25,13 +25,13 @@ limit_requester <- function(f, n, period) {
 #' @param query A list with de (key, values) pairs with the search.
 #' @param project The Wikimedia project to search.
 #' @param headers A vector with aditional query headers for the request.
-#' @param ntimes On errors, the maximun number of times the query is launched if repetition_on_error is not zero (default 2)
+#' @param attempts On errors, the maximun number of times the query is launched if repetition_on_error is not zero (default 2)
 #' @return The response in JSON format or NULL on errors.
 #' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
 #' @importFrom httr GET content add_headers stop_for_status
 #' @importFrom jsonlite fromJSON
 #' @export
-Wikimedia_query <- function(query, project='en.wikipedia.org', headers = my_headers, ntimes = 2) {
+Wikimedia_query <- function(query, project='en.wikipedia.org', headers = my_headers, attempts = 2) {
   url = paste('https://', project, "/w/api.php", sep = '')
   nt <- 1
   tryCatch( {
@@ -45,7 +45,7 @@ Wikimedia_query <- function(query, project='en.wikipedia.org', headers = my_head
       #
       # See https://www.mediawiki.org/wiki/API:Etiquette#Request_limit
       if ( !is.null(j$error) && j$error$code == 'ratelimited') {
-        if (nt > ntimes)
+        if (nt > attempts)
           stop(paste(as.character(nt)," ratelimited achieved, aborting query", sep=''))
         else {
           t = 60*nt
@@ -180,7 +180,6 @@ GetWikidataitem <- function(article = '', project = 'en.wikipedia.org') {
 #' @param project Wikimedia project, defaults "en.wikipedio.org"
 #' @return A list with the firts element the target of all redirections, or NULL on error.
 #' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
-#' @importFrom purrr map_chr
 #' @export
 Wikimedia_get_redirects <- function(article, project = "en.wikipedia.org") {
   if ((article == '') | (project == '')) {
@@ -196,7 +195,7 @@ Wikimedia_get_redirects <- function(article, project = "en.wikipedia.org") {
                rdprop        = 'title',
                titles        = article)
   titles <- character()  # An empty character vector
-  while(TRUE){
+  repeat {
     # print(cbind(query))  # checking
     j <- Wikimedia_query(query, project = project)
     #
@@ -226,7 +225,7 @@ Wikimedia_get_redirects <- function(article, project = "en.wikipedia.org") {
     if (!is.null(page$missing))  # No se encuentra el título buscado (missing)
       return(NULL)
     #
-    titles <- append(titles, purrr::map_chr(page$redirects, ~ .x$title))
+    titles <- append(titles, sapply(page$redirects,function(x){ return(x[["title"]]) }))
     #
     if (!is.null(j$continue)) {
       query$continue   <- j$continue$continue
@@ -247,7 +246,6 @@ Wikimedia_get_redirects <- function(article, project = "en.wikipedia.org") {
 #' @return If the article of the person exists, a vector with four elements: the firts one set to 1, the second de article label normalized, the third de Wikidata id, and fourth a data frame with URL to Wikipedias (lang, label, URL)
 #'         If the article of the person does not exist, the firts element is set to 0 and the third is the explication of error.
 #' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
-#' @importFrom purrr map_dfr map_chr
 #' @export
 Wikimedia_person_exists <- function(article, project="en.wikipedia.org",
                                     langs="en|es|fr|de|it|pt|ca") {
@@ -278,9 +276,12 @@ Wikimedia_person_exists <- function(article, project="en.wikipedia.org",
   if (length(bindings) == 0)
     return(c(0, art, qid, 'Not human'))
   #
-  df <- purrr::map_dfr(bindings, function(binding) {
-    return(purrr::map_chr(binding, ~ .x$value))
-  })
+  columns <- unlist(j$head$vars)
+  df <- as.data.frame(sapply(columns,function(y){
+    return(sapply(bindings,function(x){
+      return(x[[y]][["value"]])
+    }))
+  }))
   return(list(qid = c(1, art, qid),
               wiki = df))
 }

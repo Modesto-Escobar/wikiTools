@@ -9,7 +9,7 @@ Wikimedia_query(
   query,
   project = "en.wikipedia.org",
   headers = my_headers,
-  ntimes = 2
+  attempts = 2
 )
 }
 \arguments{
@@ -19,7 +19,7 @@ Wikimedia_query(
 
 \item{headers}{A vector with aditional query headers for the request.}
 
-\item{ntimes}{On errors, the maximun number of times the query is launched if repetition_on_error is not zero (default 2)}
+\item{attempts}{On errors, the maximun number of times the query is launched if repetition_on_error is not zero (default 2)}
 }
 \value{
 The response in JSON format or NULL on errors.
