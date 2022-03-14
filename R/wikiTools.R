@@ -115,7 +115,7 @@ preName <- function(X) {sub("(^.*),\\s*(.*$)","\\2 \\1", X)}
 #' @param name A vector consisting of one or more Wikipedia's entry (i.e., topic or person).
 #' @param language The language of the Wikipedia page version. This should consist of an ISO language code (default = "en").
 #' @return A character vector of names' URLs.
-#' @details This function adds the Wikipedia URL to a entry or name, i.e., "Max Weber" converts into \url{"https://es.wikipedia.org/wiki/Max_Weber"}. It also manages different the languages of Wikipedia thru the abbreviated two-letter language parameter, i.e., "en" = "english".
+#' @details This function adds the Wikipedia URL to a entry or name, i.e., "Max Weber" converts into "https://es.wikipedia.org/wiki/Max_Weber". It also manages different the languages of Wikipedia thru the abbreviated two-letter language parameter, i.e., "en" = "english".
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @examples
 #' ## When extracting a single item;

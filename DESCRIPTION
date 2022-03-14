@@ -1,9 +1,9 @@
 Package: wikiTools
 Type: Package
-Version: 0.0.4
-Date: 2022-03-04
+Version: 0.0.5
+Date: 2022-03-12
 Title: Tools for Wikidata and Wikipedia
-Description: Magage information from Wikidata and Wikipedia.
+Description: Manage information from Wikidata and Wikipedia.
 License: GPL-3
 Depends: R (>= 3.5.0)
 Encoding: UTF-8
