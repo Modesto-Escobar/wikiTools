@@ -20,6 +20,9 @@ extractWiki(
 
 \item{maximum}{Number maximum of characters to be included when the paragraph is too large.}
 }
+\value{
+a character vector with html formatted (or plain text) Wikipedia paragraphs.
+}
 \description{
 Extract the first paragraph of a Wikipedia article with a maximum of characters.
 }

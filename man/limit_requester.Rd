@@ -14,6 +14,9 @@ limit_requester(f, n, period)
 
 \item{period}{Length (in seconds) of measurement period}
 }
+\value{
+If 'f' is a single function, then a new function with the same signature and (eventual) behavior as the original function, but rate limited. If 'f' is a named list of functions, then a new list of functions with the same names and signatures, but collectively bound by a shared rate limit.
+}
 \description{
 limit_requester
 Limit the rate at which a function will execute

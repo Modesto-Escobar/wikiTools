@@ -12,6 +12,7 @@ my_headers <- c(accept = 'application/json',
 #' @param f The original function
 #' @param n Number of allowed events within a period
 #' @param period Length (in seconds) of measurement period
+#' @return If 'f' is a single function, then a new function with the same signature and (eventual) behavior as the original function, but rate limited. If 'f' is a named list of functions, then a new list of functions with the same names and signatures, but collectively bound by a shared rate limit.
 #' @author Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
 #' @seealso ratelimitr
 #' @importFrom ratelimitr limit_rate rate

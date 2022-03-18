@@ -444,11 +444,8 @@ getFiles <- function(lista, path="./", ext=NULL) {
     if(is.null(ext)) ext <- filext(url) 
     file=paste0(path,sub("/","-",name),".",ext)
     if(!is.na(url) & !file.exists(file)) {
-      oldw <- getOption("warn")
-      options(warn = -1)
-      E <- tryCatch(download.file(url, destfile=file, quiet=TRUE, mode="wb"),error = function(e) name)
+      E <- suppressWarnings(tryCatch(download.file(url, destfile=file, quiet=TRUE, mode="wb"),error = function(e) name))
       if (E!=0) errores <- c(errores, E)
-      options(warn = oldw)
     } 
   }
   return(errores)
@@ -487,11 +484,8 @@ getWikiFiles <- function(X, language=c("es", "en", "fr"), directory="./", maxtim
     person <- gsub(" ", "_", I)
     url <-paste("https://",language[1],".wikipedia.org/wiki/",person,sep="")
     file <- paste0(directory, person,".html")
-    oldw <- getOption("warn")
-    options(warn = -1)
-    E <- tryCatch(download.file(url,destfile=file, quiet=TRUE),error = function(e) person)
+    E <- suppressWarnings(tryCatch(download.file(url,destfile=file, quiet=TRUE),error = function(e) person))
     if (E!=0) errores <- c(errores, E)
-    options(warn = oldw)
     Sys.sleep(runif(1, min=0, max=maxtime))
   }
   return(errores)
@@ -508,6 +502,7 @@ getWikiFiles <- function(X, language=c("es", "en", "fr"), directory="./", maxtim
 #' names <- c("William Shakespeare", "Pablo Picasso")
 #' info <- getWikiInf(names)
 #' info$text <- extractWiki(info$label)
+#' @return a character vector with html formatted (or plain text) Wikipedia paragraphs.
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @importFrom jsonlite fromJSON
 #' @export
@@ -547,6 +542,7 @@ extractWiki <- function(names, language=c("en", "es", "fr", "de", "it"), plain=F
 #' information <- getWikiData(names)
 #' information$html <- get_template(information, title="entityLabel", text="entityDescription")
 #' }
+#' @return a character vector of html formatted vignettes.
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @export
 get_template <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wiki=NULL, width=300, color="#135dcd", cex=1){
@@ -570,6 +566,7 @@ get_template <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wik
 #' info <- getWikiData(names)
 #' info$html <- get_template_for_maps(info, title="entityLabel", text="entityDescription")
 #' }
+#' @return a character vector of html formatted vignettes.
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @export
 get_template_for_maps <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wiki=NULL, color="#cbdefb", cex=1){

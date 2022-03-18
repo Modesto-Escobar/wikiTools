@@ -1,19 +1,21 @@
 Package: wikiTools
 Type: Package
-Version: 0.0.5
-Date: 2022-03-12
+Version: 0.0.6
+Date: 2022-03-18
 Title: Tools for Wikidata and Wikipedia
-Description: Manage information from Wikidata and Wikipedia.
+Description: A set of wrappers intended to check, read and download information from the Wikimedia sources. It is specifically created to work with names of celebrities, in which case their information and statistics can be downloaded. Additionally, it also builds links and snippets to use in combination with the function gallery() in netCoin package.
 License: GPL-3
 Depends: R (>= 3.5.0)
 Encoding: UTF-8
 Imports: WikidataQueryServiceR (>= 1.0.0), WikidataR (>= 1.4.0), httr, jsonlite, ratelimitr
 NeedsCompilation: no
-Author: Modesto Escobar <modesto@usal.es>,
-  Ángel Zazo <angelzazo@usal.es>,
-  David Barrios <metal@usal.es>,
-  Carlos Prieto <cprietos@usal.es>,
-  Cristina Calvo <cristinacalvolopez@usal.es>.
+Authors@R: c( 
+    person("Modesto", "Escobar", email = "modesto@usal.es", role = c("aut", "cph","cre"), comment = c(ORCID = "0000-0003-2072-6071")),
+    person("Ángel", "Zazo", email = "angelzazo@usal.es", role = c("aut")), 
+    person("Carlos", "Prieto", email = "cprietos@usal.es", role = c("aut"), comment = c(ORCID = "0000-0001-8178-9768")),
+    person("David", "Barrios", email = "metal@usal.es", role = "aut"),
+    person("Cristina", "Calvo", email = "cristinacalvolopez@usal.es", role = "aut")
+    )
 Maintainer: Modesto Escobar <modesto@usal.es>
 Roxygen: list(markdown=TRUE)
 RoxygenNote: 7.1.2

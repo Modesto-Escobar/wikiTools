@@ -32,6 +32,9 @@ get_template_for_maps(
 
 \item{cex}{number indicating the amount by which plotting text should be scaled relative to the default.}
 }
+\value{
+a character vector of html formatted vignettes.
+}
 \description{
 Create a drop-down vignette for nodes from different items (for maps).
 }
