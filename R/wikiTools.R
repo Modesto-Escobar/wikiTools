@@ -535,6 +535,7 @@ extractWiki <- function(names, language=c("en", "es", "fr", "de", "it"), plain=F
 #' @param width length of the vignette's width.
 #' @param color color of the vignette's strip (It also could be a column name which contains colors).
 #' @param cex number indicating the amount by which plotting text should be scaled relative to the default.
+#' @param roundedImg Display images with rounded borders.
 #' @examples
 #' ## Obtaining information in English Wikidata
 #' \dontrun{
@@ -545,48 +546,26 @@ extractWiki <- function(names, language=c("en", "es", "fr", "de", "it"), plain=F
 #' @return a character vector of html formatted vignettes.
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @export
-get_template <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wiki=NULL, width=300, color="#135dcd", cex=1){
-  return(get_template_(data, title, title2, text, img, wiki, width, c(6,12), color, cex))
-}
-
-#get_template_for_maps----
-#' Create a drop-down vignette for nodes from different items (for maps).
-#' @param data data frame which contains the data.
-#' @param title column name which contains the first tittle of the vignette.
-#' @param title2 column name which contains the secondary title of the vignette.
-#' @param text column name which contains the main text of the vignette.
-#' @param img column name which contains the names of the image files.
-#' @param wiki column name which contains the wiki URL for the vignette.
-#' @param color color of the vignette's strip (It also could be a column name which contains colors).
-#' @param cex number indicating the amount by which plotting text should be scaled relative to the default.
-#' @examples
-#' ## Obtaining information in English Wikidata
-#' \dontrun{
-#' names <- c("William Shakespeare", "Pablo Picasso")
-#' info <- getWikiData(names)
-#' info$html <- get_template_for_maps(info, title="entityLabel", text="entityDescription")
-#' }
-#' @return a character vector of html formatted vignettes.
-#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
-#' @export
-get_template_for_maps <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wiki=NULL, color="#cbdefb", cex=1){
-  return(get_template_(data, title, title2, text, img, wiki, NULL, c(13,19), color, cex))
-}
-
-get_template_ <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wiki=NULL, width=NULL, padding=NULL, color=NULL, cex=1) {
+get_template <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wiki=NULL, width=300, color="auto", cex=1, roundedImg = FALSE) {
+  autocolor <- ''
+  colorstyle <- ''
   if(length(color)){
-    if(length(data[[color]])){
-      color <- data[[color]]
+    color <- color[1]
+    if(color=="auto"){
+      autocolor <- 'class="auto-color" '
+    }else{
+      if(length(data[[color]])){
+        color <- data[[color]]
+      }
+      colorstyle <- paste0('background-color:',color,';')
     }
-    color <- paste0('background-color:',color,';')
-  }else{
-    color <- ""
   }
   if(length(width)){
-    width <- paste0(" width: ",width,"px;")
+    widthstyle <- paste0(" width: ",width,"px;")
   }else{
-    width <- ""
+    widthstyle <- ""
   }
+  padding <- c(13,19)
   if(length(padding)){
     margin <- paste0("margin:",paste0(-padding,"px",collapse=" "),";")
     padding <- paste0("padding:",paste0(padding,"px",collapse=" "),";")
@@ -594,19 +573,30 @@ get_template_ <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wi
     padding <- ""
     margin <- ""
   }
-  data[["template"]] <- paste0('<div style="font-size:',cex,'em;',margin,width,'">')
+  data[["template"]] <- paste0('<div class="info-template" style="font-size:',cex,'em;',margin,widthstyle,'">')
   borderRadius <- 'border-radius:12px 12px 0 0;'
   if(is.character(img) && length(data[[img]])){
     for(i in (1:nrow(data))){
-      if(file.exists(data[[i,img]])){
-        data[i,img] <- paste0("data:",mime(data[[i,img]]),";base64,",base64encode(data[[i,img]]))
+      if(file.exists(data[i,img])){
+        data[i,img] <- paste0("data:",mime(data[i,img]),";base64,",base64encode(data[i,img]))
       }
     }
-    data[["template"]] <- paste0(data[["template"]],'<img style="width:100%;',borderRadius,'" src="',data[[img]],'"/>')
+    fit <- ''
+    heightstyle <- ''
+    if(roundedImg){
+      roundedImg <- 'border-radius:50%;'
+      if(length(width)){
+        heightstyle <- paste0('height:',width,'px;')
+      }
+      fit <- 'object-fit:cover;'
+    }else{
+      roundedImg <- borderRadius
+    }
     borderRadius <- ''
+    data[["template"]] <- paste0(data[["template"]],'<div style="',roundedImg,heightstyle,'overflow:hidden;"><img style="width:100%;height:100%;display:block;',fit,'" src="',data[[img]],'"/></div>')
   }
   if(is.character(title) && length(data[[title]])){
-    data[["template"]] <- paste0(data[["template"]],'<h2 style="font-size:2em;',color,padding,'margin-top:-3px;',borderRadius,'">',data[[title]],'</h2>')
+    data[["template"]] <- paste0(data[["template"]],'<h2 ',autocolor,'style="font-size:2em;',colorstyle,padding,'margin-top:-3px;',borderRadius,'">',data[[title]],'</h2>')
   }
   data[["template"]] <- paste0(data[["template"]],'<div style="',padding,'">')
   if(is.character(title2) && length(data[[title2]])){

@@ -12,8 +12,9 @@ get_template(
   img = NULL,
   wiki = NULL,
   width = 300,
-  color = "#135dcd",
-  cex = 1
+  color = "auto",
+  cex = 1,
+  roundedImg = FALSE
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ get_template(
 \item{color}{color of the vignette's strip (It also could be a column name which contains colors).}
 
 \item{cex}{number indicating the amount by which plotting text should be scaled relative to the default.}
+
+\item{roundedImg}{Display images with rounded borders.}
 }
 \value{
 a character vector of html formatted vignettes.
