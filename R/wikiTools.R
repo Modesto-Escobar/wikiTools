@@ -536,6 +536,7 @@ extractWiki <- function(names, language=c("en", "es", "fr", "de", "it"), plain=F
 #' @param color color of the vignette's strip (It also could be a column name which contains colors).
 #' @param cex number indicating the amount by which plotting text should be scaled relative to the default.
 #' @param roundedImg Display images with rounded borders.
+#' @param mode 2 display images next to the text. 1 by default.
 #' @examples
 #' ## Obtaining information in English Wikidata
 #' \dontrun{
@@ -546,7 +547,7 @@ extractWiki <- function(names, language=c("en", "es", "fr", "de", "it"), plain=F
 #' @return a character vector of html formatted vignettes.
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @export
-get_template <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wiki=NULL, width=300, color="auto", cex=1, roundedImg = FALSE) {
+get_template <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wiki=NULL, width=300, color="auto", cex=1, roundedImg=FALSE, mode=1) {
   autocolor <- ''
   colorstyle <- ''
   if(length(color)){
@@ -573,45 +574,56 @@ get_template <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wik
     padding <- ""
     margin <- ""
   }
-  data[["template"]] <- paste0('<div class="info-template" style="font-size:',cex,'em;',margin,widthstyle,'">')
+
   borderRadius <- 'border-radius:12px 12px 0 0;'
+  templateImg <- ''
   if(is.character(img) && length(data[[img]])){
     for(i in (1:nrow(data))){
       if(file.exists(data[i,img])){
         data[i,img] <- paste0("data:",mime(data[i,img]),";base64,",base64encode(data[i,img]))
       }
     }
-    fit <- ''
-    heightstyle <- ''
-    if(roundedImg){
-      roundedImg <- 'border-radius:50%;'
-      if(length(width)){
-        heightstyle <- paste0('height:',width,'px;')
-      }
-      fit <- 'object-fit:cover;'
+    if(mode==2){
+      templateImg <- paste0('<img style="display: block; width: 100%;" src="',data[[img]],'"/>')
     }else{
-      roundedImg <- borderRadius
+      fit <- ''
+      heightstyle <- ''
+      if(roundedImg){
+        roundedImg <- 'border-radius:50%;'
+        if(length(width)){
+          heightstyle <- paste0('height:',width,'px;')
+        }
+        fit <- 'object-fit:cover;'
+      }else{
+        roundedImg <- borderRadius
+      }
+      borderRadius <- ''
+      templateImg <- paste0('<div style="',roundedImg,heightstyle,'overflow:hidden;"><img style="width:100%;height:100%;display:block;',fit,'" src="',data[[img]],'"/></div>')
     }
-    borderRadius <- ''
-    data[["template"]] <- paste0(data[["template"]],'<div style="',roundedImg,heightstyle,'overflow:hidden;"><img style="width:100%;height:100%;display:block;',fit,'" src="',data[[img]],'"/></div>')
   }
+  templateTitle <- ''
   if(is.character(title) && length(data[[title]])){
-    data[["template"]] <- paste0(data[["template"]],'<h2 ',autocolor,'style="font-size:2em;',colorstyle,padding,'margin-top:-3px;',borderRadius,'">',data[[title]],'</h2>')
+    templateTitle <- paste0('<h2 ',autocolor,'style="font-size:2em;',colorstyle,padding,'margin:-3px 0 0 0;',borderRadius,'">',data[[title]],'</h2>')
   }
-  data[["template"]] <- paste0(data[["template"]],'<div style="',padding,'">')
+  templateTitle2 <- ''
   if(is.character(title2) && length(data[[title2]])){
-    data[["template"]] <- paste0(data[["template"]],'<h3>', data[[title2]],'</h3>')
+    templateTitle2 <- paste0('<h3>', data[[title2]],'</h3>')
   }
+  templateText <- '<p></p>'
   if(is.character(text) && length(data[[text]])){
-    data[["template"]] <- paste0(data[["template"]],'<p>',data[[text]],'</p>')
-  }else{
-    data[["template"]] <- paste0(data[["template"]],'<p></p>')
+    templateText <- paste0('<p>',data[[text]],'</p>')
   }
+  templateWiki <- ''
   if(is.character(wiki) && length(data[[wiki]])){
-    data[["template"]] <- paste0(data[["template"]],'<h3><img style="width:20px;vertical-align:bottom;margin-right:10px;" src="https://www.wikipedia.org/portal/wikipedia.org/assets/img/Wikipedia-logo-v2.png"/>Wikipedia: <a target="_blank" href="',data[[wiki]],'">',wiki,'</a></h3>')
+    templateWiki <- paste0('<h3><img style="width:20px;vertical-align:bottom;margin-right:10px;" src="https://www.wikipedia.org/portal/wikipedia.org/assets/img/Wikipedia-logo-v2.png"/>Wikipedia: <a target="_blank" href="',data[[wiki]],'">',wiki,'</a></h3>')
   }
-  data[["template"]] <- paste0(data[["template"]],'</div></div>')
-  return(data[["template"]])
+  if(templateImg!='' && mode==2){
+    celldiv <- '<div style="display: inline-block; width: 50%; vertical-align: top;">'
+    templateContent <- paste0(templateTitle,celldiv,'<div style="',padding,'">',templateTitle2,templateText,templateWiki,'</div></div>',celldiv,templateImg,'</div>')
+  }else{
+    templateContent <- paste0(templateImg,templateTitle,'<div style="',padding,'">',templateTitle2,templateText,templateWiki,'</div>')
+  }
+  return(paste0('<div class="info-template" style="font-size:',cex,'em;',margin,widthstyle,'">',templateContent,'</div>'))
 }
 
 base64encode <- function(filename) {

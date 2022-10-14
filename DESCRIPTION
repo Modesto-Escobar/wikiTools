@@ -1,7 +1,7 @@
 Package: wikiTools
 Type: Package
-Version: 0.0.7
-Date: 2022-09-09
+Version: 0.0.8
+Date: 2022-10-14
 Title: Tools for Wikidata and Wikipedia
 Description: A set of wrappers intended to check, read and download information from the Wikimedia sources. It is specifically created to work with names of celebrities, in which case their information and statistics can be downloaded. Additionally, it also builds links and snippets to use in combination with the function gallery() in netCoin package.
 License: GPL-3

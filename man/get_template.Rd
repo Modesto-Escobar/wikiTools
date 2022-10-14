@@ -14,7 +14,8 @@ get_template(
   width = 300,
   color = "auto",
   cex = 1,
-  roundedImg = FALSE
+  roundedImg = FALSE,
+  mode = 1
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ get_template(
 \item{cex}{number indicating the amount by which plotting text should be scaled relative to the default.}
 
 \item{roundedImg}{Display images with rounded borders.}
+
+\item{mode}{2 display images next to the text. 1 by default.}
 }
 \value{
 a character vector of html formatted vignettes.
