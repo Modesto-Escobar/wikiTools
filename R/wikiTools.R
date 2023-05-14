@@ -242,7 +242,7 @@ searchWiki <- function(name, language=c("en", "es", "fr", "it", "de", "pt", "ca"
 #' @export
 #' @importFrom WikidataR find_item
 getWikiInf <- function(names, number=1, language="en"){
-  get <-function(name, number=1, language="en"){
+  get <-function(name, number=1, language=language){
     i <- find_item(name, language=language)
     if(length(i)>=number) {
       X <- c(name=name, Q=i[[number]]$id, 
@@ -287,7 +287,7 @@ getWikiData <- function(names, language="en", csv=NULL) {
      (GROUP_CONCAT(DISTINCT ?no;separator="|")      as ?notableworkQ)
      WHERE {
      BIND(wd:',q,' AS ?entity)
-    SERVICE wikibase:label {bd:serviceParam wikibase:language "en"}
+    SERVICE wikibase:label {bd:serviceParam wikibase:language"', language, '"}
     {
       SELECT ?birthdate (COUNT(?refP569) AS ?cP569)
       WHERE {
@@ -320,11 +320,11 @@ getWikiData <- function(names, language="en", csv=NULL) {
     }
     OPTIONAL {?entity wdt:P21  ?sex.}
     OPTIONAl {?entity wdt:P18  ?pic.} 
-    OPTIONAL {?entity wdt:P106 ?oc. ?oc rdfs:label ?ocLabel. FILTER(LANG(?ocLabel) = "en")}
-    OPTIONAL {?entity wdt:P135 ?mo. ?mo rdfs:label ?moLabel. FILTER(LANG(?moLabel) = "en")} 
-    OPTIONAL {?entity wdt:P136 ?ge. ?ge rdfs:label ?geLabel. FILTER(LANG(?geLabel) = "en")}
-    OPTIONAL {?entity wdt:P737 ?in. ?in rdfs:label ?inLabel. FILTER(LANG(?inLabel) = "en")}
-    OPTIONAL {?entity wdt:P800 ?no. ?no rdfs:label ?noLabel. FILTER(LANG(?noLabel) = "en")}
+    OPTIONAL {?entity wdt:P106 ?oc. ?oc rdfs:label ?ocLabel. FILTER(LANG(?ocLabel) = "', language, '")}
+    OPTIONAL {?entity wdt:P135 ?mo. ?mo rdfs:label ?moLabel. FILTER(LANG(?moLabel) = "', language, '")} 
+    OPTIONAL {?entity wdt:P136 ?ge. ?ge rdfs:label ?geLabel. FILTER(LANG(?geLabel) = "', language, '")}
+    OPTIONAL {?entity wdt:P737 ?in. ?in rdfs:label ?inLabel. FILTER(LANG(?inLabel) = "', language, '")}
+    OPTIONAL {?entity wdt:P800 ?no. ?no rdfs:label ?noLabel. FILTER(LANG(?noLabel) = "', language, '")}
     }
    GROUP BY ?entityLabel ?entityDescription ?sexLabel ?birthdate ?birthplaceLabel ?birthcountryLabel ?deathdate ?deathplaceLabel ?deathcountryLabel 
 ')
