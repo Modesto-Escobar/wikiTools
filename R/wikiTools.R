@@ -336,7 +336,7 @@ getWikiData <- function(names, language="en", csv=NULL) {
     if(length(i)>0) {
       Q <- i[[1]]$id
       X <- suppressMessages(query_wikidata(petition(Q)))
-      X <- cbind(Q, X)
+      X <- cbind(Q, X[1, ])
       bcb <- !is.na(X$birthdate) && substring(X$birthdate,1,1)=="-"
       bcd <- !is.na(X$deathdate) && substring(X$deathdate,1,1)=="-"
       X$birthdate <- sub("^-","",X$birthdate)
