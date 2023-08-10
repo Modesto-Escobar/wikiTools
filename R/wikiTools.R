@@ -23,7 +23,7 @@ validUrl <- function(url, time=2){
 #' Convert a Wikipedia URL to an HTML link
 #' @param url Character vector of URLs.
 #' @param text A vector with name of the correspondent title of the url (See details).
-#' @details This function converts an available URL direction to the corresponding HTML link, i.e., "https://es.wikipedia.org/wiki/Socrates" changes into "<a href='https://es.wikipedia.org/wiki/Socrates', target='_blank'>Socrates</a>".
+#' @details This function converts an available URL direction to the corresponding HTML link, i.e., "https://es.wikipedia.org/wiki/Socrates" changes into "\verb{<a href='https://es.wikipedia.org/wiki/Socrates' target='_blank'>Socrates</a>}".
 #` It is possible to change the showing name of the link directly using the argument text. When not specified, it is extracted directly from the URL.
 #' @return A character vector of HTML links for the given urls.
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
@@ -53,7 +53,7 @@ urltoHtml <- function(url, text=NULL) {
 # urltoFrame----
 #' Convert an URL link to an HTML iframe.
 #' @param url Character vector of URLs.
-#' @details This function converts an available URL direction to the corresponding HTML iframe, i.e., "https://es.wikipedia.org/wiki/Socrates" changes into "<a href='https://es.wikipedia.org/wiki/Socrates', target='_blank'>Socrates</a>".
+#' @details This function converts an available URL direction to the corresponding HTML iframe, i.e., "https://es.wikipedia.org/wiki/Socrates" changes into "\verb{<a href='https://es.wikipedia.org/wiki/Socrates' target='_blank'>Socrates</a>}".
 #' @return A character vector of HTML iframe for the given urls.
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @examples
@@ -138,7 +138,7 @@ nametoWikiURL <- function (name, language="en") {
 #' @param name A vector consisting of one or more Wikipedia's entry (i.e., topic or person).
 #' @param language The language of the Wikipedia page version. This should consist of an ISO language code (default = "en").
 #' @return A character vector of names' links.
-#' @details This function adds the Wikipedia's html link to a entry or name, i.e., "Max Weber" converts into "<a href='https://es.wikipedia.org/wiki/Max_Weber', target='_blank'>Max Weber</a>". It also manages different the languages of Wikipedia through the abbreviated two-letter language parameter, i.e., "en" = "english".
+#' @details This function adds the Wikipedia's html link to a entry or name, i.e., "Max Weber" converts into "\verb{<a href='https://es.wikipedia.org/wiki/Max_Weber' target='_blank'>Max Weber</a>}". It also manages different the languages of Wikipedia through the abbreviated two-letter language parameter, i.e., "en" = "english".
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @examples
 #' ## When extracting a single item;
@@ -524,129 +524,3 @@ extractWiki <- function(names, language=c("en", "es", "fr", "de", "it"), plain=F
   return(sapply(names, extract, language=language, plain=plain, maximum=maximum))
 }
 
-# get_template ----
-#' Create a drop-down vignette for nodes from different items (for galleries).
-#' @param data data frame which contains the data.
-#' @param title column name which contains the first tittle of the vignette.
-#' @param title2 column name which contains the secondary title of the vignette.
-#' @param text column name which contains the main text of the vignette.
-#' @param img column name which contains the names of the image files.
-#' @param wiki column name which contains the wiki URL for the vignette.
-#' @param width length of the vignette's width.
-#' @param color color of the vignette's strip (It also could be a column name which contains colors).
-#' @param cex number indicating the amount by which plotting text should be scaled relative to the default.
-#' @param roundedImg Display images with rounded borders.
-#' @param mode 2 display images next to the text. 1 by default.
-#' @examples
-#' ## Obtaining information in English Wikidata
-#' \dontrun{
-#' names <- c("William Shakespeare", "Pablo Picasso")
-#' information <- getWikiData(names)
-#' information$html <- get_template(information, title="entityLabel", text="entityDescription")
-#' }
-#' @return a character vector of html formatted vignettes.
-#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
-#' @export
-get_template <- function(data, title=NULL, title2=NULL, text=NULL, img=NULL, wiki=NULL, width=300, color="auto", cex=1, roundedImg=FALSE, mode=1) {
-  autocolor <- ''
-  colorstyle <- ''
-  if(length(color)){
-    color <- color[1]
-    if(color=="auto"){
-      autocolor <- 'class="auto-color" '
-    }else{
-      if(length(data[[color]])){
-        color <- data[[color]]
-      }
-      colorstyle <- paste0('background-color:',color,';')
-    }
-  }
-  if(length(width)){
-    widthstyle <- paste0(" width: ",width,"px;")
-  }else{
-    widthstyle <- ""
-  }
-  padding <- c(13,19)
-  if(length(padding)){
-    margin <- paste0("margin:",paste0(-padding,"px",collapse=" "),";")
-    padding <- paste0("padding:",paste0(padding,"px",collapse=" "),";")
-  }else{
-    padding <- ""
-    margin <- ""
-  }
-
-  borderRadius <- 'border-radius:12px 12px 0 0;'
-  templateImg <- ''
-  if(is.character(img) && length(data[[img]])){
-    for(i in (1:nrow(data))){
-      if(file.exists(data[i,img])){
-        data[i,img] <- paste0("data:",mime(data[i,img]),";base64,",base64encode(data[i,img]))
-      }
-    }
-    if(mode==2){
-      templateImg <- paste0('<img style="display: block; width: 100%;" src="',data[[img]],'"/>')
-    }else{
-      fit <- ''
-      heightstyle <- ''
-      if(roundedImg){
-        roundedImg <- 'border-radius:50%;'
-        if(length(width)){
-          heightstyle <- paste0('height:',width,'px;')
-        }
-        fit <- 'object-fit:cover;'
-      }else{
-        roundedImg <- borderRadius
-      }
-      borderRadius <- ''
-      templateImg <- paste0('<div style="',roundedImg,heightstyle,'overflow:hidden;"><img style="width:100%;height:100%;display:block;',fit,'" src="',data[[img]],'"/></div>')
-    }
-  }
-  templateTitle <- ''
-  if(is.character(title) && length(data[[title]])){
-    templateTitle <- paste0('<h2 ',autocolor,'style="font-size:2em;',colorstyle,padding,'margin:-3px 0 0 0;',borderRadius,'">',data[[title]],'</h2>')
-  }
-  templateTitle2 <- ''
-  if(is.character(title2) && length(data[[title2]])){
-    templateTitle2 <- paste0('<h3>', data[[title2]],'</h3>')
-  }
-  templateText <- '<p></p>'
-  if(is.character(text) && length(data[[text]])){
-    templateText <- paste0('<p>',data[[text]],'</p>')
-  }
-  templateWiki <- ''
-  if(is.character(wiki) && length(data[[wiki]])){
-    templateWiki <- paste0('<h3><img style="width:20px;vertical-align:bottom;margin-right:10px;" src="https://www.wikipedia.org/portal/wikipedia.org/assets/img/Wikipedia-logo-v2.png"/>Wikipedia: <a target="_blank" href="',data[[wiki]],'">',wiki,'</a></h3>')
-  }
-  if(templateImg!='' && mode==2){
-    celldiv <- '<div style="display: inline-block; width: 50%; vertical-align: top;">'
-    templateContent <- paste0(templateTitle,celldiv,'<div style="',padding,'">',templateTitle2,templateText,templateWiki,'</div></div>',celldiv,templateImg,'</div>')
-  }else{
-    templateContent <- paste0(templateImg,templateTitle,'<div style="',padding,'">',templateTitle2,templateText,templateWiki,'</div>')
-  }
-  return(paste0('<div class="info-template" style="font-size:',cex,'em;',margin,widthstyle,'">',templateContent,'</div>'))
-}
-
-base64encode <- function(filename) {
-  to.read = file(filename, "rb")
-  fsize <- file.size(filename)
-  sbit <- readBin(to.read, raw(), n = fsize, endian = "little")
-  close(to.read)
-  b64c <- "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-  shfts <- c(18,12,6,0)
-  sand <- function(n,s) bitwAnd(bitwShiftR(n,s),63)+1
-  slft <- function(p,n) bitwShiftL(as.integer(p),n)
-  subs <- function(s,n) substring(s,n,n)
-  npad <- ( 3 - length(sbit) %% 3) %% 3
-  sbit <- c(sbit,as.raw(rep(0,npad)))
-  pces <- lapply(seq(1,length(sbit),by=3),function(ii) sbit[ii:(ii+2)])
-  encv <- paste0(sapply(pces,function(p) paste0(sapply(shfts,function(s)(subs(b64c,sand(slft(p[1],16)+slft(p[2],8)+slft(p[3],0),s)))))),collapse="")
-  if (npad > 0) substr(encv,nchar(encv)-npad+1,nchar(encv)) <- paste0(rep("=",npad),collapse="")
-  return(encv)
-}
-
-mime <- function(name) {
-  mimemap <- c(jpeg = "image/jpeg", jpg = "image/jpeg", png = "image/png", svg = "image/svg", gif = "image/gif")
-  ext <- sub("^.*\\.","",name)
-  mime <- unname(mimemap[ext])
-  return(mime)
-}

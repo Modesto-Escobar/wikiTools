@@ -18,7 +18,7 @@ A character vector of names' links.
 Create the Wikipedia link of a name or entry.
 }
 \details{
-This function adds the Wikipedia's html link to a entry or name, i.e., "Max Weber" converts into "<a href='https://es.wikipedia.org/wiki/Max_Weber', target='_blank'>Max Weber</a>". It also manages different the languages of Wikipedia through the abbreviated two-letter language parameter, i.e., "en" = "english".
+This function adds the Wikipedia's html link to a entry or name, i.e., "Max Weber" converts into "\verb{<a href='https://es.wikipedia.org/wiki/Max_Weber' target='_blank'>Max Weber</a>}". It also manages different the languages of Wikipedia through the abbreviated two-letter language parameter, i.e., "en" = "english".
 }
 \examples{
 ## When extracting a single item;

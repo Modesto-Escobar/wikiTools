@@ -3,7 +3,9 @@
 \name{req_wikimedia_metrics}
 \alias{req_wikimedia_metrics}
 \title{req_wikimedia_metrics
-Retrieve responses in JSON format from Wikimedia metrics API}
+Retrieve responses in JSON format from Wikimedia metrics API:
+https://wikimedia.org/api/rest_v1/
+https://www.mediawiki.org/wiki/XTools/API/Page [xtools.wmflabs.org]}
 \usage{
 req_wikimedia_metrics(url)
 }
@@ -15,11 +17,13 @@ A JSON response. Please check httr::stop_for_status(response)
 }
 \description{
 req_wikimedia_metrics
-Retrieve responses in JSON format from Wikimedia metrics API
+Retrieve responses in JSON format from Wikimedia metrics API:
+https://wikimedia.org/api/rest_v1/
+https://www.mediawiki.org/wiki/XTools/API/Page [xtools.wmflabs.org]
 }
 \note{
-Used in Wikimedia_page_views
+Used in WM_Pageviews
 }
 \author{
-Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
+Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 }

@@ -16,7 +16,7 @@ A character vector of HTML iframe for the given urls.
 Convert an URL link to an HTML iframe.
 }
 \details{
-This function converts an available URL direction to the corresponding HTML iframe, i.e., "https://es.wikipedia.org/wiki/Socrates" changes into "<a href='https://es.wikipedia.org/wiki/Socrates', target='_blank'>Socrates</a>".
+This function converts an available URL direction to the corresponding HTML iframe, i.e., "https://es.wikipedia.org/wiki/Socrates" changes into "\verb{<a href='https://es.wikipedia.org/wiki/Socrates' target='_blank'>Socrates</a>}".
 }
 \examples{
 ## When you have a single URL:

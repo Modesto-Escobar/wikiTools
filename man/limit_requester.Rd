@@ -3,7 +3,7 @@
 \name{limit_requester}
 \alias{limit_requester}
 \title{limit_requester
-Limit the rate at which a function will execute}
+Limits the rate at which a function will execute}
 \usage{
 limit_requester(f, n, period)
 }
@@ -15,15 +15,19 @@ limit_requester(f, n, period)
 \item{period}{Length (in seconds) of measurement period}
 }
 \value{
-If 'f' is a single function, then a new function with the same signature and (eventual) behavior as the original function, but rate limited. If 'f' is a named list of functions, then a new list of functions with the same names and signatures, but collectively bound by a shared rate limit.
+If 'f' is a single function, then a new function with the same
+signature and (eventual) behavior as the original function, but rate limited.
+If 'f' is a named list of functions, then a new list of functions with the
+same names and signatures, but collectively bound by a shared rate limit.
+Used only for WikiData Query Service (WDQS).
 }
 \description{
 limit_requester
-Limit the rate at which a function will execute
+Limits the rate at which a function will execute
 }
 \seealso{
 ratelimitr
 }
 \author{
-Angel F. Zazo, Departament of Computer Science and Automatics, University of Salamanca
+Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 }

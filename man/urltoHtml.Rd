@@ -18,7 +18,7 @@ A character vector of HTML links for the given urls.
 Convert a Wikipedia URL to an HTML link
 }
 \details{
-This function converts an available URL direction to the corresponding HTML link, i.e., "https://es.wikipedia.org/wiki/Socrates" changes into "<a href='https://es.wikipedia.org/wiki/Socrates', target='_blank'>Socrates</a>".
+This function converts an available URL direction to the corresponding HTML link, i.e., "https://es.wikipedia.org/wiki/Socrates" changes into "\verb{<a href='https://es.wikipedia.org/wiki/Socrates' target='_blank'>Socrates</a>}".
 }
 \examples{
 ## When you have a single URL:
