@@ -20,6 +20,9 @@ WDQS_OccupationCount(Qoc)
 Search in WDQS to know the number of Wikidata entities with P106 property
 (occupation) set to Qoc.
 }
+\examples{
+WDQS_OccupationCount(Qoc='Q2306091') # Qoc for Sociologist
+}
 \author{
 Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 }

@@ -2,35 +2,36 @@
 % Please edit documentation in R/wiki_utils.R
 \name{WDQS_query}
 \alias{WDQS_query}
-\title{WDQS_query
+\title{WDQS_query(sparql_query, format="csv", method="GET", limitRequester=FALSE)
 Retrieves responses from Wikidata Query Service (WDQS). Uses ratelimitr if
-param limit_requester = TRUE.}
+param limitRequester = TRUE.}
 \usage{
 WDQS_query(
   sparql_query,
   format = "csv",
   method = "GET",
-  limit_requester = FALSE
+  limitRequester = FALSE
 )
 }
 \arguments{
 \item{sparql_query}{A string with the query in SPARQL language.}
 
-\item{format}{A string with the query response format.
+\item{format}{A string with the query response format. Mandatory.
 See https://www.mediawiki.org/wiki/Wikidata_Query_Service/User_Manual#SPARQL_endpoint.
-Only  'json', 'xml' or 'csv' formats are permitted, default 'csv'.}
+Only  'json', 'xml' or 'csv' formats are allowed, default 'csv'.}
 
-\item{method}{The method used in the httr request. Default 'GET'.}
+\item{method}{The method used in the httr request, GET or POST, mandatory.
+Default 'GET'.}
 
-\item{limit_requester}{If True, uses ratelimitr to limit the requests.}
+\item{limitRequester}{If True, uses ratelimitr to limit the requests.}
 }
 \value{
 The response in selected format or NULL on errors.
 }
 \description{
-WDQS_query
+WDQS_query(sparql_query, format="csv", method="GET", limitRequester=FALSE)
 Retrieves responses from Wikidata Query Service (WDQS). Uses ratelimitr if
-param limit_requester = TRUE.
+param limitRequester = TRUE.
 }
 \author{
 Angel Zazo, Department of Computer Science and Automatics, University of Salamanca

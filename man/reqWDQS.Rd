@@ -2,7 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{reqWDQS}
 \alias{reqWDQS}
-\title{reqWDQS
+\title{reqWDQS(sparql_query, format='json', method='GET')
 Retrieves responses from Wikidata Query Service (WDQS)}
 \usage{
 reqWDQS(sparql_query, format = "json", method = "GET")
@@ -10,17 +10,18 @@ reqWDQS(sparql_query, format = "json", method = "GET")
 \arguments{
 \item{sparql_query}{A string with the query in SPARQL language.}
 
-\item{format}{A string with the query response format. See
+\item{format}{A string with the query response format, mandatory. See
 https://www.mediawiki.org/wiki/Wikidata_Query_Service/User_Manual#SPARQL_endpoint.
-Only  'json', 'xml' or 'csv' formats are permitted, default 'json'.}
+Only  'json', 'xml' or 'csv' formats are allowed, default 'json'.}
 
-\item{method}{The method used in the httr request. Default 'GET'.}
+\item{method}{The method used in the httr request, GET or POST, mandatory.
+Default 'GET'.}
 }
 \value{
 The response in the format selected. Please check httr::stop_for_status(response)
 }
 \description{
-reqWDQS
+reqWDQS(sparql_query, format='json', method='GET')
 Retrieves responses from Wikidata Query Service (WDQS)
 }
 \note{

@@ -2,8 +2,9 @@
 % Please edit documentation in R/wiki_utils.R
 \name{WDQS_OccupationEntities}
 \alias{WDQS_OccupationEntities}
-\title{WDQS_OccupationEntities(Qoc, nlimit)
-Returns the Wikidata entities of the occupation Qoc. Use chunked requests.}
+\title{WDQS_OccupationEntities(Qoc, nlimit=10000)
+Returns the Wikidata entities which have the occupation indicated in Qoc, the
+Wikidata entity for that occupation. Use chunked requests.}
 \usage{
 WDQS_OccupationEntities(Qoc, nlimit = 10000)
 }
@@ -18,8 +19,12 @@ in each chunk.}
 A vector with the Wikidata entities with that occupation.
 }
 \description{
-WDQS_OccupationEntities(Qoc, nlimit)
-Returns the Wikidata entities of the occupation Qoc. Use chunked requests.
+WDQS_OccupationEntities(Qoc, nlimit=10000)
+Returns the Wikidata entities which have the occupation indicated in Qoc, the
+Wikidata entity for that occupation. Use chunked requests.
+}
+\examples{
+l <- WDQS_OccupationEntities(Qoc='Q2306091')
 }
 \author{
 Angel Zazo, Department of Computer Science and Automatics, University of Salamanca

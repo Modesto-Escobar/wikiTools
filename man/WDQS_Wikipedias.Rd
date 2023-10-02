@@ -2,47 +2,51 @@
 % Please edit documentation in R/wiki_utils.R
 \name{WDQS_Wikipedias}
 \alias{WDQS_Wikipedias}
-\title{WDQS_Wikipedias(entity_list, instanceof, wikilangs, nlimit)
-Gets from Wikidata all Wikipedia pages of the Wikidata entities in
+\title{WDQS_Wikipedias(entity_list, wikilangs="", instanceof="", nlimit=1500)
+Gets from Wikidata all Wikipedia page titles of the Wikidata entities in
 entity_list. If set "instanceof", then only returns the pages for Wikidata
-entities which are instances of that Wikidata class. If langs='', then
-returns all Wikipedia pages, else only the languages in langs.
+entities which are instances of that Wikidata class. If wikilangs='', then
+returns all Wikipedia page titles, else only the languages in wikilangs.
 Duplicated entities are deleted before search.}
 \usage{
-WDQS_Wikipedias(
-  entity_list,
-  instanceof = "",
-  wikilangs = "es|en|ca|eu|gl|pt|fr|it|de|ru|ko|ja|zh",
-  nlimit = 1500
-)
+WDQS_Wikipedias(entity_list, wikilangs = "", instanceof = "", nlimit = 1500)
 }
 \arguments{
 \item{entity_list}{A vector with de Wikidata entities.}
 
+\item{wikilangs}{List of languages to limit the search, using "|" as
+separator. Wikipedias page titles are returned in same order as languages in
+this parameter. If wikilangs='' the function returns Wikipedia page titles
+in any language, not sorted.}
+
 \item{instanceof}{Wikidata entity class to limit the result to the instances
 of that class. For example, if instanceof='Q5', limit the results to "human".}
-
-\item{wikilangs}{List of languages to limit the search, using "|" as
-separator. Wikipedias are returned in same order as languages in this
-parameter. If wikilangs=='' the function returns Wikipedia pages in any
-language, not sorted.}
 
 \item{nlimit}{If the number of entities exceeds this number, do chunked
 queries. This is the number of entities requested in each chunk.}
 }
 \value{
 A data-frame with four columns, first the count of Wikipedia pages,
-second, the langs, third, the page name, and last, the URL of the
-wikipedia pages. Last three use "|" as separator. Index of the data-frame is
-also set to entity_list.
+second, the the langs, page title, and URL's of the wikipedia pages. Last
+three use "|" as separator. Index of the data-frame is also set to the
+entity_list.
 }
 \description{
-WDQS_Wikipedias(entity_list, instanceof, wikilangs, nlimit)
-Gets from Wikidata all Wikipedia pages of the Wikidata entities in
+WDQS_Wikipedias(entity_list, wikilangs="", instanceof="", nlimit=1500)
+Gets from Wikidata all Wikipedia page titles of the Wikidata entities in
 entity_list. If set "instanceof", then only returns the pages for Wikidata
-entities which are instances of that Wikidata class. If langs='', then
-returns all Wikipedia pages, else only the languages in langs.
+entities which are instances of that Wikidata class. If wikilangs='', then
+returns all Wikipedia page titles, else only the languages in wikilangs.
 Duplicated entities are deleted before search.
+}
+\examples{
+# aux: get a vector of entities (l).
+df <- WDQS_SearchByLabel_Inlabel(string='Iranzo', langsorder='es|en')
+l <- df$entity
+
+w <- WDQS_Wikipedias(entity_list=l)
+w <- WDQS_Wikipedias(entity_list=l, wikilangs='es|en|fr')
+w <- WDQS_Wikipedias(entity_list=l, wikilangs='es|en|fr', instanceof="Q5")
 }
 \author{
 Angel Zazo, Department of Computer Science and Automatics, University of Salamanca

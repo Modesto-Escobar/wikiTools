@@ -2,34 +2,39 @@
 % Please edit documentation in R/wiki_utils.R
 \name{WDQS_SearchByLabel_Startswith}
 \alias{WDQS_SearchByLabel_Startswith}
-\title{WDQS_SearchByLabel_Startswith(string, instanceof, Pproperty, lang, langsorder)
+\title{WDQS_SearchByLabel_Startswith(string, lang='en', langsorder='en', instanceof="", Pproperty="")
 Search Wikidata entities which label or altLabel starts with "string" in
-language "lang". It's similar to a wildcard search: "string*". Diacritics and
-case are ignored. Search "string" in language "lang" (mandatory) in label,
+language "lang" (mandatory). It's similar to a wildcard search: "string*".
+Diacritics and case are ignored. Search "string" in language "lang" in label,
 but in any language in altLabel.}
 \usage{
 WDQS_SearchByLabel_Startswith(
   string,
+  lang = "en",
+  langsorder = "en",
   instanceof = "",
-  Pproperty = "",
-  lang = "es",
-  langsorder = "es|en|ca|eu|gl|pt|fr|it|de|ru|ko|ja|zh"
+  Pproperty = ""
 )
 }
 \arguments{
 \item{string}{string to search.}
 
+\item{lang}{The language to search in label, mandatory, only one language,
+default, 'en'.}
+
+\item{langsorder}{Order of languages in which the information will be
+returned, using "|" as separator. If no information is given in the first
+language, next is used. This parameter is mandatory, at least one language is
+required, default, 'en'.}
+
 \item{instanceof}{Wikidata entity of which the entities searched for are an
-example or member of it (class). For example, if instanceof=Q5 the
-search are filtered to Wikidata entities of class Q5 (human).}
+example or member of it (class). For example, if instanceof="Q5" the
+search are filtered to Wikidata entities of class Q5 (human). Some
+entity classes are allowed, separated with '|'.}
 
 \item{Pproperty}{Wikidata properties, separated with '|', to optionally
 include in the search. For example, is Pproperty="P21", the results
 include information of the sex of entities found.}
-
-\item{lang}{language to search in label, mandatory.}
-
-\item{langsorder}{Order of languages in which the information will be returned.}
 }
 \value{
 : A data-frame with 'entity', 'entityLabel', 'entityDescription',
@@ -37,11 +42,20 @@ include information of the sex of entities found.}
 Pproperty param.
 }
 \description{
-WDQS_SearchByLabel_Startswith(string, instanceof, Pproperty, lang, langsorder)
+WDQS_SearchByLabel_Startswith(string, lang='en', langsorder='en', instanceof="", Pproperty="")
 Search Wikidata entities which label or altLabel starts with "string" in
-language "lang". It's similar to a wildcard search: "string*". Diacritics and
-case are ignored. Search "string" in language "lang" (mandatory) in label,
+language "lang" (mandatory). It's similar to a wildcard search: "string*".
+Diacritics and case are ignored. Search "string" in language "lang" in label,
 but in any language in altLabel.
+}
+\examples{
+df <- WDQS_SearchByLabel_Startswith(string='Iranzo', lang='en', langsorder='es|en')
+df <- WDQS_SearchByLabel_Startswith(string='Iranzo', lang='en', langsorder='es|en',
+instanceof = 'Q5')
+df <- WDQS_SearchByLabel_Startswith(string='Iranzo', lang='en', langsorder='es|en',
+instanceof = 'Q5|Q101352')
+df <- WDQS_SearchByLabel_Startswith(string='Iranzo', lang='en', langsorder='en',
+instanceof = 'Q5', Pproperty = 'P21|P569|P570')
 }
 \author{
 Angel Zazo, Department of Computer Science and Automatics, University of Salamanca

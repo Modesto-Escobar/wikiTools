@@ -5,13 +5,15 @@
 \title{VIAF_Search(CQL_Query)
 Run the CQL_Query using the VIAF Search API and return a list of records
 found. The search string is formed using the CQL_Query syntax of the API.
-Note that returned records use the http://viaf.org/BriefVIAFCluster record
-schema. Also note that only returns a maximum of 250 records.}
+Note that returned records use the http://viaf.org/VIAFCluster record
+schema, i.e., complete cluster records. Also note that only returns a maximum
+of 250 records.}
 \usage{
 VIAF_Search(CQL_Query)
 }
 \arguments{
-\item{CQL_Query}{string with the search. See https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html}
+\item{CQL_Query}{string with the search.
+See https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html}
 }
 \value{
 A list with the records found.
@@ -20,6 +22,28 @@ A list with the records found.
 VIAF_Search(CQL_Query)
 Run the CQL_Query using the VIAF Search API and return a list of records
 found. The search string is formed using the CQL_Query syntax of the API.
-Note that returned records use the http://viaf.org/BriefVIAFCluster record
-schema. Also note that only returns a maximum of 250 records.
+Note that returned records use the http://viaf.org/VIAFCluster record
+schema, i.e., complete cluster records. Also note that only returns a maximum
+of 250 records.
+}
+\examples{
+## Search in any field (cql.any)
+# Operator is "=": so search one or more terms:
+CQL_Query <- 'cql.any = "García Iranzo, Juan"'
+r <- VIAF_Search(CQL_Query)
+# r contains complete VIAF records (sometimes seen as a "cluster record",
+# which is unified by combining records from many libraries around the world)
+# Search in 1xx, 4xx, 5xx fields of MARC record (local.names)
+# Operator is "all": search all terms
+CQL_Query <- 'local.names all "Modesto Escobar"'
+r <- VIAF_Search(CQL_Query)
+
+# Search in 100, 400, 500 fields of MARC record (local.personalNames)
+# Operator is "all": search all terms
+CQL_Query <- 'local.personalNames all "Modesto Escobar"'
+r <- VIAF_Search(CQL_Query)
+
+# Search in Titles
+CQL_Query <- 'local.title all "Los pronósticos electorales con encuestas"'
+r <- VIAF_Search(CQL_Query)
 }

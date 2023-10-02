@@ -2,42 +2,54 @@
 % Please edit documentation in R/wiki_utils.R
 \name{MW_XtoolsInfo}
 \alias{MW_XtoolsInfo}
-\title{MW_XtoolsInfo
-Obtains information about an article in the Wikimedia project using wmflabs
-in JSON format, or NULL on error. The XTools Page API endpoints offer data
-related to a single page. See https://www.mediawiki.org/wiki/XTools/API/Page
-[xtools.wmflabs.org]}
+\title{MW_XtoolsInfo(article, infotype="articleinfo", project="en.wikipedia.org", redirects=FALSE)
+Obtains information in JSON format about an article in the Wikimedia project
+or NULL on errors. Use the wmflabs API. The XTools Page API endpoints offer data
+related to a single page. See https://www.mediawiki.org/wiki/XTools/API/Page.
+The URL of the API starts with 'https://xtools.wmcloud.org/api/page/'}
 \usage{
 MW_XtoolsInfo(
   article,
   infotype = "articleinfo",
   project = "en.wikipedia.org",
-  inlinks_redirects = FALSE
+  redirects = FALSE
 )
 }
 \arguments{
-\item{article}{The title of the article to search}
+\item{article}{The title of the article to search. Only one article is allowed.}
 
-\item{infotype}{The type of information to request: articleinfo, prose, links}
+\item{infotype}{The type of information to request: articleinfo, prose, links
+Note that the API also offer theses options: top_editors, assessments,
+bot_data and automated_edits.}
 
-\item{project}{The Wikimedia project, defaults en.wikipedia.org}
+\item{project}{The Wikimedia project, defaults en.wikipedia.org.}
 
-\item{inlinks_redirects}{If infotype==links, if redirects are included or not}
+\item{redirects}{If redirects==TRUE, then the information is obtained
+of the destiny of the page. In that case, then the "original" element of
+the returned list contains the original page, and the "page" element the
+destiny page. Also, if infotype=='links, the sum of the in-links of all
+redirections is assigned to links_in_count.}
 }
 \value{
-The information about the article.
+A list with the information about the article.
 }
 \description{
-MW_XtoolsInfo
-Obtains information about an article in the Wikimedia project using wmflabs
-in JSON format, or NULL on error. The XTools Page API endpoints offer data
-related to a single page. See https://www.mediawiki.org/wiki/XTools/API/Page
-[xtools.wmflabs.org]
+MW_XtoolsInfo(article, infotype="articleinfo", project="en.wikipedia.org", redirects=FALSE)
+Obtains information in JSON format about an article in the Wikimedia project
+or NULL on errors. Use the wmflabs API. The XTools Page API endpoints offer data
+related to a single page. See https://www.mediawiki.org/wiki/XTools/API/Page.
+The URL of the API starts with 'https://xtools.wmcloud.org/api/page/'
 }
-\note{
-Is important that the article don't be a redirection: if infotype=prose
-the function gets information of the target article, but with infotype=articleinfo
-or infotype=links the information is about the redirection.
+\examples{
+\dontrun{
+x <-  MW_XtoolsInfo(article="Cervantes", infotype="articleinfo", project="es.wikipedia.org")
+xx <- MW_XtoolsInfo(article="Cervantes", infotype="articleinfo", project="es.wikipedia.org",
+                   redirects=TRUE)
+
+y <-  MW_XtoolsInfo(article="Miguel de Cervantes", infotype="links", project="es.wikipedia.org")
+yy <- MW_XtoolsInfo(article="Cervantes", infotype="links", project="es.wikipedia.org",
+                    redirects=TRUE)
+}
 }
 \author{
 Angel Zazo, Department of Computer Science and Automatics, University of Salamanca

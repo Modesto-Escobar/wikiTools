@@ -2,8 +2,10 @@
 % Please edit documentation in R/wiki_utils.R
 \name{MW_Opensearch}
 \alias{MW_Opensearch}
-\title{MW_Opensearch(string, project, profile, redirects)
-Search y string in article title using OpenSearch. Only in namespace 0.}
+\title{MW_Opensearch(string, project='en.wikipedia.org', profile="engine_autoselect", redirects="resolve")
+Search string in the content of the project page using OpenSearch. Only in
+namespace 0. Please, see https://www.mediawiki.org/wiki/API:Opensearch for
+further information.}
 \usage{
 MW_Opensearch(
   string,
@@ -17,25 +19,34 @@ MW_Opensearch(
 
 \item{project}{Wikimedia project, defaults "en.wikipedio.org".}
 
-\item{profile}{See: https://www.mediawiki.org/wiki/API:Opensearch. This
-parameter sets the search type: strict, normal, fuzzy, fast-fuzzy, classic
-and engine_autoselect (default).}
+\item{profile}{This parameter sets the search type: classic,
+engine_autoselect (default), fast-fuzzy, fuzzy, fuzzy-subphrases, normal,
+normal-subphrases, and strict.}
 
-\item{redirects}{See: https://www.mediawiki.org/wiki/API:Opensearch. If
-redirects='return', the title is the normalized one (also the url). If
-redirets='resolve", the title is the normalized and resolved redirection
-is in effect (also the url). Note that in both cases the API performs a NFC
-Unicode normalization on search string.}
+\item{redirects}{If redirects='return', the page title is the normalized one
+(also the URL). If redirects='resolve", the page title is the normalized and
+resolved redirection is in effect (also the URL). Note that in both cases the
+API performs a NFC Unicode normalization on search string.}
 }
 \value{
-A data-frame of titles and URL returned. If error, return Null.
+A data-frame of page titles and URL returned. If error, return Null.
 }
 \description{
-MW_Opensearch(string, project, profile, redirects)
-Search y string in article title using OpenSearch. Only in namespace 0.
+MW_Opensearch(string, project='en.wikipedia.org', profile="engine_autoselect", redirects="resolve")
+Search string in the content of the project page using OpenSearch. Only in
+namespace 0. Please, see https://www.mediawiki.org/wiki/API:Opensearch for
+further information.
 }
 \note{
-Only for namespace 0. The function also obtains redirections for disambiguation pages.
+Only for namespace 0. The function also obtains redirections for
+disambiguation pages.
+}
+\examples{
+# Some search profiles:
+df <- MW_Opensearch(string='Duque de Alba', project='es.wikipedia.org',
+                    profile="engine_autoselect", redirects="resolve")
+df <- MW_Opensearch(string='Duque de Alba', project='es.wikipedia.org', profile="strict")
+df <- MW_Opensearch(string='Duque de Alba', project='es.wikipedia.org', profile="fuzzy")
 }
 \author{
 Angel Zazo, Department of Computer Science and Automatics, University of Salamanca

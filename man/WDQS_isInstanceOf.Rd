@@ -3,9 +3,9 @@
 \name{WDQS_isInstanceOf}
 \alias{WDQS_isInstanceOf}
 \title{WDQS_isInstanceOf(entity_list, instanceof)
-Search using WDQS if the Wikidata entities in entity_list are instances of
-"instanceof" Wikipedia class. For example, if instanceof="Q5", search if
-entities are instances of the Wikidata class Q5, i.e, are humans.
+Check using WDQS if the Wikidata entities in entity_list are instances of
+"instanceof" Wikidata entity class. For example, if instanceof="Q5", check if
+entities are instances of the Wikidata entity class Q5, i.e, are humans.
 Duplicated entities are deleted before search.}
 \usage{
 WDQS_isInstanceOf(entity_list, instanceof)
@@ -13,19 +13,28 @@ WDQS_isInstanceOf(entity_list, instanceof)
 \arguments{
 \item{entity_list}{A vector with de Wikidata entities.}
 
-\item{instanceof}{The Wikidata class to check, madatory.}
+\item{instanceof}{The Wikidata class to check, mandatory.}
 }
 \value{
-A data-frame with two columns, first Wikidata entity, second True
-if that entity is instance of the "instanceof" entity, else False. Index of
+A data-frame with two columns, first Wikidata entity, second TRUE
+if that entity is instance of the "instanceof" entity, else FALSE. Index of
 data-frame are also set to entity_list.
 }
 \description{
 WDQS_isInstanceOf(entity_list, instanceof)
-Search using WDQS if the Wikidata entities in entity_list are instances of
-"instanceof" Wikipedia class. For example, if instanceof="Q5", search if
-entities are instances of the Wikidata class Q5, i.e, are humans.
+Check using WDQS if the Wikidata entities in entity_list are instances of
+"instanceof" Wikidata entity class. For example, if instanceof="Q5", check if
+entities are instances of the Wikidata entity class Q5, i.e, are humans.
 Duplicated entities are deleted before search.
+}
+\examples{
+# aux: get a vector of entities (l).
+df <- WDQS_SearchByLabel_Inlabel(string='Iranzo', langsorder='es|en')
+l <- df$entity
+
+df <- WDQS_isInstanceOf(entity_list=l, instanceof='Q5')
+# Not TRUE
+df[!df$instanceof_Q5,]
 }
 \author{
 Angel Zazo, Department of Computer Science and Automatics, University of Salamanca

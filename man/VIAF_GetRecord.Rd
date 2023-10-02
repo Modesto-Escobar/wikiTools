@@ -2,7 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{VIAF_GetRecord}
 \alias{VIAF_GetRecord}
-\title{VIAF_GetRecord(viafid, record_format)
+\title{VIAF_GetRecord(viafid,  record_format='viaf.json')
 Obtains the record cluster identified by viafid from VIAF, in the format
 indicated in record_format. Note that the returned record may be a VIAF
 cluster record or a redirect/scavenged record: the function returns the
@@ -13,13 +13,14 @@ VIAF_GetRecord(viafid, record_format = "viaf.json")
 \arguments{
 \item{viafid}{The VIAF identification.}
 
-\item{record_format}{'viaf.json' (default) or others in https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html.}
+\item{record_format}{'viaf.json' (default) or others in
+https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html.}
 }
 \value{
 The VIAF record cluster in the format indicated in record_format.
 }
 \description{
-VIAF_GetRecord(viafid, record_format)
+VIAF_GetRecord(viafid,  record_format='viaf.json')
 Obtains the record cluster identified by viafid from VIAF, in the format
 indicated in record_format. Note that the returned record may be a VIAF
 cluster record or a redirect/scavenged record: the function returns the

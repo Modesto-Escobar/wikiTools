@@ -2,37 +2,43 @@
 % Please edit documentation in R/wiki_utils.R
 \name{WDQS_EntityInfo}
 \alias{WDQS_EntityInfo}
-\title{WDQS_EntityInfo(entity, langs, wikilangs)
+\title{WDQS_EntityInfo(entity, langsorder='en', wikilangs="")
 Gets some properties of the Wikidata "entity" related to birth and death
 dates, places, occupations, works, education, awards, identificator in some
-libraries, wikipedia pages (limit languages to wikilangs), etc.}
+libraries, Wikipedia page titles (which can be limitted to the languages in
+the "wikilangs" parameter), etc.}
 \usage{
-WDQS_EntityInfo(
-  entity,
-  langs = "es|en|ca|eu|gl|pt|fr|it|de|ru|ko|ja|zh",
-  wikilangs = "es|en|ca|eu|gl|pt|fr|it|de|ru|ko|ja|zh"
-)
+WDQS_EntityInfo(entity, langsorder = "en", wikilangs = "")
 }
 \arguments{
-\item{entity}{Wikidata entity to search for properties.}
+\item{entity}{The Wikidata entity to search for properties. Only one entity
+is allowed.}
 
-\item{langs}{Language order of the "SERVICE wikibase:label", mandatory.
-Note: sometimes not label in any language of langs is assigned to a entity,
-so an additional search is used to obtain almost one label for it
+\item{langsorder}{Order of languages in which the information will be
+returned, separated with '|'. If no information exists in the first language,
+next is used. This parameter is mandatory, at least one language is required,
+default, 'en'.
+Note: sometimes not label in any language of langsorder is assigned to an
+entity, so an additional search is used to obtain almost one label for it
 (?entitylab) with LIMIT 1.}
 
-\item{wikilangs}{only return the Wikipedia pages of the entity in those
-languages and in its order. If wikilangs="" retrieve all wikipedias pages,
-not sorted.}
+\item{wikilangs}{List of languages to limit the search of Wikipedia pages,
+using "|" as separator. Wikipedias pages are returned in same order as
+languages in this parameter. If wikilangs='' the function returns Wikipedia
+pages in any language, not sorted.}
 }
 \value{
-: A data-frame with all properties of entity.
+: A data-frame with the properties of the entity.
 }
 \description{
-WDQS_EntityInfo(entity, langs, wikilangs)
+WDQS_EntityInfo(entity, langsorder='en', wikilangs="")
 Gets some properties of the Wikidata "entity" related to birth and death
 dates, places, occupations, works, education, awards, identificator in some
-libraries, wikipedia pages (limit languages to wikilangs), etc.
+libraries, Wikipedia page titles (which can be limitted to the languages in
+the "wikilangs" parameter), etc.
+}
+\examples{
+df1 <- WDQS_EntityInfo(entity='Q134644', langsorder = 'es|en')
 }
 \author{
 Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
