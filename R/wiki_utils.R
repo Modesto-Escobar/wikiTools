@@ -68,7 +68,7 @@ reqWDQS <- function(sparql_query, format='json', method='GET') {
   else stop(paste0("ERROR: method '", method, "' is not supported."))
 }
 
-#' WDQS_query(sparql_query, format="csv", method="GET", limitRequester=FALSE)
+#' w_query(sparql_query, format="csv", method="GET", limitRequester=FALSE)
 #' Retrieves responses from Wikidata Query Service (WDQS). Uses ratelimitr if
 #' param limitRequester = TRUE.
 #' @param sparql_query A string with the query in SPARQL language.
@@ -83,7 +83,7 @@ reqWDQS <- function(sparql_query, format='json', method='GET') {
 #' @importFrom httr stop_for_status content
 #' @importFrom jsonlite fromJSON
 #' @importFrom utils read.csv
-WDQS_query <- function(sparql_query, format="csv", method="GET",
+w_query <- function(sparql_query, format="csv", method="GET",
                        limitRequester=FALSE) {
   # reqWDQS_rated: The ratelimitr version of reqWDQS
   # https://www.mediawiki.org/wiki/Wikidata_Query_Service/User_Manual#SPARQL_endpoint
@@ -114,7 +114,7 @@ WDQS_query <- function(sparql_query, format="csv", method="GET",
   )
 }
 
-#' WDQS_isInstanceOf(entity_list, instanceof)
+#' w_isInstanceOf(entity_list, instanceof)
 #' Check using WDQS if the Wikidata entities in entity_list are instances of
 #' "instanceof" Wikidata entity class. For example, if instanceof="Q5", check if
 #' entities are instances of the Wikidata entity class Q5, i.e, are humans.
@@ -126,15 +126,15 @@ WDQS_query <- function(sparql_query, format="csv", method="GET",
 #' data-frame are also set to entity_list.
 #' @examples
 #' # aux: get a vector of entities (l).
-#' df <- WDQS_SearchByLabel_Inlabel(string='Iranzo', langsorder='es|en')
+#' df <- w_SearchByLabel_Inlabel(string='Iranzo', langsorder='es|en')
 #' l <- df$entity
 #' 
-#' df <- WDQS_isInstanceOf(entity_list=l, instanceof='Q5')
+#' df <- w_isInstanceOf(entity_list=l, instanceof='Q5')
 #' # Not TRUE
 #' df[!df$instanceof_Q5,]
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-WDQS_isInstanceOf <- function(entity_list, instanceof) {
+w_isInstanceOf <- function(entity_list, instanceof) {
   if (instanceof == '')
     stop(paste0("ERROR: instanceof is mandatory."))
   #
@@ -142,7 +142,7 @@ WDQS_isInstanceOf <- function(entity_list, instanceof) {
   values <- paste0("wd:",paste0(entity_list, collapse = ' wd:'))
   query <- paste0('SELECT ?entity WHERE {VALUES ?entity {', values,'}',
                   ' ?entity wdt:P31 wd:', instanceof, '}')
-  r <- WDQS_query(query, format="csv", method='POST')
+  r <- w_query(query, format="csv", method='POST')
   r$entity <- sub('^http://www.wikidata.org/entity/', '', r$entity)
   #
   data <- ifelse(entity_list %in% r$entity, T, F)
@@ -152,7 +152,7 @@ WDQS_isInstanceOf <- function(entity_list, instanceof) {
   return(d)
 }
 
-#' WDQS_Wikipedias(entity_list, wikilangs="", instanceof="", nlimit=1500)
+#' w_Wikipedias(entity_list, wikilangs="", instanceof="", nlimit=1500)
 #' Gets from Wikidata all Wikipedia page titles of the Wikidata entities in
 #' entity_list. If set "instanceof", then only returns the pages for Wikidata
 #' entities which are instances of that Wikidata class. If wikilangs='', then
@@ -173,15 +173,15 @@ WDQS_isInstanceOf <- function(entity_list, instanceof) {
 #' entity_list.
 #' @examples
 #' # aux: get a vector of entities (l).
-#' df <- WDQS_SearchByLabel_Inlabel(string='Iranzo', langsorder='es|en')
+#' df <- w_SearchByLabel_Inlabel(string='Iranzo', langsorder='es|en')
 #' l <- df$entity
 #' 
-#' w <- WDQS_Wikipedias(entity_list=l)
-#' w <- WDQS_Wikipedias(entity_list=l, wikilangs='es|en|fr')
-#' w <- WDQS_Wikipedias(entity_list=l, wikilangs='es|en|fr', instanceof="Q5")
+#' w <- w_Wikipedias(entity_list=l)
+#' w <- w_Wikipedias(entity_list=l, wikilangs='es|en|fr')
+#' w <- w_Wikipedias(entity_list=l, wikilangs='es|en|fr', instanceof="Q5")
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-WDQS_Wikipedias <- function(entity_list, wikilangs="", instanceof="",
+w_Wikipedias <- function(entity_list, wikilangs="", instanceof="",
                             nlimit=1500) {
   # Eliminate duplicates
   entity_list <- unique(entity_list)
@@ -197,7 +197,7 @@ WDQS_Wikipedias <- function(entity_list, wikilangs="", instanceof="",
         break
       q_list <- entity_list[(offset+1):min(n,offset+nlimit)]
       cat(paste0(" INFO: Getting Wikipedias of entities from ", offset+1," to ", offset+length(q_list),".\n"), file=stderr())
-      d <- WDQS_Wikipedias(q_list, wikilangs, instanceof, nlimit)
+      d <- w_Wikipedias(q_list, wikilangs, instanceof, nlimit)
       if (k==0)
         output <- d
       else
@@ -238,7 +238,7 @@ WHERE {\n",
   ifelse(filterq,'', "}\n"),
   "} GROUP BY ?entity")
   # cat(query)
-  r <- WDQS_query(query, format='csv', method='POST')
+  r <- w_query(query, format='csv', method='POST')
   r$entity <- sub('http://www.wikidata.org/entity/', '', r$entity)
   rownames(r) <- r$entity
 
@@ -262,7 +262,7 @@ WHERE {\n",
   return(q)
 }
 
-#' WDQS_isValid(entity_list, nlimit=50000)
+#' w_isValid(entity_list, nlimit=50000)
 #' Check if the Wikidata entities are valid. A entity is valid if it has a label
 #' or has a description. If one entity exists but is not valid, is possible that
 #' it has a redirection to other entity, in that case, the redirection is
@@ -277,17 +277,17 @@ WHERE {\n",
 #' redirects to another Wikidata entity, this entity.
 #' @examples
 #' \dontrun{
-#' WDQS_isValid(c("Q9021", "Q115637688", "Q105660123"))
+#' w_isValid(c("Q9021", "Q115637688", "Q105660123"))
 #' 
-#' l  <- WDQS_OccupationEntities(Qoc='Q2306091')
+#' l  <- w_OccupationEntities(Qoc='Q2306091')
 #' l2 <- append(l, c("Q115637688", "Q105660123"))  # Note: adding two new entities
-#' v <- WDQS_isValid(l2)
+#' v <- w_isValid(l2)
 #' # Not valid
 #' v[!v$valid,]
 #' }
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-WDQS_isValid <- function(entity_list, nlimit=50000) {
+w_isValid <- function(entity_list, nlimit=50000) {
   entity_list <- unique(entity_list)
   # Check limits to make chunked queries
   n <- length(entity_list)
@@ -301,7 +301,7 @@ WDQS_isValid <- function(entity_list, nlimit=50000) {
         break
       q_list <- entity_list[(offset+1):min(n,offset+nlimit)]
       cat(paste0(" INFO: Getting information of entities from ", offset+1," to ", offset+length(q_list),"\n"), file=stderr())
-      d <- WDQS_isValid(q_list, nlimit)
+      d <- w_isValid(q_list, nlimit)
       if (k==0)
         output <- d
       else
@@ -318,7 +318,7 @@ OPTIONAL {?entity owl:sameAs ?redirection}
 }')
   #cat(query)
   #
-  r <- WDQS_query(query, format = "csv", method = 'POST')
+  r <- w_query(query, format = "csv", method = 'POST')
   for (c in c('entity',  'redirection'))
     r[[c]] <- gsub('http://www.wikidata.org/entity/', '', r[[c]])
   r$valid <- ifelse(r$valid == 'true', T, F)
@@ -328,23 +328,23 @@ OPTIONAL {?entity owl:sameAs ?redirection}
   return(r)
 }
 
-#' WDQS_OccupationCount(Qoc)
+#' w_OccupationCount(Qoc)
 #' Search in WDQS to know the number of Wikidata entities with P106 property
 #' (occupation) set to Qoc.
 #' @param Qoc The Wikidata entity of the occupation. For example, Q2306091
 #' sociologist, Q2526255 Film director, etc.
 #' @return The number of entities with that occupation (integer).
 #' @examples
-#' WDQS_OccupationCount(Qoc='Q2306091') # Qoc for Sociologist
+#' w_OccupationCount(Qoc='Q2306091') # Qoc for Sociologist
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-WDQS_OccupationCount <- function(Qoc) {
+w_OccupationCount <- function(Qoc) {
  query <- paste0('SELECT (COUNT(DISTINCT ?human) AS ?count) WHERE {?human wdt:P106 wd:',Qoc,'}')
- r <- WDQS_query(query, format="csv")
+ r <- w_query(query, format="csv")
  return(r$count)
 }
 
-#' WDQS_OccupationEntities(Qoc, nlimit=10000)
+#' w_OccupationEntities(Qoc, nlimit=10000)
 #' Returns the Wikidata entities which have the occupation indicated in Qoc, the
 #' Wikidata entity for that occupation. Use chunked requests.
 #' @param Qoc The Wikidata entity of the occupation. For example, Q2306091 (sociologist)
@@ -353,12 +353,12 @@ WDQS_OccupationCount <- function(Qoc) {
 #' in each chunk.
 #' @return A vector with the Wikidata entities with that occupation.
 #' @examples
-#' l <- WDQS_OccupationEntities(Qoc='Q2306091')
+#' l <- w_OccupationEntities(Qoc='Q2306091')
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-WDQS_OccupationEntities <- function(Qoc, nlimit=10000) {
+w_OccupationEntities <- function(Qoc, nlimit=10000) {
   entity <- character()
-  nq <- WDQS_OccupationCount(Qoc)
+  nq <- w_OccupationCount(Qoc)
   nlim <- as.integer(nq/nlimit)
   if (nlim > 0)
     cat(paste0("INFO: The number of entities (", nq, ") exceeds nlimit (",
@@ -369,7 +369,7 @@ WDQS_OccupationEntities <- function(Qoc, nlimit=10000) {
       cat(paste0(" INFO: sending query from ", offset+1," to ", min(offset+nlimit,nq),"\n"), file=stderr())
     query <- paste0("SELECT ?entity WHERE {?entity wdt:P106 wd:", Qoc,
                     "} ORDER BY ?entity LIMIT ", nlimit, " OFFSET ", offset)
-    r <- WDQS_query(query, format="csv")
+    r <- w_query(query, format="csv")
     r$entity <- sub('^http://www.wikidata.org/entity/', '', r$entity)
     entity <- append(entity, r$entity)
   }
@@ -377,12 +377,12 @@ WDQS_OccupationEntities <- function(Qoc, nlimit=10000) {
   return(entity)
 }
 
-#' WDQS_OccupationEntitiesWikipedias(Qoc, nlimit=5000)
+#' w_OccupationEntitiesWikipedias(Qoc, nlimit=5000)
 #  Returns the Wikidata entities which have the occupation indicated in Qoc,
 #' plus the Wikipedia page titles of them. Return all Wikipedias pages, not
 #' limited by languages. Use chunked requests.
-#' Note that WDQS_OccupationEntitiesWikipedias is similar to first launch
-#' WDQS_OccupationEntities and then launch WDQS_Wikipedias, but is more efficient.
+#' Note that w_OccupationEntitiesWikipedias is similar to first launch
+#' w_OccupationEntities and then launch w_Wikipedias, but is more efficient.
 #' @param Qoc The Wikidata entity of the occupation. For example, Q2306091 is
 #' the entity of sociologist.
 #' @param nlimit If the number of entities found with that occupation exceeds
@@ -393,12 +393,12 @@ WDQS_OccupationEntities <- function(Qoc, nlimit=10000) {
 #' finally, the URL to the pages. Last three columns concatenated with "|".
 #' @examples
 #' \dontrun{
-#' lw <- WDQS_OccupationEntitiesWikipedias(Qoc='Q2306091')
+#' lw <- w_OccupationEntitiesWikipedias(Qoc='Q2306091')
 #' }
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-WDQS_OccupationEntitiesWikipedias <- function(Qoc, nlimit=5000) {
-  nq <- WDQS_OccupationCount(Qoc)
+w_OccupationEntitiesWikipedias <- function(Qoc, nlimit=5000) {
+  nq <- w_OccupationCount(Qoc)
   nlim <- as.integer(nq/nlimit)
   if (nlim > 0)
     cat(paste0("INFO: The number of entities (", nq, ") exceeds nlimit (",
@@ -425,7 +425,7 @@ WHERE {
                    schema:isPartOf [ wikibase:wikiGroup 'wikipedia' ] .}
 } GROUP BY ?entity")
     # cat(query)
-    r <- WDQS_query(query, format = "csv")
+    r <- w_query(query, format = "csv")
     r$entity <- sub('^http://www.wikidata.org/entity/', '', r$entity)
     rownames(r) <- r$entity
     if (k==0)
@@ -436,7 +436,7 @@ WHERE {
   return(output)
 }
 
-#' WDQS_SearchByLabel_Exact(string, langs='en', instanceof="", Pproperty="")
+#' w_SearchByLabel_Exact(string, langs='en', instanceof="", Pproperty="")
 #' Search Wikidata entities by exact search using case sensitive and
 #' differentiate diacritics in label and altLabel ("Also known as") in the
 #' languages indicated in langs.
@@ -455,14 +455,14 @@ WHERE {
 #' @return: A data-frame with 'entity', 'entityLabel', 'entityDescription' and,
 #' additionally the properties of Pproperty.
 #' @examples
-#' df <- WDQS_SearchByLabel_Exact(string='Iranzo', langs='es|en')
-#' df <- WDQS_SearchByLabel_Exact(string='Iranzo', langs='es|en', instanceof = 'Q5')
-#' df <- WDQS_SearchByLabel_Exact(string='Iranzo', langs='es|en', instanceof = 'Q5|Q101352')
-#' df <- WDQS_SearchByLabel_Exact(string='Iranzo', langs='es|en', instanceof = 'Q5',
+#' df <- w_SearchByLabel_Exact(string='Iranzo', langs='es|en')
+#' df <- w_SearchByLabel_Exact(string='Iranzo', langs='es|en', instanceof = 'Q5')
+#' df <- w_SearchByLabel_Exact(string='Iranzo', langs='es|en', instanceof = 'Q5|Q101352')
+#' df <- w_SearchByLabel_Exact(string='Iranzo', langs='es|en', instanceof = 'Q5',
 #' Pproperty = 'P21|P569|P570')
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-WDQS_SearchByLabel_Exact <- function(string, langs='en', instanceof="",
+w_SearchByLabel_Exact <- function(string, langs='en', instanceof="",
                                      Pproperty="") {
   #
   string  <- gsub("'", "\\'", string, fixed = T)
@@ -520,14 +520,14 @@ paste0(searchlang, '}'),
   #
   # cat(query)
   #
-  r <- WDQS_query(query, format = "csv")
+  r <- w_query(query, format = "csv")
   for (c in c('entity',  'instance'))
     r[[c]] <- gsub('http://www.wikidata.org/entity/', '', r[[c]])
   rownames(r) <- r$entity
   return(r)
 }
 
-#' WDQS_SearchByLabel_Startswith(string, lang='en', langsorder='en', instanceof="", Pproperty="")
+#' w_SearchByLabel_Startswith(string, lang='en', langsorder='en', instanceof="", Pproperty="")
 #' Search Wikidata entities which label or altLabel starts with "string" in
 #' language "lang" (mandatory). It's similar to a wildcard search: "string*".
 #' Diacritics and case are ignored. Search "string" in language "lang" in label,
@@ -550,16 +550,16 @@ paste0(searchlang, '}'),
 #' 'instance', 'instanceLabel', 'altLabel' and, additionally, the properties of
 #' Pproperty param.
 #' @examples
-#' df <- WDQS_SearchByLabel_Startswith(string='Iranzo', lang='en', langsorder='es|en')
-#' df <- WDQS_SearchByLabel_Startswith(string='Iranzo', lang='en', langsorder='es|en',
+#' df <- w_SearchByLabel_Startswith(string='Iranzo', lang='en', langsorder='es|en')
+#' df <- w_SearchByLabel_Startswith(string='Iranzo', lang='en', langsorder='es|en',
 #' instanceof = 'Q5')
-#' df <- WDQS_SearchByLabel_Startswith(string='Iranzo', lang='en', langsorder='es|en',
+#' df <- w_SearchByLabel_Startswith(string='Iranzo', lang='en', langsorder='es|en',
 #' instanceof = 'Q5|Q101352')
-#' df <- WDQS_SearchByLabel_Startswith(string='Iranzo', lang='en', langsorder='en',
+#' df <- w_SearchByLabel_Startswith(string='Iranzo', lang='en', langsorder='en',
 #' instanceof = 'Q5', Pproperty = 'P21|P569|P570')
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-WDQS_SearchByLabel_Startswith <- function(string, lang='en', langsorder='en',
+w_SearchByLabel_Startswith <- function(string, lang='en', langsorder='en',
                                           instanceof="", Pproperty="") {
   #
   string <- gsub("'", "\\'", string, fixed = T)
@@ -615,14 +615,14 @@ if (searchp) group_concat else "",
   #
   # cat(query)
   #
-  r <- WDQS_query(query, format = "csv")
+  r <- w_query(query, format = "csv")
   for (c in c('entity',  'instance'))
     r[[c]] <- gsub('http://www.wikidata.org/entity/', '', r[[c]])
   rownames(r) <- r$entity
   return(r)
 }
 
-#' WDQS_SearchByLabel_Inlabel(string, langsorder='en', lang="", instanceof="", Pproperty="")
+#' w_SearchByLabel_Inlabel(string, langsorder='en', lang="", instanceof="", Pproperty="")
 #' Search Wikidata entities matching whole words in any position in label and
 #' altLabel. Diacritics and case are ignored. If lang has a value (es, en...)
 #' then the search is only in that language, otherwise any.
@@ -646,18 +646,18 @@ if (searchp) group_concat else "",
 #' ## Search in any position in Label or AltLabel (diacritics and case are ignored)
 #' # If lang=='' search in any language, else the search is performed only in the
 #' # language indicated.
-#' #   WDQS_SearchByLabel_Inlabel(string, langsorder, lang, instanceof, Pproperty)
-#' df <- WDQS_SearchByLabel_Inlabel(string='Iranzo', langsorder='es|en')
+#' #   w_SearchByLabel_Inlabel(string, langsorder, lang, instanceof, Pproperty)
+#' df <- w_SearchByLabel_Inlabel(string='Iranzo', langsorder='es|en')
 #' # Search in Chinese (Simplified) (language code: zh):
-#' df <- WDQS_SearchByLabel_Inlabel(string='Iranzo', langsorder='zh|es', lang='zh')
+#' df <- w_SearchByLabel_Inlabel(string='Iranzo', langsorder='zh|es', lang='zh')
 #' # Optional instanceof and Pproperty
-#' df <- WDQS_SearchByLabel_Inlabel(string='Iranzo', langsorder='es|en', instanceof = 'Q5')
-#' df <- WDQS_SearchByLabel_Inlabel(string='Iranzo', langsorder='es|en', instanceof = 'Q5|Q101352')
-#' df <- WDQS_SearchByLabel_Inlabel(string='Iranzo', langsorder='es|en', instanceof = 'Q5',
+#' df <- w_SearchByLabel_Inlabel(string='Iranzo', langsorder='es|en', instanceof = 'Q5')
+#' df <- w_SearchByLabel_Inlabel(string='Iranzo', langsorder='es|en', instanceof = 'Q5|Q101352')
+#' df <- w_SearchByLabel_Inlabel(string='Iranzo', langsorder='es|en', instanceof = 'Q5',
 #' Pproperty = 'P21|P569|P570')
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-WDQS_SearchByLabel_Inlabel <- function(string, langsorder='en',
+w_SearchByLabel_Inlabel <- function(string, langsorder='en',
                                        lang="", instanceof="", Pproperty="") {
   #
   string <- gsub("'", "\\'", string, fixed = T)
@@ -715,14 +715,14 @@ paste0(searchlang, '}'),
   #
   # cat(query)
   #
-  r <- WDQS_query(query, format = "csv")
+  r <- w_query(query, format = "csv")
   for (c in c('entity',  'instance'))
     r[[c]] <- gsub('http://www.wikidata.org/entity/', '', r[[c]])
   rownames(r) <- r$entity
   return(r)
 }
 
-#' WDQS_Property(entity_list, Pproperty, langsorder='en', nlimit=10000)
+#' w_Property(entity_list, Pproperty, langsorder='en', nlimit=10000)
 #' Search the entities of the entity_list for property or properties. Return the
 #' properties in langsorder order. Duplicated entities are deleted before search.
 #' @param entity_list A vector with de Wikidata entities.
@@ -741,12 +741,12 @@ paste0(searchlang, '}'),
 #' set to entity_list.
 #' @examples
 #' \dontrun{
-#' l <- WDQS_OccupationEntities(Qoc='Q2306091')
-#' p <- WDQS_Property(l, Pproperty = 'P21|P569|P214', langsorder = 'es|en')
+#' l <- w_OccupationEntities(Qoc='Q2306091')
+#' p <- w_Property(l, Pproperty = 'P21|P569|P214', langsorder = 'es|en')
 #' }
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-WDQS_Property <- function(entity_list, Pproperty, langsorder='en', nlimit=10000) {
+w_Property <- function(entity_list, Pproperty, langsorder='en', nlimit=10000) {
   #
   if (Pproperty == "")
       stop(paste0("ERROR: Pproperty is mandatory."))
@@ -764,7 +764,7 @@ WDQS_Property <- function(entity_list, Pproperty, langsorder='en', nlimit=10000)
         break
       q_list <- entity_list[(offset+1):min(n,offset+nlimit)]
       cat(paste0(" INFO: Getting properties of entities from ", offset+1," to ", offset+length(q_list),"\n"), file=stderr())
-      d <- WDQS_Property(q_list, Pproperty, langsorder, nlimit)
+      d <- w_Property(q_list, Pproperty, langsorder, nlimit)
       if (k==0)
         output <- d
       else
@@ -799,13 +799,13 @@ paste0(search, searchlang, '}'),
   #
   # cat(query, file='borrar.txt')
   #
-  r <- WDQS_query(query, format = "csv", method = 'POST')
+  r <- w_query(query, format = "csv", method = 'POST')
   r$entity   <- gsub('http://www.wikidata.org/entity/', '', r$entity)
   rownames(r) <- r$entity
   return(r)
 }
 
-#' WDQS_IdentifiersOfAuthority(Pauthority, langsorder='en', instanceof="")
+#' w_IdentifiersOfAuthority(Pauthority, langsorder='en', instanceof="")
 #' Search for Wikidata entities that have an identifier in the Wikidata
 #' authority property "Pauthority". Return the entities and information (label,
 #' description) in the language order indicated in langsorder. If instanceof
@@ -828,16 +828,16 @@ paste0(search, searchlang, '}'),
 #' \dontrun{
 #' # Example: Pauthority=P4439 (has identificator in the Museo Nacional Centro de
 #' # Arte Reina Sofía)
-#' mncars   <- WDQS_IdentifiersOfAuthority(Pauthority="P4439",
+#' mncars   <- w_IdentifiersOfAuthority(Pauthority="P4439",
 #' langsorder = 'es|en')  # 1286  [human, groups, etc.]
-#' mncarsQ5 <- WDQS_IdentifiersOfAuthority(Pauthority="P4439", langsorder = 'es|en',
+#' mncarsQ5 <- w_IdentifiersOfAuthority(Pauthority="P4439", langsorder = 'es|en',
 #' instanceof = 'Q5')  # 1280
 #' # Wikidata entities are not 'human' (Q5) (see entityDescription column):
 #' mncars[!(mncars$entity %in% mncarsQ5$entity),]  # not instance of Q5.
 #' }
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-WDQS_IdentifiersOfAuthority <- function(Pauthority, langsorder='en', instanceof="") {
+w_IdentifiersOfAuthority <- function(Pauthority, langsorder='en', instanceof="") {
   #
   if (Pauthority == "")
     stop(paste0("ERROR: Pauthority is mandatory."))
@@ -863,13 +863,13 @@ if (filterq) filters else "",
 } GROUP BY ?entity ?entityLabel ?entityDescription')
   #cat(query)
   #
-  r <- WDQS_query(query, format = "csv", method = 'POST')
+  r <- w_query(query, format = "csv", method = 'POST')
   r$entity   <- gsub('http://www.wikidata.org/entity/', '', r$entity)
   rownames(r) <- r$entity
   return(r)
 }
 
-#' WDQS_EntityInfo(entity, langsorder='en', wikilangs="")
+#' w_EntityInfo(entity, langsorder='en', wikilangs="")
 #' Gets some properties of the Wikidata "entity" related to birth and death
 #' dates, places, occupations, works, education, awards, identifier in some
 #' libraries, Wikipedia page titles (which can be limited to the languages in
@@ -889,10 +889,10 @@ if (filterq) filters else "",
 #' pages in any language, not sorted.
 #' @return: A data-frame with the properties of the entity.
 #' @examples
-#' df1 <- WDQS_EntityInfo(entity='Q134644', langsorder = 'es|en')
+#' df1 <- w_EntityInfo(entity='Q134644', langsorder = 'es|en')
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-WDQS_EntityInfo <- function(entity, langsorder='en', wikilangs="") {
+w_EntityInfo <- function(entity, langsorder='en', wikilangs="") {
   #
   langsorder <- gsub("|", ",", langsorder, fixed = T)
   if (wikilangs != "") {
@@ -1022,7 +1022,7 @@ WHERE {
   #
   # cat(query)
   #
-  r <- WDQS_query(query, format = "csv", method = 'POST')
+  r <- w_query(query, format = "csv", method = 'POST')
   # Eliminate 'http://www.wikidata.org/entity/' in columns that ends with 'Q'
   forgsub <- append(c('entity'), colnames(r)[endsWith(colnames(r), 'Q')])
   for (c in forgsub)
@@ -1046,8 +1046,8 @@ WHERE {
   return(r)
 }
 
-#' WDQS_EntityInfo_tiny(entity, langsorder='en', wikilangs="")
-#' Same as WDQS_EntityInfo function but less properties are requested and
+#' w_EntityInfo_tiny(entity, langsorder='en', wikilangs="")
+#' Same as w_EntityInfo function but less properties are requested and
 #' less checks are done.
 #' Gets some properties of the Wikidata "entity" related to birth and death
 #' dates, places, occupations, works, education, awards, identifier in some
@@ -1067,10 +1067,10 @@ WHERE {
 #' pages in any language, not sorted.
 #' @return: A data-frame with the properties of entity.
 #' @examples
-#' df2 <- WDQS_EntityInfo_tiny(entity='Q134644', langsorder = 'es|en')
+#' df2 <- w_EntityInfo_tiny(entity='Q134644', langsorder = 'es|en')
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-WDQS_EntityInfo_tiny <- function(entity, langsorder='en', wikilangs="") {
+w_EntityInfo_tiny <- function(entity, langsorder='en', wikilangs="") {
   #
   langsorder <- gsub("|", ",", langsorder, fixed = T)
   if (wikilangs != "") {
@@ -1180,7 +1180,7 @@ WHERE {
   ?ddate ?dplaceLabel ?dplaceCoord ?dcountryLabel")
   # cat(query)
   #
-  r <- WDQS_query(query, format = "csv", method = 'POST')
+  r <- w_query(query, format = "csv", method = 'POST')
   # Eliminate 'http://www.wikidata.org/entity/' in columns that ends with 'Q'
   forgsub <- append(c('entity'), colnames(r)[endsWith(colnames(r), 'Q')])
   for (c in forgsub)
@@ -1204,7 +1204,7 @@ WHERE {
   return(r)
 }
 
-#' WDQS_FilmInfo(film_entity, langsorder='en', wikilangs="")
+#' w_FilmInfo(film_entity, langsorder='en', wikilangs="")
 #' Gets some properties of the Wikidata "film_entity" related to information
 #' about that film entity.
 #' @param film_entity Wikidata entity to search for properties.
@@ -1220,8 +1220,8 @@ WHERE {
 #' @return: A data-frame with all properties of film_entity
 #' @examples
 #' \dontrun{
-#' BenHur    <- WDQS_FilmInfo(film_entity='Q180098', langsorder='es|en', wikilangs = 'es|fr')
-#' Nosferatu <- WDQS_FilmInfo(film_entity='Q151895', langsorder='es|en', wikilangs = 'es|fr|en')
+#' BenHur    <- w_FilmInfo(film_entity='Q180098', langsorder='es|en', wikilangs = 'es|fr')
+#' Nosferatu <- w_FilmInfo(film_entity='Q151895', langsorder='es|en', wikilangs = 'es|fr|en')
 #' # Nosferatu has public video:
 #' Nosferatu$video
 #' # Combination of information:
@@ -1229,7 +1229,7 @@ WHERE {
 #' }
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-WDQS_FilmInfo <- function(film_entity, langsorder='en', wikilangs="") {
+w_FilmInfo <- function(film_entity, langsorder='en', wikilangs="") {
   #
   langsorder  <- gsub("|", ",", langsorder, fixed = T)
   if (wikilangs != "") {
@@ -1348,7 +1348,7 @@ if (wikilangs != '') paste0(";
 "} GROUP BY  ?entity ?entityLabel ?entityLabelES ?pubdate # ?entityDescription ")
   # cat(query)
   #
-  r <- WDQS_query(query, format = "csv", method = 'POST')
+  r <- w_query(query, format = "csv", method = 'POST')
 
   forgsub <- append(c('entity'), colnames(r)[endsWith(colnames(r), 'Q')])
   # Eliminate 'http://www.wikidata.org/entity/' in columns
@@ -1511,7 +1511,7 @@ checkTitles <- function(titles){
   return(TRUE)
 }
 
-#' MW_Opensearch(string, project='en.wikipedia.org', profile="engine_autoselect", redirects="resolve")
+#' m_Opensearch(string, project='en.wikipedia.org', profile="engine_autoselect", redirects="resolve")
 #' Search string in the content of the project page using OpenSearch. Only in
 #' namespace 0. Please, see https://www.mediawiki.org/wiki/API:Opensearch for
 #' further information.
@@ -1529,13 +1529,13 @@ checkTitles <- function(titles){
 #' disambiguation pages.
 #' @examples
 #' # Some search profiles:
-#' df <- MW_Opensearch(string='Duque de Alba', project='es.wikipedia.org',
+#' df <- m_Opensearch(string='Duque de Alba', project='es.wikipedia.org',
 #'                     profile="engine_autoselect", redirects="resolve")
-#' df <- MW_Opensearch(string='Duque de Alba', project='es.wikipedia.org', profile="strict")
-#' df <- MW_Opensearch(string='Duque de Alba', project='es.wikipedia.org', profile="fuzzy")
+#' df <- m_Opensearch(string='Duque de Alba', project='es.wikipedia.org', profile="strict")
+#' df <- m_Opensearch(string='Duque de Alba', project='es.wikipedia.org', profile="fuzzy")
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-MW_Opensearch <- function(string, project='en.wikipedia.org',
+m_Opensearch <- function(string, project='en.wikipedia.org',
                           profile="engine_autoselect", redirects="resolve") {
   #
   query = list(format        = 'json',
@@ -1565,7 +1565,7 @@ MW_Opensearch <- function(string, project='en.wikipedia.org',
   return(output)
 }
 
-#' MW_WikidataEntity(titles, project='en.wikipedia.org', redirects=TRUE)
+#' m_WikidataEntity(titles, project='en.wikipedia.org', redirects=TRUE)
 #' Use reqMediaWiki to check if page titles are in a Wikimedia project and returns
 #' the Wikidata entity for them. Automatically resolves redirects if parameter
 #' redirects = TRUE (default). If a page title exists in the Wikimedia project,
@@ -1588,11 +1588,11 @@ MW_Opensearch <- function(string, project='en.wikipedia.org',
 #' @examples
 #' # Note that URLdecode("a%CC%8C") is
 #' # the letter "a" with the combining caron
-#' df <- MW_WikidataEntity(c('Max Planck', URLdecode("a%CC%8C"), 'Max', 'Cervante', 'humanist'),
+#' df <- m_WikidataEntity(c('Max Planck', URLdecode("a%CC%8C"), 'Max', 'Cervante', 'humanist'),
 #'                         project='en.wikipedia.org')
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-MW_WikidataEntity <- function(titles, project='en.wikipedia.org',
+m_WikidataEntity <- function(titles, project='en.wikipedia.org',
                                redirects=TRUE) {
   if (!checkTitles(titles))
     return(NULL)
@@ -1612,7 +1612,7 @@ MW_WikidataEntity <- function(titles, project='en.wikipedia.org',
       t_list <- titles[(offset+1):min(n,offset+nlimit)]
       cat(paste0(" INFO: Getting information of entities from ", offset+1," to ", offset+length(t_list), '.\n'),
           file = stderr())
-      aux <- MW_WikidataEntity(t_list, project, redirects)
+      aux <- m_WikidataEntity(t_list, project, redirects)
       #
       if (k==0)
         output <- aux
@@ -1641,7 +1641,7 @@ MW_WikidataEntity <- function(titles, project='en.wikipedia.org',
     j <- reqMediaWiki(query, project)
     #
     if (is.null(j) | is.null(j$query)){
-      cat("Error in MW_WikidataEntity: reqMediaWiki returns an improper JSON.",
+      cat("Error in m_WikidataEntity: reqMediaWiki returns an improper JSON.",
           file = stderr())
       return(NULL)
     }
@@ -1700,7 +1700,7 @@ MW_WikidataEntity <- function(titles, project='en.wikipedia.org',
   }
 }
 
-#' MW_Redirects(titles, project="en.wikipedia.org")
+#' m_Redirects(titles, project="en.wikipedia.org")
 #' Obtains the redirection pages to the article titles in the Wikimedia project
 #' restricted to namespace 0. Return a vector for each title, in each vector the
 #' first element is the page destiny, rest are all pages that redirect to it. If
@@ -1710,10 +1710,10 @@ MW_WikidataEntity <- function(titles, project='en.wikipedia.org',
 #' @return A vector for each title, with all pages that are redirects to the
 #' first element.
 #' @examples
-#' a <- MW_Redirects(c('Cervantes', 'Planck', 'Noexiste'), project='es.wikipedia.org')
+#' a <- m_Redirects(c('Cervantes', 'Planck', 'Noexiste'), project='es.wikipedia.org')
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-MW_Redirects <- function(titles, project="en.wikipedia.org") {
+m_Redirects <- function(titles, project="en.wikipedia.org") {
   if (!checkTitles(titles))
     return(NULL)
   #
@@ -1732,7 +1732,7 @@ MW_Redirects <- function(titles, project="en.wikipedia.org") {
       t_list <- titles[(offset+1):min(n,offset+nlimit)]
       cat(paste0(" INFO: Getting redirects of entities from ", offset+1," to ", offset+length(t_list), '.\n'),
           file = stderr())
-      aux <- MW_Redirects(t_list, project)
+      aux <- m_Redirects(t_list, project)
       #
       if (k==0)
         output <- aux
@@ -1758,7 +1758,7 @@ MW_Redirects <- function(titles, project="en.wikipedia.org") {
     j <- reqMediaWiki(query, project)
     #
     if (is.null(j) | is.null(j$query)){
-      cat("Error in MW_Redirects: reqMediaWiki returns an improper JSON.",
+      cat("Error in m_Redirects: reqMediaWiki returns an improper JSON.",
           file = stderr())
       return(NULL)
     }
@@ -1793,7 +1793,7 @@ MW_Redirects <- function(titles, project="en.wikipedia.org") {
   }
 }
 
-#' MW_PagePrimaryImage(titles, project="en.wikipedia.org")
+#' m_PagePrimaryImage(titles, project="en.wikipedia.org")
 #' Return the URL of the image associated with the Wikipedia pages of the titles,
 #' if pages has one. Automatically resolves redirects, the "normalized" column
 #' of the returned data-frames contains the destiny page of the redirection.
@@ -1803,10 +1803,10 @@ MW_Redirects <- function(titles, project="en.wikipedia.org") {
 #' @return A data-frame with original titles, normalized ones, the status of the
 #' pages and the primary image of the page or NA if it does not exist.
 #' @examples
-#' i <- MW_PagePrimaryImage(c('Max Planck', URLdecode("a%CC%8C"), 'Max', 'Cervante', 'humanist'))
+#' i <- m_PagePrimaryImage(c('Max Planck', URLdecode("a%CC%8C"), 'Max', 'Cervante', 'humanist'))
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-MW_PagePrimaryImage <- function(titles, project="en.wikipedia.org") {
+m_PagePrimaryImage <- function(titles, project="en.wikipedia.org") {
   if (!checkTitles(titles))
     return(NULL)
   #
@@ -1825,7 +1825,7 @@ MW_PagePrimaryImage <- function(titles, project="en.wikipedia.org") {
       t_list <- titles[(offset+1):min(n,offset+nlimit)]
       cat(paste0(" INFO: Getting primary images of entities from ", offset+1," to ", offset+length(t_list), '.\n'),
           file = stderr())
-      aux <- MW_PagePrimaryImage(t_list, project)
+      aux <- m_PagePrimaryImage(t_list, project)
       #
       if (k==0)
         output <- aux
@@ -1852,7 +1852,7 @@ MW_PagePrimaryImage <- function(titles, project="en.wikipedia.org") {
     j <- reqMediaWiki(query, project)
     #
     if (is.null(j) | is.null(j$query)){
-      cat("Error in MW_PagePrimaryImage: reqMediaWiki returns an improper JSON.",
+      cat("Error in m_PagePrimaryImage: reqMediaWiki returns an improper JSON.",
           file = stderr())
       return(NULL)
     }
@@ -1911,7 +1911,7 @@ MW_PagePrimaryImage <- function(titles, project="en.wikipedia.org") {
   }
 }
 
-#' MW_PageFiles(titles, project="en.wikipedia.org", exclude_ext='svg|webp|xcf')
+#' m_PageFiles(titles, project="en.wikipedia.org", exclude_ext='svg|webp|xcf')
 #' Search for URL of files inserted in the Wikipedia pages. Exclude extensions
 #' in exclude_ext. Note that the query API named this search as 'images',
 #' but all source files in the page are returned. The function only return URL
@@ -1926,11 +1926,11 @@ MW_PagePrimaryImage <- function(titles, project="en.wikipedia.org") {
 #' for the page and the URL files of the Wikipedia pages, using use "|" to
 #' separate ones) or NA if files do not exits or are excluded.
 #' @examples
-#' f <- MW_PageFiles(c('Max Planck', URLdecode("a%CC%8C"), 'Max', 'Cervante', 'humanist'),
+#' f <- m_PageFiles(c('Max Planck', URLdecode("a%CC%8C"), 'Max', 'Cervante', 'humanist'),
 #'                   exclude_ext = "svg|webp|xcf")
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-MW_PageFiles <- function(titles, project = "en.wikipedia.org",
+m_PageFiles <- function(titles, project = "en.wikipedia.org",
                          exclude_ext = 'svg|webp|xcf') {
   if (!checkTitles(titles))
     return(NULL)
@@ -1952,7 +1952,7 @@ MW_PageFiles <- function(titles, project = "en.wikipedia.org",
       t_list <- titles[(offset+1):min(n,offset+nlimit)]
       cat(paste0(" INFO: Getting inserted files of entities from ", offset+1," to ", offset+length(t_list), '.\n'),
           file = stderr())
-      aux <- MW_PageFiles(t_list, project, exclude_ext)
+      aux <- m_PageFiles(t_list, project, exclude_ext)
       #
       if (k==0)
         output <- aux
@@ -1978,7 +1978,7 @@ MW_PageFiles <- function(titles, project = "en.wikipedia.org",
     j <- reqMediaWiki(query, project)
     #
     if (is.null(j) | is.null(j$query)){
-      cat("Error in MW_PageFiles: reqMediaWiki returns an improper JSON.",
+      cat("Error in m_PageFiles: reqMediaWiki returns an improper JSON.",
           file = stderr())
       return(NULL)
     }
@@ -2071,7 +2071,7 @@ MW_PageFiles <- function(titles, project = "en.wikipedia.org",
 #' @return A JSON response. Please check httr::stop_for_status(response)
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @importFrom httr GET user_agent add_headers
-#' @note Used in MW_Pageviews
+#' @note Used in m_Pageviews
 httrGetJSON <- function(url) {
   # URL must be encode
   httr::GET(
@@ -2081,7 +2081,7 @@ httrGetJSON <- function(url) {
   )
 }
 
-#' MW_Pageviews(article, start, end, project="en.wikipedia.org", access="all-access",
+#' m_Pageviews(article, start, end, project="en.wikipedia.org", access="all-access",
 #' agent="user", granularity="monthly", redirects=FALSE))
 #' Use the Wikimedia REST API (https://wikimedia.org/api/rest_v1/) to get the
 #' number of views one article has in a Wikimedia project in a date interval
@@ -2102,16 +2102,16 @@ httrGetJSON <- function(url) {
 #' necessary set redirects=TRUE,  otherwise only you have the views of that page.
 #' @return A vector with the number of visits by granularity.
 #' @examples
-#' v <-  MW_Pageviews(article="Cervantes", start="20230101", end="20230501",
+#' v <-  m_Pageviews(article="Cervantes", start="20230101", end="20230501",
 #'                    project="es.wikipedia.org", granularity="monthly")
-#' vv <- MW_Pageviews(article="Cervantes", start="20230101", end="20230501",
+#' vv <- m_Pageviews(article="Cervantes", start="20230101", end="20230501",
 #'                    project="es.wikipedia.org", granularity="monthly",
 #'                    redirects=TRUE)
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @importFrom httr stop_for_status content
 #' @importFrom jsonlite fromJSON
 #' @export
-MW_Pageviews <- function(article, start, end, project="en.wikipedia.org",
+m_Pageviews <- function(article, start, end, project="en.wikipedia.org",
                          access="all-access", agent="user",
                          granularity="monthly", redirects=FALSE) {
   # httrGetJSON_rated: the limitratedr version of httrGetJSON.
@@ -2123,7 +2123,7 @@ MW_Pageviews <- function(article, start, end, project="en.wikipedia.org",
   a <- list()
   a[['original']] <- article
   if (redirects) {
-    arts <- MW_Redirects(article, project)   # vector of lists
+    arts <- m_Redirects(article, project)   # vector of lists
     arts <- arts[[article]]
     article <- arts[1]
     a[['normalized']] <- article
@@ -2132,7 +2132,7 @@ MW_Pageviews <- function(article, start, end, project="en.wikipedia.org",
     for (art in arts) {
       if (length(arts) > 1)
         cat(paste0(" INFO: Getting the number of views of '", art,"' page.\n"), file=stderr())
-      b <- MW_Pageviews(art, start, end, project, access, agent,
+      b <- m_Pageviews(art, start, end, project, access, agent,
                         granularity, redirects=FALSE)
       for (n in union(names(a), names(b))) {
         if (!(n %in% c('original', 'normalized')))
@@ -2152,7 +2152,7 @@ MW_Pageviews <- function(article, start, end, project="en.wikipedia.org",
 }
 
 
-#' MW_XtoolsInfo(article, infotype="articleinfo", project="en.wikipedia.org", redirects=FALSE)
+#' m_XtoolsInfo(article, infotype="articleinfo", project="en.wikipedia.org", redirects=FALSE)
 #' Obtains information in JSON format about an article in the Wikimedia project
 #' or NULL on errors. Use the wmflabs API. The XTools Page API endpoints offer data
 #' related to a single page. See https://www.mediawiki.org/wiki/XTools/API/Page.
@@ -2170,26 +2170,26 @@ MW_Pageviews <- function(article, start, end, project="en.wikipedia.org",
 #' @return A list with the information about the article.
 #' @examples
 #' \dontrun{
-#' x <-  MW_XtoolsInfo(article="Cervantes", infotype="articleinfo", project="es.wikipedia.org")
-#' xx <- MW_XtoolsInfo(article="Cervantes", infotype="articleinfo", project="es.wikipedia.org",
+#' x <-  m_XtoolsInfo(article="Cervantes", infotype="articleinfo", project="es.wikipedia.org")
+#' xx <- m_XtoolsInfo(article="Cervantes", infotype="articleinfo", project="es.wikipedia.org",
 #'                    redirects=TRUE)
 #' 
-#' y <-  MW_XtoolsInfo(article="Miguel de Cervantes", infotype="links", project="es.wikipedia.org")
-#' yy <- MW_XtoolsInfo(article="Cervantes", infotype="links", project="es.wikipedia.org",
+#' y <-  m_XtoolsInfo(article="Miguel de Cervantes", infotype="links", project="es.wikipedia.org")
+#' yy <- m_XtoolsInfo(article="Cervantes", infotype="links", project="es.wikipedia.org",
 #'                     redirects=TRUE)
 #' }
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @importFrom httr stop_for_status content
 #' @importFrom jsonlite fromJSON
 #' @export
-MW_XtoolsInfo <- function(article, infotype="articleinfo",
+m_XtoolsInfo <- function(article, infotype="articleinfo",
                           project="en.wikipedia.org", redirects=FALSE) {
   # httrGetJSON_rated: the limitratedr version of httrGetJSON.
   # Limit is 100 req/s.
   httrGetJSON_rated <- limitRequester(httrGetJSON, n=100, period=1)
   originalarticle <- article
   if (redirects) {
-    arts <- MW_Redirects(article, project)   # vector of lists
+    arts <- m_Redirects(article, project)   # vector of lists
     arts <- arts[[article]]
     article <- arts[1]
     cat(paste0(" INFO: Getting information of the '", article,"' page.\n"), file=stderr())
@@ -2206,7 +2206,7 @@ MW_XtoolsInfo <- function(article, infotype="articleinfo",
     l <- length(arts)
     for (i in 2:l) {
       cat(paste0("  INFO: Adding the number of links_in_count of the '", arts[i],"' page.\n"), file=stderr())
-      b <- MW_XtoolsInfo(arts[i], infotype="links", project=project,
+      b <- m_XtoolsInfo(arts[i], infotype="links", project=project,
                          redirects=FALSE)
       d["links_in_count"] <- d["links_in_count"][[1]] + b["links_in_count"][[1]]
       d["elapsed_time"] <- d["elapsed_time"][[1]] + b["elapsed_time"][[1]]
@@ -2217,7 +2217,7 @@ MW_XtoolsInfo <- function(article, infotype="articleinfo",
   return(d)
 }
 
-#' MW_XtoolsInfoAll(article, project="en.wikipedia.org", redirects=FALSE)
+#' m_XtoolsInfoAll(article, project="en.wikipedia.org", redirects=FALSE)
 #' Obtains information about a page in the Wikimedia project using wmflabs
 #' in JSON format, or NULL on error. The XTools Page API endpoints offer data
 #' related to a single page. See https://www.mediawiki.org/wiki/XTools/API/Page
@@ -2231,32 +2231,32 @@ MW_XtoolsInfo <- function(article, infotype="articleinfo",
 #' destiny page. Also, if infotype=='links, the sum of the in-links of all
 #' redirections is assigned to links_in_count.
 #' @return The information about the page.
-#' Note: use the MW_XtoolsInfo function.
+#' Note: use the m_XtoolsInfo function.
 #' @examples
 #' \dontrun{
-#' z  <- MW_XtoolsInfoAll(article="Miguel de Cervantes", project="es.wikipedia.org")
-#' zz <- MW_XtoolsInfoAll(article="Cervantes", project="es.wikipedia.org",
+#' z  <- m_XtoolsInfoAll(article="Miguel de Cervantes", project="es.wikipedia.org")
+#' zz <- m_XtoolsInfoAll(article="Cervantes", project="es.wikipedia.org",
 #'                        redirects=TRUE)
 #' }
 #' @export
-MW_XtoolsInfoAll <- function(article, project="en.wikipedia.org",
+m_XtoolsInfoAll <- function(article, project="en.wikipedia.org",
                              redirects=FALSE){
   # first: articleinfo
-  r <- MW_XtoolsInfo(article, infotype='articleinfo', project=project,
+  r <- m_XtoolsInfo(article, infotype='articleinfo', project=project,
                      redirects=redirects)
   # Error in response
   if (!is.null(r$error)) {
-    cat(paste0("Error in response from MW_XtoolsInfo: ", r$error, '.\n'),
+    cat(paste0("Error in response from m_XtoolsInfo: ", r$error, '.\n'),
         file = stderr())
     return(NULL)
   }
   # Second: prose
-  b <- MW_XtoolsInfo(article, infotype="prose", project=project,
+  b <- m_XtoolsInfo(article, infotype="prose", project=project,
                      redirects=redirects)
   for (n in names(b))
     r[n] <- b[n]
   # Third: links
-  c <- MW_XtoolsInfo(article, infotype="links", project=project,
+  c <- m_XtoolsInfo(article, infotype="links", project=project,
                      redirects=redirects)
   for (n in names(c))
     r[n] <- c[n]
@@ -2269,7 +2269,7 @@ MW_XtoolsInfoAll <- function(article, project="en.wikipedia.org",
 # https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html
 # ---------------------------------------------------------------------------
 
-#' VIAF_AutoSuggest(author)
+#' v_AutoSuggest(author)
 #' Search the name of the author from the VIAF AutoSuggest API and returns
 #' information in JSON format of the records found. Note that only
 #' returns a maximum of 10 records. Note that those records are not
@@ -2283,12 +2283,12 @@ MW_XtoolsInfoAll <- function(article, project="en.wikipedia.org",
 #' "nametype" and "viafid" of the Autosuggest API response.
 #' @seealso https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html
 #' @examples
-#' VIAF_AutoSuggest('Iranzo')
-#' VIAF_AutoSuggest('Esparza, María')
+#' v_AutoSuggest('Iranzo')
+#' v_AutoSuggest('Esparza, María')
 #' # Four rows, only two viafid:
-#' VIAF_AutoSuggest('Escobar, Modesto')
+#' v_AutoSuggest('Escobar, Modesto')
 #' @export
-VIAF_AutoSuggest <- function(author) {
+v_AutoSuggest <- function(author) {
   url <- "https://www.viaf.org/viaf/AutoSuggest"
   query <- list(query = author)
   #
@@ -2310,7 +2310,7 @@ VIAF_AutoSuggest <- function(author) {
   )
 }
 
-#' VIAF_Search(CQL_Query)
+#' v_Search(CQL_Query)
 #' Run the CQL_Query using the VIAF Search API and return a list of records
 #' found. The search string is formed using the CQL_Query syntax of the API.
 #' Note that returned records use the "info:srw/schema/1/JSON" record schema,
@@ -2325,26 +2325,26 @@ VIAF_AutoSuggest <- function(author) {
 #' ## Search in any field (cql.any)
 #' # Operator is "=": so search one or more terms:
 #' CQL_Query <- 'cql.any = "García Iranzo, Juan"'
-#' r <- VIAF_Search(CQL_Query)
+#' r <- v_Search(CQL_Query)
 #' # r contains complete VIAF records (sometimes seen as a "cluster record",
 #' # which is unified by combining records from many libraries around the world)
 
 #' # Search in 1xx, 4xx, 5xx fields of MARC record (local.names)
 #' # Operator is "all": search all terms
 #' CQL_Query <- 'local.names all "Modesto Escobar"'
-#' r <- VIAF_Search(CQL_Query)
+#' r <- v_Search(CQL_Query)
 #' 
 #' # Search in 100, 400, 500 fields of MARC record (local.personalNames)
 #' # Operator is "all": search all terms
 #' CQL_Query <- 'local.personalNames all "Modesto Escobar"'
-#' r <- VIAF_Search(CQL_Query)
+#' r <- v_Search(CQL_Query)
 #' 
 #' # Search in Titles
 #' CQL_Query <- 'local.title all "Los pronósticos electorales con encuestas"'
-#' r <- VIAF_Search(CQL_Query)
+#' r <- v_Search(CQL_Query)
 #' }
 #' @export
-VIAF_Search <- function(CQL_Query) {
+v_Search <- function(CQL_Query) {
   maxrecords <- 250
   url <- "https://www.viaf.org/viaf/search"
   query <- list(httpAccept = 'application/json',
@@ -2387,8 +2387,8 @@ VIAF_Search <- function(CQL_Query) {
   )
 }
 
-#' VIAF_Search_anyField(string)
-#' This function is a wrapper to VIAF_Search, using this CQL_Query:
+#' v_Search_anyField(string)
+#' This function is a wrapper to v_Search, using this CQL_Query:
 #'   'cql.any = "string"'
 #' Search preferred Name - names which are the preferred form in an authority record
 #' (1xx fields of the MARC records).
@@ -2402,13 +2402,13 @@ VIAF_Search <- function(CQL_Query) {
 #' in the order that words appear. With the "all" operator, more words can be in
 #' the field and in any order. Search is case insensitive.
 #' @export
-VIAF_Search_anyField <- function(name) {
+v_Search_anyField <- function(name) {
   CQL_query <- paste0("cql.any = ", name)
-  return(VIAF_Search(CQL_query))
+  return(v_Search(CQL_query))
 }
 
-#' VIAF_Search_allmainHeadingEl(name)
-#' This function is a wrapper to VIAF_Search, using this CQL_Query:
+#' v_Search_allmainHeadingEl(name)
+#' This function is a wrapper to v_Search, using this CQL_Query:
 #'   'local.mainHeadingEl all "name"'
 #' Search preferred Name - names which are the preferred form in an authority
 #' record (1xx fields of the MARC records).
@@ -2420,13 +2420,13 @@ VIAF_Search_anyField <- function(name) {
 #' an "=" search. The "=" operator searches for all words and only those words.
 #' With the "all" operator, more words can appear in the field.
 #' @export
-VIAF_Search_allmainHeadingEl <- function(name) {
+v_Search_allmainHeadingEl <- function(name) {
   CQL_query <- paste0("local.mainHeadingEl all ", name)
-  return(VIAF_Search(CQL_query))
+  return(v_Search(CQL_query))
 }
 
-#' VIAF_Search_allNames(name)
-#' This function is a wrapper to VIAF_Search, using this CQL_Query:
+#' v_Search_allNames(name)
+#' This function is a wrapper to v_Search, using this CQL_Query:
 #'   'local.names all "name"'
 #' Search Names - any name preferred or alternate 1xx, 4xx, 5xx fields of the
 #' MARC records):
@@ -2437,13 +2437,13 @@ VIAF_Search_allmainHeadingEl <- function(name) {
 #' @param name It is the name o search.
 #' @return A list with the records found.
 #' @export
-VIAF_Search_allNames <- function(name) {
+v_Search_allNames <- function(name) {
   CQL_query <- paste0("local.names all ", name)
-  return(VIAF_Search(CQL_query))
+  return(v_Search(CQL_query))
 }
 
-#' VIAF_Search_allPersonalNames(name)
-#' This function is a wrapper to VIAF_Search, using this CQL_Query:
+#' v_Search_allPersonalNames(name)
+#' This function is a wrapper to v_Search, using this CQL_Query:
 #'   'local.personalNames all "name"'
 #' Search Personal Names within the authority record (100, 400, 500 fields of
 #' MARC records):
@@ -2454,26 +2454,26 @@ VIAF_Search_allNames <- function(name) {
 #' @param name It is the name o search.
 #' @return A list with the records found.
 #' @export
-VIAF_Search_allPersonalNames <- function(name) {
+v_Search_allPersonalNames <- function(name) {
   CQL_query <- paste0("local.personalNames all ", name)
-  return(VIAF_Search(CQL_query))
+  return(v_Search(CQL_query))
 }
 
-#' VIAF_Search_allTitle(title)
-#' This function is a wrapper to VIAF_Search, using this CQL_Query:
+#' v_Search_allTitle(title)
+#' This function is a wrapper to v_Search, using this CQL_Query:
 #'   'local.title all "title"'
 #' Search for titles.
 #' The search is performed with the "all" operator (for all the listed terms).
 #' @param name It is the title o search.
 #' @return A list with the records found.
 #' @export
-VIAF_Search_allTitle <- function(name) {
+v_Search_allTitle <- function(name) {
   CQL_query <- paste0("local.title all ", name)
-  return(VIAF_Search(CQL_query))
+  return(v_Search(CQL_query))
 }
 
 
-#' VIAF_GetRecord(viafid,  record_format='viaf.json')
+#' v_GetRecord(viafid,  record_format='viaf.json')
 #' Obtains the record cluster identified by viafid from VIAF, in the format
 #' indicated in record_format. Note that the returned record may be a VIAF
 #' cluster record or a redirect/scavenged record: the function returns the
@@ -2483,7 +2483,7 @@ VIAF_Search_allTitle <- function(name) {
 #' https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html.
 #' @return The VIAF record cluster in the format indicated in record_format.
 #' @export
-VIAF_GetRecord <- function(viafid, record_format='viaf.json') {
+v_GetRecord <- function(viafid, record_format='viaf.json') {
   r <- httr::GET(
     url = url <- paste0("https://viaf.org/viaf/", viafid, '/', record_format),
     httr::user_agent(user_agent)
@@ -2509,13 +2509,13 @@ VIAF_GetRecord <- function(viafid, record_format='viaf.json') {
   )
 }
 
-#' VIAF_Titles(viaf)
+#' v_Titles(viaf)
 #' Returns titles of works from the VIAF record. Note that the VIAF record musts
 #' be in JSON format.
 #' @param viaf VIAF cluster record (in JSON format).
 #' @return A list with titles.
 #' @export
-VIAF_Titles <- function(viaf) {
+v_Titles <- function(viaf) {
   if (is.null(viaf$titles) | is.null(viaf$titles$work))
     return(NULL)
   if (!is.null(viaf$titles$work$title))
@@ -2527,13 +2527,13 @@ VIAF_Titles <- function(viaf) {
   return(titles)
 }
 
-#' VIAF_Gender(viaf)
+#' v_Gender(viaf)
 #' Return the gender of the author from the VIAF record. Note that the VIAF
 #' record musts be in JSON format.
 #' @param viaf VIAF cluster record (in JSON format).
 #' @return The gender of the author o NULL if not exits in the record.
 #' @export
-VIAF_Gender <- function(viaf) {
+v_Gender <- function(viaf) {
   if (is.null(viaf$fixed))
     return(NULL)
   if (viaf$fixed$gender == 'a')
@@ -2544,13 +2544,13 @@ VIAF_Gender <- function(viaf) {
     return(viaf$fixed$gender)
 }
 
-#' VIAF_Dates(viaf)
+#' v_Dates(viaf)
 #' Returns bird year and death year from the VIAF cluster record with this
 #' format byear:dyear. Note that the VIAF record musts be in JSON format.
 #' @param viaf VIAF cluster record (in JSON format).
 #' @return The bird year and death year in format byear:dyear.
 #' @export
-VIAF_Dates <- function(viaf) {
+v_Dates <- function(viaf) {
   if (is.null(viaf$birthDate))
     byear <- ''
   else
@@ -2564,14 +2564,14 @@ VIAF_Dates <- function(viaf) {
   return(paste0(byear,":", dyear))
 }
 
-#' VIAF_Occupations(viaf)
+#' v_Occupations(viaf)
 #' Return the occupations from the VIAF record. Note that the VIAF record musts
 #' be in JSON format.
 #' @param viaf VIAF cluster record (in JSON format).
 #' @return A data-frame with sources and occupations from each source or NULL if
 #' occupations do not exist in the record.
 #' @export
-VIAF_Occupations <- function(viaf) {
+v_Occupations <- function(viaf) {
   if (is.null(viaf$occupation))
     return(NULL)
   #
@@ -2603,13 +2603,13 @@ VIAF_Occupations <- function(viaf) {
   return(df1)
 }
 
-#' VIAF_Sources(viaf)
+#' v_Sources(viaf)
 #' Return the text of all sources id from the VIAF record. Note that the VIAF
 #' record musts be in JSON format.
 #' @param viaf VIAF cluster record (in JSON format).
 #' @return A data-frame with text and sources.
 #' @export
-VIAF_Sources <- function(viaf) {
+v_Sources <- function(viaf) {
   vv <- viaf$mainHeadings$data
   if (!is.null(vv$text))
     vv <- list(vv)
@@ -2638,7 +2638,7 @@ VIAF_Sources <- function(viaf) {
   return(df1)
 }
 
-#' VIAF_SourceId(viaf, source)
+#' v_SourceId(viaf, source)
 #' Return the text and identifier of the source from the VIAF record.
 #' Note that the VIAF record musts be in JSON format.
 #' @param viaf VIAF cluster record (in JSON format).
@@ -2646,21 +2646,21 @@ VIAF_Sources <- function(viaf) {
 #' @return A data-frame with columns text and source, or NULL if the source does
 #' no exist in the viaf record.
 #' @export
-VIAF_SourceId <- function(viaf, source) {
-  texts <- VIAF_Sources(viaf)
+v_SourceId <- function(viaf, source) {
+  texts <- v_Sources(viaf)
   if (is.null(texts[[source]]))
     return(NULL)
   else
     return(texts[!is.na(texts[[source]]), c('text', source)])
 }
 
-#' VIAF_Wikipedias(viaf)
+#' v_Wikipedias(viaf)
 #' Return the Wikipedia pages (URL) from the VIAF record. Note that the VIAF
 #' record musts be in JSON format.
 #' @param viaf VIAF cluster record (in JSON format).
 #' @return A vector with the URL of the Wikipedias.
 #' @export
-VIAF_Wikipedias <- function(viaf) {
+v_Wikipedias <- function(viaf) {
   if (is.null(viaf$xLinks) | is.null(viaf$xLinks$xLink))
     return(NULL)
   #

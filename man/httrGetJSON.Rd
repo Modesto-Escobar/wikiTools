@@ -24,7 +24,7 @@ https://wikimedia.org/api/rest_v1/
 https://www.mediawiki.org/wiki/XTools/API/Page (xtools.wmflabs.org)
 }
 \note{
-Used in MW_Pageviews
+Used in m_Pageviews
 }
 \author{
 Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
