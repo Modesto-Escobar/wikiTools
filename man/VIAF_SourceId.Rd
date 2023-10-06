@@ -3,7 +3,7 @@
 \name{VIAF_SourceId}
 \alias{VIAF_SourceId}
 \title{VIAF_SourceId(viaf, source)
-Return the text and identification of the source from the VIAF record.
+Return the text and identifier of the source from the VIAF record.
 Note that the VIAF record musts be in JSON format.}
 \usage{
 VIAF_SourceId(viaf, source)
@@ -11,7 +11,7 @@ VIAF_SourceId(viaf, source)
 \arguments{
 \item{viaf}{VIAF cluster record (in JSON format).}
 
-\item{source}{the identificator of the source (LC, WKP, JPG, BNE...)}
+\item{source}{the identifier of the source (LC, WKP, JPG, BNE...)}
 }
 \value{
 A data-frame with columns text and source, or NULL if the source does
@@ -19,6 +19,6 @@ no exist in the viaf record.
 }
 \description{
 VIAF_SourceId(viaf, source)
-Return the text and identification of the source from the VIAF record.
+Return the text and identifier of the source from the VIAF record.
 Note that the VIAF record musts be in JSON format.
 }

@@ -165,8 +165,8 @@ WDQS_isInstanceOf <- function(entity_list, instanceof) {
 #' in any language, not sorted.
 #' @param instanceof Wikidata entity class to limit the result to the instances
 #' of that class. For example, if instanceof='Q5', limit the results to "human".
-#' @param nlimit If the number of entities exceeds this number, do chunked
-#' queries. This is the number of entities requested in each chunk.
+#' @param nlimit If the number of entities exceeds this number, chunked queries
+#' are done. This is the number of entities requested in each chunk.
 #' @return A data-frame with four columns, first the count of Wikipedia pages,
 #' second, the the langs, page title, and URL's of the wikipedia pages. Last
 #' three use "|" as separator. Index of the data-frame is also set to the
@@ -189,7 +189,7 @@ WDQS_Wikipedias <- function(entity_list, wikilangs="", instanceof="",
   n <- length(entity_list)
   if (n > nlimit) {
     cat(paste0("INFO: The number of entities (", n, ") exceeds nlimit (",
-               nlimit,"): do chunked queries.\n"), file=stderr())
+               nlimit,"): doing chunked queries.\n"), file=stderr())
     nlim <- as.integer(n/nlimit)
     for (k in 0:nlim) {
       offset <- nlimit * k
@@ -270,8 +270,8 @@ WHERE {\n",
 #' Duplicated entities in entity_list are deleted before checking. Index of the
 #' data-frame returned are also set to entity_list.
 #' @param entity_list A vector with de Wikidata entities.
-#' @param nlimit If the number of entities exceeds this number, do chunked
-#' queries. This is the number of entities requested in each chunk.
+#' @param nlimit If the number of entities exceeds this number, chunked queries
+#' are done. This is the number of entities requested in each chunk.
 #' @return A data-frame with three columns: firts, the entity itself, second,
 #' if that entity is valid in Wikidata (TRUE or FALSE), last, if the entity
 #' redirects to another Wikidata entity, this entity.
@@ -293,7 +293,7 @@ WDQS_isValid <- function(entity_list, nlimit=50000) {
   n <- length(entity_list)
   if (n > nlimit) {
     cat(paste0("INFO: The number of entities (", n, ") exceeds nlimit (",
-               nlimit,"): do chunked queries.\n"), file=stderr())
+               nlimit,"): doing chunked queries.\n"), file=stderr())
     nlim <- as.integer(n/nlimit)
     for (k in 0:nlim) {
       offset <- nlimit * k
@@ -349,7 +349,7 @@ WDQS_OccupationCount <- function(Qoc) {
 #' Wikidata entity for that occupation. Use chunked requests.
 #' @param Qoc The Wikidata entity of the occupation. For example, Q2306091 (sociologist)
 #' @param nlimit If the number of entities found with that occupation exceeds
-#' this number, do chunked queries. This is the number of entities requested
+#' this number, chunked queries are done. This is the number of entities requested
 #' in each chunk.
 #' @return A vector with the Wikidata entities with that occupation.
 #' @examples
@@ -362,7 +362,7 @@ WDQS_OccupationEntities <- function(Qoc, nlimit=10000) {
   nlim <- as.integer(nq/nlimit)
   if (nlim > 0)
     cat(paste0("INFO: The number of entities (", nq, ") exceeds nlimit (",
-               nlimit,"): do chunked queries.\n"), file=stderr())
+               nlimit,"): doing chunked queries.\n"), file=stderr())
   for (k in 0:nlim) {
     offset <- nlimit * k
     if (nlim > 0)
@@ -386,7 +386,7 @@ WDQS_OccupationEntities <- function(Qoc, nlimit=10000) {
 #' @param Qoc The Wikidata entity of the occupation. For example, Q2306091 is
 #' the entity of sociologist.
 #' @param nlimit If the number of entities found with that occupation exceeds
-#' this number, do chunked queries. This is the number of entities requested
+#' this number, chunked queries are done. This is the number of entities requested
 #' in each chunk.
 #' @return A data-frame with Wikidata entities, the number of Wikipedias in
 #' which they have page, the Wikipedia languages, the page titles, and,
@@ -402,7 +402,7 @@ WDQS_OccupationEntitiesWikipedias <- function(Qoc, nlimit=5000) {
   nlim <- as.integer(nq/nlimit)
   if (nlim > 0)
     cat(paste0("INFO: The number of entities (", nq, ") exceeds nlimit (",
-               nlimit,"): do chunked queries.\n"), file=stderr())
+               nlimit,"): doing chunked queries.\n"), file=stderr())
   for (k in 0:nlim) {
     offset <- nlimit * k
     if (nlim > 0)
@@ -734,8 +734,8 @@ paste0(searchlang, '}'),
 #' returned, separated with '|'. If no information is given in the first
 #' language, next is used. This parameter is mandatory, at least one language is
 #' required, default, 'en'
-#' @param nlimit If the number of entities exceeds this number, do chunked
-#' queries. This is the number of entities requested in each chunk.
+#' @param nlimit If the number of entities exceeds this number, chunked queries
+#' are done. This is the number of entities requested in each chunk.
 #' @return A data-frame with 'entity', 'entityLabel', 'entityDescription' and,
 #' additionally, the properties of Pproperty. Index of the data-frame is also
 #' set to entity_list.
@@ -756,7 +756,7 @@ WDQS_Property <- function(entity_list, Pproperty, langsorder='en', nlimit=10000)
   n <- length(entity_list)
   if (n > nlimit) {
     cat(paste0("INFO: The number of entities (", n, ") exceeds nlimit (",
-               nlimit,"): do chunked queries.\n"), file=stderr())
+               nlimit,"): doing chunked queries.\n"), file=stderr())
     nlim <- as.integer(n/nlimit)
     for (k in 0:nlim) {
       offset <- nlimit * k
@@ -823,7 +823,7 @@ paste0(search, searchlang, '}'),
 #' the search are filtered to Wikidata entities of class Q5 (human). Some
 #' entity classes are allowed, separated with '|'.
 #' @return: A data-frame with 'entity', 'entityLabel', 'entityDescription' and
-#' the identificator in the "Pauthority" database.
+#' the identifier in the "Pauthority" database,
 #' @examples
 #' \dontrun{
 #' # Example: Pauthority=P4439 (has identificator in the Museo Nacional Centro de
@@ -871,8 +871,8 @@ if (filterq) filters else "",
 
 #' WDQS_EntityInfo(entity, langsorder='en', wikilangs="")
 #' Gets some properties of the Wikidata "entity" related to birth and death
-#' dates, places, occupations, works, education, awards, identificator in some
-#' libraries, Wikipedia page titles (which can be limitted to the languages in
+#' dates, places, occupations, works, education, awards, identifier in some
+#' libraries, Wikipedia page titles (which can be limited to the languages in
 #' the "wikilangs" parameter), etc.
 #' @param entity The Wikidata entity to search for properties. Only one entity
 #' is allowed.
@@ -1050,8 +1050,8 @@ WHERE {
 #' Same as WDQS_EntityInfo function but less properties are requested and
 #' less checks are done.
 #' Gets some properties of the Wikidata "entity" related to birth and death
-#' dates, places, occupations, works, education, awards, identificator in some
-#' libraries, Wikipedia page titles (which can be limitted to the languages in
+#' dates, places, occupations, works, education, awards, identifier in some
+#' libraries, Wikipedia page titles (which can be limited to the languages in
 #' the "wikilangs" parameter), etc.
 #' @param entity The Wikidata entity to search for properties.
 #' @param langsorder Order of languages in which the information will be
@@ -1602,7 +1602,7 @@ MW_WikidataEntity <- function(titles, project='en.wikipedia.org',
   nlimit <- 50
   if (n > nlimit) {
     cat(paste0("INFO: The number of titles (", n,") exceeds Wikipedia API limit (",
-               nlimit,"): do chunked queries.\n"),
+               nlimit,"): doing chunked queries.\n"),
         file = stderr())
     nlim <- as.integer(n/nlimit)
     for (k in 0:nlim) {
@@ -1722,7 +1722,7 @@ MW_Redirects <- function(titles, project="en.wikipedia.org") {
   nlimit = 50
   if (n > nlimit) {
     cat(paste0("INFO: The number of titles (", n,") exceeds Wikipedia API limit (",
-               nlimit,"): do chunked queries.\n"),
+               nlimit,"): doing chunked queries.\n"),
         file = stderr())
     nlim <- as.integer(n/nlimit)
     for (k in 0:nlim) {
@@ -1815,7 +1815,7 @@ MW_PagePrimaryImage <- function(titles, project="en.wikipedia.org") {
   nlimit = 50
   if (n > nlimit) {
     cat(paste0("INFO: The number of titles (", n,") exceeds Wikipedia API limit (",
-               nlimit,"): do chunked queries.\n"),
+               nlimit,"): doing chunked queries.\n"),
         file = stderr())
     nlim <- as.integer(n/nlimit)
     for (k in 0:nlim) {
@@ -1942,7 +1942,7 @@ MW_PageFiles <- function(titles, project = "en.wikipedia.org",
   nlimit = 50
   if (n > nlimit) {
     cat(paste0("INFO: The number of titles (", n,") exceeds Wikipedia API limit (",
-               nlimit,"): do chunked queries.\n"),
+               nlimit,"): doing chunked queries.\n"),
         file = stderr())
     nlim <- as.integer(n/nlimit)
     for (k in 0:nlim) {
@@ -2313,13 +2313,15 @@ VIAF_AutoSuggest <- function(author) {
 #' VIAF_Search(CQL_Query)
 #' Run the CQL_Query using the VIAF Search API and return a list of records
 #' found. The search string is formed using the CQL_Query syntax of the API.
-#' Note that returned records use the http://viaf.org/VIAFCluster record
-#' schema, i.e., complete cluster records. Also note that only returns a maximum
-#' of 250 records.
-#' @param CQL_Query string with the search.
+#' Note that returned records use the "info:srw/schema/1/JSON" record schema,
+#' i.e., are complete cluster records packed in JSON format. If the number
+#' of records found is greater than 250 (API restrictions), successive requests
+#' are made.
+#' @param CQL_Query String with the search.
 #' See https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html
 #' @return A list with the records found.
 #' @examples
+#' \dontrun{
 #' ## Search in any field (cql.any)
 #' # Operator is "=": so search one or more terms:
 #' CQL_Query <- 'cql.any = "García Iranzo, Juan"'
@@ -2340,27 +2342,44 @@ VIAF_AutoSuggest <- function(author) {
 #' # Search in Titles
 #' CQL_Query <- 'local.title all "Los pronósticos electorales con encuestas"'
 #' r <- VIAF_Search(CQL_Query)
+#' }
 #' @export
 VIAF_Search <- function(CQL_Query) {
   maxrecords <- 250
   url <- "https://www.viaf.org/viaf/search"
   query <- list(httpAccept = 'application/json',
-                maximunRecords = maxrecords,
-                # recordSchema = 'http://viaf.org/BriefVIAFCluster',
-                recordSchema = 'http://viaf.org/VIAFCluster',
-                startRecords = 1,
+                maximumRecords = maxrecords,
+                # recordSchema = paste0('http://viaf.org/', recordSchema),
+                recordSchema = 'info:srw/schema/1/JSON',
+                startRecord = 1,
                 query = CQL_Query)
   #
   tryCatch(
     {
-      r <- httr::GET(url = url,
-                     httr::user_agent(user_agent),
-                     query = query)
-      httr::stop_for_status(r)
-      content <- httr::content(r, as = "text", encoding = "UTF-8")
-      d <- jsonlite::fromJSON(content, simplifyVector = FALSE)
-      records <- d$searchRetrieveResponse$records
-      return(records)
+      output <- list()
+      while(TRUE) {
+        r <- httr::GET(url = url,
+                       httr::user_agent(user_agent),
+                       query = query)
+        httr::stop_for_status(r)
+        # cat(r$url)
+        content <- httr::content(r, as = "text", encoding = "UTF-8")
+        d <- jsonlite::fromJSON(content, simplifyVector = FALSE)
+        nrecords <- d$searchRetrieveResponse$numberOfRecords
+        records  <- d$searchRetrieveResponse$records
+        output <- append(output, records)
+        if (length(output) >= as.integer(nrecords)) {
+          if (query$startRecord > 1)
+            cat(paste0(' INFO: Retrieved ', length(output), ' records.\n'), file = stderr())
+          return(output)
+        }
+        if (query$startRecord == 1)
+           cat(paste0("INFO: Number of records found (", nrecords,
+                      ") excedes the maximun per request API limit (", maxrecords,
+                      "). Doing sucesivelly requests.\n"), file = stderr())
+        cat(paste0(' INFO: Retrieved ', length(output), ' records.\n'), file = stderr())
+        query$startRecord <- query$startRecord + maxrecords
+      }
     }, error = function(e) {
       cat(as.character(e), file = stderr())
       return(NULL)
@@ -2368,12 +2387,98 @@ VIAF_Search <- function(CQL_Query) {
   )
 }
 
+#' VIAF_Search_anyField(string)
+#' This function is a wrapper to VIAF_Search, using this CQL_Query:
+#'   'cql.any = "string"'
+#' Search preferred Name - names which are the preferred form in an authority record
+#' (1xx fields of the MARC records).
+#' 1xx: Main Entry: Personal name (100), corporate name (110), meeting name (111), uniform title (130)
+#' The search is performed with the "=" operator (all terms are searched, and only
+#' those ones).
+#' @param name It is the name o search.
+#' @return A list with the records found.
+#' @note Note that the search is performed with the "=" operator, it is not
+#' an "all" search. The "=" operator searches for all words and only those words
+#' in the order that words appear. With the "all" operator, more words can be in
+#' the field and in any order. Search is case insensitive.
+#' @export
+VIAF_Search_anyField <- function(name) {
+  CQL_query <- paste0("cql.any = ", name)
+  return(VIAF_Search(CQL_query))
+}
+
+#' VIAF_Search_allmainHeadingEl(name)
+#' This function is a wrapper to VIAF_Search, using this CQL_Query:
+#'   'local.mainHeadingEl all "name"'
+#' Search preferred Name - names which are the preferred form in an authority
+#' record (1xx fields of the MARC records).
+#' 1xx: Main Entry: Personal name (100), corporate name (110), meeting name (111), uniform title (130)
+#' The search is performed with the "all" operator (all terms are searched).
+#' @param name It is the name o search.
+#' @return A list with the records found.
+#' @note Note that the search is performed with the "all" operator, it is not
+#' an "=" search. The "=" operator searches for all words and only those words.
+#' With the "all" operator, more words can appear in the field.
+#' @export
+VIAF_Search_allmainHeadingEl <- function(name) {
+  CQL_query <- paste0("local.mainHeadingEl all ", name)
+  return(VIAF_Search(CQL_query))
+}
+
+#' VIAF_Search_allNames(name)
+#' This function is a wrapper to VIAF_Search, using this CQL_Query:
+#'   'local.names all "name"'
+#' Search Names - any name preferred or alternate 1xx, 4xx, 5xx fields of the
+#' MARC records):
+#' 1xx: Main Entry: Personal name (100), corporate name (110), meeting name (111), uniform title (130)
+#' 4xx: Series entry: Personal name (400), corporate name (410), meeting name (411), uniform title (440 - obsolete)
+#' 5xx: Note Fields
+#' The search is performed with the "all" operator (for all the listed terms).
+#' @param name It is the name o search.
+#' @return A list with the records found.
+#' @export
+VIAF_Search_allNames <- function(name) {
+  CQL_query <- paste0("local.names all ", name)
+  return(VIAF_Search(CQL_query))
+}
+
+#' VIAF_Search_allPersonalNames(name)
+#' This function is a wrapper to VIAF_Search, using this CQL_Query:
+#'   'local.personalNames all "name"'
+#' Search Personal Names within the authority record (100, 400, 500 fields of
+#' MARC records):
+#' 100: Main Entry: Personal name
+#' 400: Series entry: Personal name (400)
+#' 500: Note field: General Note.
+#' The search is performed with the "all" operator (for all the listed terms).
+#' @param name It is the name o search.
+#' @return A list with the records found.
+#' @export
+VIAF_Search_allPersonalNames <- function(name) {
+  CQL_query <- paste0("local.personalNames all ", name)
+  return(VIAF_Search(CQL_query))
+}
+
+#' VIAF_Search_allTitle(title)
+#' This function is a wrapper to VIAF_Search, using this CQL_Query:
+#'   'local.title all "title"'
+#' Search for titles.
+#' The search is performed with the "all" operator (for all the listed terms).
+#' @param name It is the title o search.
+#' @return A list with the records found.
+#' @export
+VIAF_Search_allTitle <- function(name) {
+  CQL_query <- paste0("local.title all ", name)
+  return(VIAF_Search(CQL_query))
+}
+
+
 #' VIAF_GetRecord(viafid,  record_format='viaf.json')
 #' Obtains the record cluster identified by viafid from VIAF, in the format
 #' indicated in record_format. Note that the returned record may be a VIAF
 #' cluster record or a redirect/scavenged record: the function returns the
 #' record as is.
-#' @param viafid The VIAF identification.
+#' @param viafid The VIAF identifier.
 #' @param record_format 'viaf.json' (default) or others in
 #' https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html.
 #' @return The VIAF record cluster in the format indicated in record_format.
@@ -2534,10 +2639,10 @@ VIAF_Sources <- function(viaf) {
 }
 
 #' VIAF_SourceId(viaf, source)
-#' Return the text and identification of the source from the VIAF record.
+#' Return the text and identifier of the source from the VIAF record.
 #' Note that the VIAF record musts be in JSON format.
 #' @param viaf VIAF cluster record (in JSON format).
-#' @param source the identificator of the source (LC, WKP, JPG, BNE...)
+#' @param source the identifier of the source (LC, WKP, JPG, BNE...)
 #' @return A data-frame with columns text and source, or NULL if the source does
 #' no exist in the viaf record.
 #' @export

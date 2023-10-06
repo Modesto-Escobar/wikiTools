@@ -5,14 +5,15 @@
 \title{VIAF_Search(CQL_Query)
 Run the CQL_Query using the VIAF Search API and return a list of records
 found. The search string is formed using the CQL_Query syntax of the API.
-Note that returned records use the http://viaf.org/VIAFCluster record
-schema, i.e., complete cluster records. Also note that only returns a maximum
-of 250 records.}
+Note that returned records use the "info:srw/schema/1/JSON" record schema,
+i.e., are complete cluster records packed in JSON format. If the number
+of records found is greater than 250 (API restrictions), successive requests
+are made.}
 \usage{
 VIAF_Search(CQL_Query)
 }
 \arguments{
-\item{CQL_Query}{string with the search.
+\item{CQL_Query}{String with the search.
 See https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html}
 }
 \value{
@@ -22,11 +23,13 @@ A list with the records found.
 VIAF_Search(CQL_Query)
 Run the CQL_Query using the VIAF Search API and return a list of records
 found. The search string is formed using the CQL_Query syntax of the API.
-Note that returned records use the http://viaf.org/VIAFCluster record
-schema, i.e., complete cluster records. Also note that only returns a maximum
-of 250 records.
+Note that returned records use the "info:srw/schema/1/JSON" record schema,
+i.e., are complete cluster records packed in JSON format. If the number
+of records found is greater than 250 (API restrictions), successive requests
+are made.
 }
 \examples{
+\dontrun{
 ## Search in any field (cql.any)
 # Operator is "=": so search one or more terms:
 CQL_Query <- 'cql.any = "García Iranzo, Juan"'
@@ -46,4 +49,5 @@ r <- VIAF_Search(CQL_Query)
 # Search in Titles
 CQL_Query <- 'local.title all "Los pronósticos electorales con encuestas"'
 r <- VIAF_Search(CQL_Query)
+}
 }

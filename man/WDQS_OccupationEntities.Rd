@@ -12,7 +12,7 @@ WDQS_OccupationEntities(Qoc, nlimit = 10000)
 \item{Qoc}{The Wikidata entity of the occupation. For example, Q2306091 (sociologist)}
 
 \item{nlimit}{If the number of entities found with that occupation exceeds
-this number, do chunked queries. This is the number of entities requested
+this number, chunked queries are done. This is the number of entities requested
 in each chunk.}
 }
 \value{

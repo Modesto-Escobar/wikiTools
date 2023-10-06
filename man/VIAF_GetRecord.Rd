@@ -11,7 +11,7 @@ record as is.}
 VIAF_GetRecord(viafid, record_format = "viaf.json")
 }
 \arguments{
-\item{viafid}{The VIAF identification.}
+\item{viafid}{The VIAF identifier.}
 
 \item{record_format}{'viaf.json' (default) or others in
 https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html.}

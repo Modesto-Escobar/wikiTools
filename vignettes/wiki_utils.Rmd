@@ -1,0 +1,437 @@
+---
+title: "Examples with wiki_utils"
+author: "Angel Zazo, Department of Computer Science and Automatics, University of Salamanca"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{netCoin package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Functions
+
+### Functions to obtain a list of Wikidata entities
+
+WDQS_SearchByLabel_Exact(string, langs='en', instanceof="", Pproperty="")
+
+WDQS_SearchByLabel_Startswith(string, lang='en', langsorder='en', instanceof="", Pproperty="")
+
+WDQS_SearchByLabel_Inlabel(string, langsorder='en', lang="", instanceof="", Pproperty="")
+
+WDQS_OccupationCount(Qoc)    # Qoc = the Wikidata entity for an occupation
+
+WDQS_OccupationEntities(Qoc, nlimit=10000)
+
+WDQS_OccupationEntitiesWikipedias(Qoc, nlimit=5000)
+
+### Function to obtain information from a list of Wikidata entities or a single one.
+
+WDQS_isInstanceOf(entity_list, instanceof)
+
+WDQS_Wikipedias(entity_list, wikilangs="", instanceof="", nlimit=1500)
+
+WDQS_isValid(entity_list, nlimit=50000)
+
+WDQS_Property(entity_list, Pproperty, langsorder='en', nlimit=10000)
+
+WDQS_IdentifiersOfAuthority(Pauthority, langsorder='en', instanceof="")
+
+Pauthority = Authority Database Property in Wikidata
+
+WDQS_EntityInfo(entity, langsorder='en', wikilangs="")
+
+WDQS_EntityInfo_tiny(entity, langsorder='en', wikilangs="")
+
+WDQS_FilmInfo(film_entity, langsorder='en', wikilangs='')
+
+### Functions to obtain information using the WikiMedia API's
+
+MW_Opensearch(string, project='en.wikipedia.org', profile="engine_autoselect", redirects="resolve")
+
+MW_WikidataEntity(titles, project='en.wikipedia.org', redirects=TRUE)
+
+MW_Redirects(titles, project="en.wikipedia.org")
+
+MW_PagePrimaryImage(titles, project="en.wikipedia.org")
+
+MW_PageFiles(titles, project="en.wikipedia.org", exclude_ext='svg|webp|xcf')
+
+MW_Pageviews(article, start, end, project="en.wikipedia.org", access="all-access",
+             agent="user", granularity="monthly", redirects=FALSE))
+
+MW_XtoolsInfo(article, infotype="articleinfo", project="en.wikipedia.org", redirects=FALSE)
+
+MW_XtoolsInfoAll(article, project="en.wikipedia.org", redirects=FALSE)
+
+### Functions to obtain information (viafID or cluster records) using the VIAF API
+
+VIAF_AutoSuggest(author) : obtains viafID
+
+VIAF_Search(CQL_Query) : obtains clusters records
+
+#### The following functions are wrappers to the previous one:
+
+VIAF_Search_anyField(string) : CQL_Query = cql.any = "string"'
+
+VIAF_Search_allmainHeadingEl(name) : CQL_Query = 'local.mainHeadingEl all "name"
+
+VIAF_Search_allNames(name) : CQL_Query = 'local.names all "name"'
+
+VIAF_Search_allPersonalNames(name) : CQL_Query = 'local.personalNames all "name"'
+
+VIAF_Search_allTitle(title) : CQL_Query = 'local.title all "title"'
+
+### Function to retrieve a cluster record using the viafID.
+
+VIAF_GetRecord(viafid,  record_format='viaf.json'): retrieve a cluster record
+
+### Function to extract information from a VIAF cluster record
+
+VIAF_Titles(viaf)
+
+VIAF_Gender(viaf)
+
+VIAF_Dates(viaf)
+
+VIAF_Occupations(viaf)
+
+VIAF_Sources(viaf)
+
+Gets all sources and identifier in each one.
+
+VIAF_SourceId(viaf, source)
+
+Gets the identifier in that source, if exits.
+
+VIAF_Wikipedias(viaf)
+
+
+
+## Package installation and loading
+
+To install and load the updated version of the netCoin package simply run the following commands:
+```{r eval=FALSE}
+install.packages("wikiTools")
+```
+```{r echo=TRUE}
+library(wikiTools)
+```
+
+
+
+## Examples of Wikidata functions using WDQS
+
+#### Search string "Iranzo" in different positions
+Exact search in Label or exact search in AltLabel (case sensitive and diacritics)
+
+Optional: limit by instanceof Wikidata class (Qxx).
+
+Optional: return information of some properties (Pproperties, Pxxx).
+```{r echo=TRUE}
+df <- WDQS_SearchByLabel_Exact(string='Iranzo', langs='es|en')
+df <- WDQS_SearchByLabel_Exact(string='Iranzo', langs='es|en', instanceof = 'Q5')
+df <- WDQS_SearchByLabel_Exact(string='Iranzo', langs='es|en', instanceof = 'Q5|Q101352')
+df <- WDQS_SearchByLabel_Exact(string='Iranzo', langs='es|en', instanceof = 'Q5', Pproperty = 'P21|P569|P570')
+```
+
+#### Search at the beginning in Label or AltLabel (diacritics and case are ignored)
+```{r echo=TRUE}
+df <- WDQS_SearchByLabel_Startswith(string='Iranzo', lang='en', langsorder='es|en')
+df <- WDQS_SearchByLabel_Startswith(string='Iranzo', lang='en', langsorder='es|en', instanceof = 'Q5')
+df <- WDQS_SearchByLabel_Startswith(string='Iranzo', lang='en', langsorder='es|en', instanceof = 'Q5|Q101352')
+df <- WDQS_SearchByLabel_Startswith(string='Iranzo', lang='en', langsorder='en', instanceof = 'Q5', Pproperty = 'P21|P569|P570')
+```
+
+#### Search in any position in Label or AltLabel (diacritics and case are ignored)
+If lang=='' search in any language, else the search is performed only in the language indicated.
+```{r echo=TRUE}
+df <- WDQS_SearchByLabel_Inlabel(string='Iranzo', langsorder='es|en')
+```
+Search only in Chinese (Simplified) (language code: zh):
+```{r echo=TRUE}
+df <- WDQS_SearchByLabel_Inlabel(string='Iranzo', langsorder='zh|es', lang='zh')
+```
+Optional instanceof and Property
+```{r echo=TRUE}
+df <- WDQS_SearchByLabel_Inlabel(string='Iranzo', langsorder='es|en', instanceof = 'Q5')
+df <- WDQS_SearchByLabel_Inlabel(string='Iranzo', langsorder='es|en', instanceof = 'Q5|Q101352')
+df <- WDQS_SearchByLabel_Inlabel(string='Iranzo', langsorder='es|en', instanceof = 'Q5', Pproperty = 'P21|P569|P570')
+```
+
+#### aux: getting a vector of entities (`l`) to use later.
+```{r echo=TRUE}
+df <- WDQS_SearchByLabel_Inlabel(string='Iranzo', langsorder='es|en')
+l <- df$entity
+```
+
+#### WDQS_isInstanceOf
+Check if elements in entity_list are instance of a Wikimedia class
+```{r echo=TRUE}
+df <- WDQS_isInstanceOf(entity_list=l, instanceof='Q5')
+# Not TRUE
+df[!df$instanceof_Q5,]
+```
+
+#### WDQS_Wikipedias
+Search for Wikipedia pages in all/some languages
+
+Optional: instanceOF (limit to entities which are instance of a Wikidata class)
+```{r echo=TRUE}
+df <- WDQS_Wikipedias(entity_list=l)
+df <- WDQS_Wikipedias(entity_list=l, wikilangs='es|en|fr')
+df <- WDQS_Wikipedias(entity_list=l, wikilangs='es|en|fr', instanceof="Q5")
+```
+
+#### WDQS_Occupations
+Count entities, or get the entities with that occupation, also get Wikipedia pages
+
+Note: depending on connection speed, nlimit parameter musts be adjusted
+```{r echo=TRUE}
+WDQS_OccupationCount(Qoc='Q2306091')                    # Qoc for Sociologist
+l  <- WDQS_OccupationEntities(Qoc='Q2306091')           # l=entities: vector
+lw <- WDQS_OccupationEntitiesWikipedias(Qoc='Q2306091') # lw=dataframe
+ # We can obtain the same information using previous function WDQS_Wikipedias:
+ lw2 <- WDQS_Wikipedias(entity_list=l, wikilangs='')
+ # Verifying:
+ all(lw['Q10320558','pages'] == lw2['Q10320558','pages'])
+ # Verifying:
+ all(sort(strsplit(lw['Q9061', 'pages'], '|', fixed = T)[[1]]) ==
+     sort(strsplit(lw2['Q9061', 'pages'], '|', fixed = T)[[1]]))
+```
+
+#### WDQS_isValid.
+Check if the Wikidata entities are valid. A entity is valid if it has a label
+or has a description. If one entity exists but is not valid, is possible that
+it has a redirection to other entity, in that case, the redirection is
+obtained. Other entities may have existed in the past, but they are currently
+deleted.
+```{r echo=TRUE}
+l2 <- append(l, c("Q115637688", "Q105660123"))  # Note: adding two new entities
+v <- WDQS_isValid(l2)
+# Not valid
+v[!v$valid,]
+```
+
+#### WDQS_Property
+Obtain properties of entity_list.
+```{r echo=TRUE}
+p <- WDQS_Property(l, Pproperty = 'P21|P569|P214', langsorder = 'es|en')
+```
+
+#### WDQS_IdentifiersOfAuthority
+Search for Wikidata entities that have an identifier in the Wikidata authority property "Pauthority".
+
+Optional: instanceOf
+
+Example: Pauthority=P4439 (has identifier in the Museo Nacional Centro de Arte Reina Sofía)
+```{r echo=TRUE}
+mncars   <- WDQS_IdentifiersOfAuthority(Pauthority="P4439", langsorder = 'es|en')  # 1286  [human, groups, etc.]
+mncarsQ5 <- WDQS_IdentifiersOfAuthority(Pauthority="P4439", langsorder = 'es|en', instanceof = 'Q5')  # 1280
+# Entities are not 'human' (Q5) [see entityDescription column):
+mncars[!(mncars$entity %in% mncarsQ5$entity),]  # not instance of Q5.
+```
+
+#### WDQS_EntityInfo
+Get some properties of a Wikidata entity.
+```{r echo=TRUE}
+df1 <- WDQS_EntityInfo(entity='Q134644', langsorder = 'es|en')
+# Also a "tiny" version
+df2 <- WDQS_EntityInfo_tiny(entity='Q134644', langsorder = 'es|en')
+# Differences: fields non existing in the tiny row set as "--":
+Aleixandre <- rbind(
+  df1,
+  data.frame(c(df2, sapply(setdiff(names(df1), names(df2)), function(x) "--")),
+             row.names = 'tiny')
+)
+```
+
+#### WDQS_FilmInfo
+Get some properties of a Wikidata entity for a film.
+```{r echo=TRUE}
+BenHur    <- WDQS_FilmInfo(film_entity='Q180098', langsorder='es|en', wikilangs = 'es|fr')
+Nosferatu <- WDQS_FilmInfo(film_entity='Q151895', langsorder='es|en', wikilangs = 'es|fr|en')
+# Nosferatu has a public video:
+Nosferatu$video
+# Combining data-frames:
+films <- rbind(BenHur, Nosferatu)
+```
+
+
+## Examples of WikiMedia functions
+
+#### MW_Opensearch
+Search articles that contains any words (note: it is better to use a large string)
+
+Some search profiles:
+```{r echo=TRUE}
+df <- MW_Opensearch(string='Duque de Alba', project='es.wikipedia.org', profile="engine_autoselect", redirects="resolve")
+df <- MW_Opensearch(string='Duque de Alba', project='es.wikipedia.org', profile="strict")
+df <- MW_Opensearch(string='Duque de Alba', project='es.wikipedia.org', profile="fuzzy")
+```
+
+#### MW_WikidataEntity
+Checks if titles are in a Wikimedia project and returns the Wikidata entity for them, if they have one.
+
+Note that URLdecode("a%CC%8C") is the letter "a" with the combining caron (ǎ)
+```{r echo=TRUE}
+df <- MW_WikidataEntity(c('Max Planck', URLdecode("a%CC%8C"), 'Max', 'Cervante', 'humanist'),
+                        project='en.wikipedia.org')
+```
+
+#### MW_Redirects
+Obtains the redirections of a page (the page itself can be a redirect to other page).
+
+Returns a vector for each title, in each vector the first element is the destiny, rest are all pages that redirect to it.
+```{r echo=TRUE}
+a <- MW_Redirects(c('Cervantes', 'Planck', 'Noexiste'), project='es.wikipedia.org')
+a
+```
+
+#### MW_PagePrimaryImage
+Gets the URL of de Primary image as a URL of Wikimedia pages.
+
+#### MW_PageFiles
+Gets all URL of files inserted in the pages (images, sounds, videos...), using '|' as separator, and excluding some extensions in the exclude_ext parameter.
+
+Both functions automatically resolve redirects (the destiny is the "normalized" column of the data-frame returned).
+```{r echo=TRUE}
+i <- MW_PagePrimaryImage(c('Max Planck', URLdecode("a%CC%8C"), 'Max', 'Cervante', 'humanist'))
+
+f <- MW_PageFiles(c('Max Planck', URLdecode("a%CC%8C"), 'Max', 'Cervante', 'humanist'),
+                  exclude_ext = "svg|webp|xcf")
+```
+
+#### MW_Pageviews
+Gets visits that a page have had in a date interval
+
+Optional: redirects
+```{r echo=TRUE}
+v <-  MW_Pageviews(article="Cervantes", start="20230101", end="20230501",
+                   project="es.wikipedia.org", granularity="monthly")
+vv <- MW_Pageviews(article="Cervantes", start="20230101", end="20230501",
+                   project="es.wikipedia.org", granularity="monthly",
+                   redirects=TRUE)
+```
+
+#### MW_XtoolsInfo
+Obtains information (as vector) about an article in the Wikimedia project.
+
+Infotype: articleinfo, prose, links
+
+Optional: redirects
+```{r echo=TRUE}
+x <-  MW_XtoolsInfo(article="Cervantes", infotype="articleinfo", project="es.wikipedia.org")
+xx <- MW_XtoolsInfo(article="Cervantes", infotype="articleinfo", project="es.wikipedia.org",
+                   redirects=TRUE)
+
+y <-  MW_XtoolsInfo(article="Miguel de Cervantes", infotype="links", project="es.wikipedia.org")
+yy <- MW_XtoolsInfo(article="Cervantes", infotype="links", project="es.wikipedia.org",
+                    redirects=TRUE)
+```
+
+#### MW_XtoolsInfoAll
+Gets all information (articleinfo, prose, links).
+```{r echo=TRUE}
+z  <- MW_XtoolsInfoAll(article="Miguel de Cervantes", project="es.wikipedia.org")
+zz <- MW_XtoolsInfoAll(article="Cervantes", project="es.wikipedia.org",
+                       redirects=TRUE)
+```
+
+## Examples using VIAF functions
+
+#### VIAF_AutoSuggest
+Searches authors. Sometimes the same author appears several times, under a different name).
+
+Return a data-frame.
+
+Important: The API returns a maximum of 10 records.
+```{r echo=TRUE}
+VIAF_AutoSuggest('Iranzo')
+VIAF_AutoSuggest('Esparza, María')
+VIAF_AutoSuggest('Escobar, Modesto')
+# Note that four rows are returned, but only two different viafids.
+```
+
+#### VIAF_Search
+Search using CQL_Query
+
+See https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html
+
+```{r echo=TRUE}
+# Auxiliary function that extracts specific information from each record.
+showVIAF <- function(r) {
+  i <- 0
+  for (j in r) {
+    i <- i+1
+    # Get viaf record
+    viaf <- j$record$recordData
+    viafid <- viaf$viafID
+    cat(paste0("-----------\nRecord #",i,"\nSources:\n"))
+    print(VIAF_Sources(viaf))
+    cat("Gender: ");       print(VIAF_Gender(viaf))
+    cat("Dates: ") ;       print(VIAF_Dates(viaf))
+    cat('Occupations: ');  print(VIAF_Occupations(viaf))
+    cat("Titles: ");       print(VIAF_Titles(viaf))
+    cat("Wikipedias: ");   print(VIAF_Wikipedias(viaf))
+  }
+}
+```
+
+Search in any field (cql.any)
+
+Operator is "=": so search all terms and only those ones:
+```{r echo=TRUE}
+CQL_Query <- 'cql.any = "García Iranzo, Juan"'
+r <- VIAF_Search(CQL_Query)
+# r contains complete VIAF records (sometimes seen as a "cluster record",
+# which is unified by combining records from many libraries around the world)
+showVIAF(r)
+```
+
+Wrapper
+```{r echo=TRUE}
+r <- VIAF_Search_anyField("García Iranzo, Juan")
+showVIAF(r)
+```
+
+Search in 1xx, 4xx, 5xx fields of MARC record (local.names)
+
+Operator is "all": search all terms
+```{r echo=TRUE}
+CQL_Query <- 'local.names all "Figuerola"'
+r <- VIAF_Search(CQL_Query)
+```
+
+Wrapper
+```{r echo=TRUE}
+r2 <- VIAF_Search_allNames("Figuerola")
+cat(length(r), length(r2))
+```
+
+Records found exceeds the maximum per request API limit : 250
+```{r echo=TRUE}
+CQL_Query <- 'local.names all "Bolero"'
+r <- VIAF_Search(CQL_Query)
+```
+
+Search in 100, 400, 500 fields of MARC record (local.personalNames)
+
+Operator is "all": search all terms
+```{r echo=TRUE}
+CQL_Query <- 'local.personalNames all "Modesto Escobar"'
+r <- VIAF_Search(CQL_Query)
+showVIAF(r)
+```
+
+VIAF_Search_allmainHeadingEl: 1xx fields of MARC record:
+```{r echo=TRUE}
+r <- VIAF_Search_allmainHeadingEl("Escobar Mercado, Modesto")
+```
+
+Search in Titles
+```{r echo=TRUE}
+CQL_Query <- 'local.title all "Los pronósticos electorales con encuestas"'
+r <- VIAF_Search(CQL_Query)
+showVIAF(r)
+```

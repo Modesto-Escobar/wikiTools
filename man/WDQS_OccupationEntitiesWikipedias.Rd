@@ -15,7 +15,7 @@ WDQS_OccupationEntitiesWikipedias(Qoc, nlimit = 5000)
 the entity of sociologist.}
 
 \item{nlimit}{If the number of entities found with that occupation exceeds
-this number, do chunked queries. This is the number of entities requested
+this number, chunked queries are done. This is the number of entities requested
 in each chunk.}
 }
 \value{

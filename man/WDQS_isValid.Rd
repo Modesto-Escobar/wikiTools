@@ -15,8 +15,8 @@ WDQS_isValid(entity_list, nlimit = 50000)
 \arguments{
 \item{entity_list}{A vector with de Wikidata entities.}
 
-\item{nlimit}{If the number of entities exceeds this number, do chunked
-queries. This is the number of entities requested in each chunk.}
+\item{nlimit}{If the number of entities exceeds this number, chunked queries
+are done. This is the number of entities requested in each chunk.}
 }
 \value{
 A data-frame with three columns: firts, the entity itself, second,

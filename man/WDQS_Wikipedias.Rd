@@ -22,8 +22,8 @@ in any language, not sorted.}
 \item{instanceof}{Wikidata entity class to limit the result to the instances
 of that class. For example, if instanceof='Q5', limit the results to "human".}
 
-\item{nlimit}{If the number of entities exceeds this number, do chunked
-queries. This is the number of entities requested in each chunk.}
+\item{nlimit}{If the number of entities exceeds this number, chunked queries
+are done. This is the number of entities requested in each chunk.}
 }
 \value{
 A data-frame with four columns, first the count of Wikipedia pages,

@@ -6,8 +6,8 @@
 Same as WDQS_EntityInfo function but less properties are requested and
 less checks are done.
 Gets some properties of the Wikidata "entity" related to birth and death
-dates, places, occupations, works, education, awards, identificator in some
-libraries, Wikipedia page titles (which can be limitted to the languages in
+dates, places, occupations, works, education, awards, identifier in some
+libraries, Wikipedia page titles (which can be limited to the languages in
 the "wikilangs" parameter), etc.}
 \usage{
 WDQS_EntityInfo_tiny(entity, langsorder = "en", wikilangs = "")
@@ -36,8 +36,8 @@ WDQS_EntityInfo_tiny(entity, langsorder='en', wikilangs="")
 Same as WDQS_EntityInfo function but less properties are requested and
 less checks are done.
 Gets some properties of the Wikidata "entity" related to birth and death
-dates, places, occupations, works, education, awards, identificator in some
-libraries, Wikipedia page titles (which can be limitted to the languages in
+dates, places, occupations, works, education, awards, identifier in some
+libraries, Wikipedia page titles (which can be limited to the languages in
 the "wikilangs" parameter), etc.
 }
 \examples{

@@ -28,7 +28,7 @@ entity classes are allowed, separated with '|'.}
 }
 \value{
 : A data-frame with 'entity', 'entityLabel', 'entityDescription' and
-the identificator in the "Pauthority" database.
+the identifier in the "Pauthority" database,
 }
 \description{
 WDQS_IdentifiersOfAuthority(Pauthority, langsorder='en', instanceof="")

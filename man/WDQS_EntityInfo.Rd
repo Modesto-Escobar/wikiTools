@@ -4,8 +4,8 @@
 \alias{WDQS_EntityInfo}
 \title{WDQS_EntityInfo(entity, langsorder='en', wikilangs="")
 Gets some properties of the Wikidata "entity" related to birth and death
-dates, places, occupations, works, education, awards, identificator in some
-libraries, Wikipedia page titles (which can be limitted to the languages in
+dates, places, occupations, works, education, awards, identifier in some
+libraries, Wikipedia page titles (which can be limited to the languages in
 the "wikilangs" parameter), etc.}
 \usage{
 WDQS_EntityInfo(entity, langsorder = "en", wikilangs = "")
@@ -33,8 +33,8 @@ pages in any language, not sorted.}
 \description{
 WDQS_EntityInfo(entity, langsorder='en', wikilangs="")
 Gets some properties of the Wikidata "entity" related to birth and death
-dates, places, occupations, works, education, awards, identificator in some
-libraries, Wikipedia page titles (which can be limitted to the languages in
+dates, places, occupations, works, education, awards, identifier in some
+libraries, Wikipedia page titles (which can be limited to the languages in
 the "wikilangs" parameter), etc.
 }
 \examples{

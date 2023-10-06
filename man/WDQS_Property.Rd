@@ -21,8 +21,8 @@ returned, separated with '|'. If no information is given in the first
 language, next is used. This parameter is mandatory, at least one language is
 required, default, 'en'}
 
-\item{nlimit}{If the number of entities exceeds this number, do chunked
-queries. This is the number of entities requested in each chunk.}
+\item{nlimit}{If the number of entities exceeds this number, chunked queries
+are done. This is the number of entities requested in each chunk.}
 }
 \value{
 A data-frame with 'entity', 'entityLabel', 'entityDescription' and,
