@@ -2,9 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{v_Gender}
 \alias{v_Gender}
-\title{v_Gender(viaf)
-Return the gender of the author from the VIAF record. Note that the VIAF
-record musts be in JSON format.}
+\title{Gets author's gender from a VIAF record}
 \usage{
 v_Gender(viaf)
 }
@@ -15,7 +13,6 @@ v_Gender(viaf)
 The gender of the author o NULL if not exits in the record.
 }
 \description{
-v_Gender(viaf)
 Return the gender of the author from the VIAF record. Note that the VIAF
 record musts be in JSON format.
 }

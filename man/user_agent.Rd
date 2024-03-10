@@ -3,8 +3,7 @@
 \docType{data}
 \name{user_agent}
 \alias{user_agent}
-\title{General user_agent header for Wikimedia, Wikidata, MediaWiki and VIAF requests
-See https://meta.wikimedia.org/wiki/User-Agent_policy.}
+\title{See https://meta.wikimedia.org/wiki/User-Agent_policy.}
 \format{
 An object of class \code{character} of length 1.
 }
@@ -12,7 +11,6 @@ An object of class \code{character} of length 1.
 user_agent
 }
 \description{
-General user_agent header for Wikimedia, Wikidata, MediaWiki and VIAF requests
 See https://meta.wikimedia.org/wiki/User-Agent_policy.
 }
 \keyword{datasets}

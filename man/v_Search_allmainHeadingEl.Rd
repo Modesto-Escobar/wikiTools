@@ -2,13 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{v_Search_allmainHeadingEl}
 \alias{v_Search_allmainHeadingEl}
-\title{v_Search_allmainHeadingEl(name)
-This function is a wrapper to v_Search, using this CQL_Query:
-'local.mainHeadingEl all "name"'
-Search preferred Name - names which are the preferred form in an authority
-record (1xx fields of the MARC records).
-1xx: Main Entry: Personal name (100), corporate name (110), meeting name (111), uniform title (130)
-The search is performed with the "all" operator (all terms are searched).}
+\title{Run a CQL Query (local.mainHeadingEl all) in VIAF}
 \usage{
 v_Search_allmainHeadingEl(name)
 }
@@ -19,7 +13,6 @@ v_Search_allmainHeadingEl(name)
 A list with the records found.
 }
 \description{
-v_Search_allmainHeadingEl(name)
 This function is a wrapper to v_Search, using this CQL_Query:
 'local.mainHeadingEl all "name"'
 Search preferred Name - names which are the preferred form in an authority

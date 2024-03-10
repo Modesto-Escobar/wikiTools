@@ -2,11 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{m_Redirects}
 \alias{m_Redirects}
-\title{m_Redirects(titles, project="en.wikipedia.org")
-Obtains the redirection pages to the article titles in the Wikimedia project
-restricted to namespace 0. Return a vector for each title, in each vector the
-first element is the page destiny, rest are all pages that redirect to it. If
-a title is not in the Wikimedia project its list is NA.}
+\title{Get redirections of Wikipedia pages}
 \usage{
 m_Redirects(titles, project = "en.wikipedia.org")
 }
@@ -20,10 +16,9 @@ A vector for each title, with all pages that are redirects to the
 first element.
 }
 \description{
-m_Redirects(titles, project="en.wikipedia.org")
-Obtains the redirection pages to the article titles in the Wikimedia project
-restricted to namespace 0. Return a vector for each title, in each vector the
-first element is the page destiny, rest are all pages that redirect to it. If
+Obtains redirection of pages of the article titles in the Wikimedia project
+restricted to namespace 0. Returns a vector for each title, in each vector the
+first element is the page destiny, the rest are all pages that redirect to it. If
 a title is not in the Wikimedia project its list is NA.
 }
 \examples{

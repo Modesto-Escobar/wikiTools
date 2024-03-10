@@ -2,11 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{w_IdentifiersOfAuthority}
 \alias{w_IdentifiersOfAuthority}
-\title{w_IdentifiersOfAuthority(Pauthority, langsorder='en', instanceof="")
-Search for Wikidata entities that have an identifier in the Wikidata
-authority property "Pauthority". Return the entities and information (label,
-description) in the language order indicated in langsorder. If instanceof
-has a value, then response is limited to entities which are instance of it.}
+\title{Search for Wikidata entities that have a property identifier}
 \usage{
 w_IdentifiersOfAuthority(Pauthority, langsorder = "en", instanceof = "")
 }
@@ -31,7 +27,6 @@ entity classes are allowed, separated with '|'.}
 the identifier in the "Pauthority" database,
 }
 \description{
-w_IdentifiersOfAuthority(Pauthority, langsorder='en', instanceof="")
 Search for Wikidata entities that have an identifier in the Wikidata
 authority property "Pauthority". Return the entities and information (label,
 description) in the language order indicated in langsorder. If instanceof

@@ -2,9 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{v_Occupations}
 \alias{v_Occupations}
-\title{v_Occupations(viaf)
-Return the occupations from the VIAF record. Note that the VIAF record musts
-be in JSON format.}
+\title{Gets occupations from a VIAF record}
 \usage{
 v_Occupations(viaf)
 }
@@ -16,7 +14,6 @@ A data-frame with sources and occupations from each source or NULL if
 occupations do not exist in the record.
 }
 \description{
-v_Occupations(viaf)
 Return the occupations from the VIAF record. Note that the VIAF record musts
 be in JSON format.
 }

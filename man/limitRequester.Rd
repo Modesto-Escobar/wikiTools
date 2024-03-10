@@ -2,8 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{limitRequester}
 \alias{limitRequester}
-\title{limitRequester
-Limits the rate at which a function will execute}
+\title{Limits the rate at which a function will execute}
 \usage{
 limitRequester(f, n, period)
 }
@@ -22,7 +21,6 @@ same names and signatures, but collectively bound by a shared rate limit.
 Used only for WikiData Query Service (WDQS).
 }
 \description{
-limitRequester
 Limits the rate at which a function will execute
 }
 \seealso{

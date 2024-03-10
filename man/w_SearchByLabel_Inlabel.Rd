@@ -2,10 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{w_SearchByLabel_Inlabel}
 \alias{w_SearchByLabel_Inlabel}
-\title{w_SearchByLabel_Inlabel(string, langsorder='en', lang="", instanceof="", Pproperty="")
-Search Wikidata entities matching whole words in any position in label and
-altLabel. Diacritics and case are ignored. If lang has a value (es, en...)
-then the search is only in that language, otherwise any.}
+\title{Search Wikidata entities matching whole words in any position}
 \usage{
 w_SearchByLabel_Inlabel(
   string,
@@ -40,7 +37,6 @@ include information of the sex of entities found as STRING.}
 additionally the properties of Pproperty.
 }
 \description{
-w_SearchByLabel_Inlabel(string, langsorder='en', lang="", instanceof="", Pproperty="")
 Search Wikidata entities matching whole words in any position in label and
 altLabel. Diacritics and case are ignored. If lang has a value (es, en...)
 then the search is only in that language, otherwise any.

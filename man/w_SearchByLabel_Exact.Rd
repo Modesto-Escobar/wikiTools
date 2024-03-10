@@ -2,10 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{w_SearchByLabel_Exact}
 \alias{w_SearchByLabel_Exact}
-\title{w_SearchByLabel_Exact(string, langs='en', instanceof="", Pproperty="")
-Search Wikidata entities by exact search using case sensitive and
-differentiate diacritics in label and altLabel ("Also known as") in the
-languages indicated in langs.}
+\title{Search Wikidata entities by exact search}
 \usage{
 w_SearchByLabel_Exact(string, langs = "en", instanceof = "", Pproperty = "")
 }
@@ -30,7 +27,6 @@ include information of the sex of entities found as STRING.}
 additionally the properties of Pproperty.
 }
 \description{
-w_SearchByLabel_Exact(string, langs='en', instanceof="", Pproperty="")
 Search Wikidata entities by exact search using case sensitive and
 differentiate diacritics in label and altLabel ("Also known as") in the
 languages indicated in langs.

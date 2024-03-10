@@ -2,9 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{v_SourceId}
 \alias{v_SourceId}
-\title{v_SourceId(viaf, source)
-Return the text and identifier of the source from the VIAF record.
-Note that the VIAF record musts be in JSON format.}
+\title{Gets text and identifier of the source from a VIAF record}
 \usage{
 v_SourceId(viaf, source)
 }
@@ -18,7 +16,6 @@ A data-frame with columns text and source, or NULL if the source does
 no exist in the viaf record.
 }
 \description{
-v_SourceId(viaf, source)
 Return the text and identifier of the source from the VIAF record.
 Note that the VIAF record musts be in JSON format.
 }

@@ -2,9 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{w_OccupationEntities}
 \alias{w_OccupationEntities}
-\title{w_OccupationEntities(Qoc, nlimit=10000)
-Returns the Wikidata entities which have the occupation indicated in Qoc, the
-Wikidata entity for that occupation. Use chunked requests.}
+\title{Gets Wikidata entities with a certain occupation}
 \usage{
 w_OccupationEntities(Qoc, nlimit = 10000)
 }
@@ -19,7 +17,6 @@ in each chunk.}
 A vector with the Wikidata entities with that occupation.
 }
 \description{
-w_OccupationEntities(Qoc, nlimit=10000)
 Returns the Wikidata entities which have the occupation indicated in Qoc, the
 Wikidata entity for that occupation. Use chunked requests.
 }

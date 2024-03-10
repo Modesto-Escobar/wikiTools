@@ -2,11 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{m_XtoolsInfo}
 \alias{m_XtoolsInfo}
-\title{m_XtoolsInfo(article, infotype="articleinfo", project="en.wikipedia.org", redirects=FALSE)
-Obtains information in JSON format about an article in the Wikimedia project
-or NULL on errors. Use the wmflabs API. The XTools Page API endpoints offer data
-related to a single page. See https://www.mediawiki.org/wiki/XTools/API/Page.
-The URL of the API starts with 'https://xtools.wmcloud.org/api/page/'}
+\title{Gets various information from a Wikimedia page}
 \usage{
 m_XtoolsInfo(
   article,
@@ -34,7 +30,6 @@ redirections is assigned to links_in_count.}
 A list with the information about the article.
 }
 \description{
-m_XtoolsInfo(article, infotype="articleinfo", project="en.wikipedia.org", redirects=FALSE)
 Obtains information in JSON format about an article in the Wikimedia project
 or NULL on errors. Use the wmflabs API. The XTools Page API endpoints offer data
 related to a single page. See https://www.mediawiki.org/wiki/XTools/API/Page.

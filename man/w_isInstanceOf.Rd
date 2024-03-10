@@ -2,11 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{w_isInstanceOf}
 \alias{w_isInstanceOf}
-\title{w_isInstanceOf(entity_list, instanceof)
-Check using WDQS if the Wikidata entities in entity_list are instances of
-"instanceof" Wikidata entity class. For example, if instanceof="Q5", check if
-entities are instances of the Wikidata entity class Q5, i.e, are humans.
-Duplicated entities are deleted before search.}
+\title{Check if a Wikidata entity is an instance of a class}
 \usage{
 w_isInstanceOf(entity_list, instanceof)
 }
@@ -21,7 +17,6 @@ if that entity is instance of the "instanceof" entity, else FALSE. Index of
 data-frame are also set to entity_list.
 }
 \description{
-w_isInstanceOf(entity_list, instanceof)
 Check using WDQS if the Wikidata entities in entity_list are instances of
 "instanceof" Wikidata entity class. For example, if instanceof="Q5", check if
 entities are instances of the Wikidata entity class Q5, i.e, are humans.

@@ -2,9 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{w_Property}
 \alias{w_Property}
-\title{w_Property(entity_list, Pproperty, langsorder='en', nlimit=10000)
-Search the entities of the entity_list for property or properties. Return the
-properties in langsorder order. Duplicated entities are deleted before search.}
+\title{Searching for properties of the entity list}
 \usage{
 w_Property(entity_list, Pproperty, langsorder = "en", nlimit = 10000)
 }
@@ -30,7 +28,6 @@ additionally, the properties of Pproperty. Index of the data-frame is also
 set to entity_list.
 }
 \description{
-w_Property(entity_list, Pproperty, langsorder='en', nlimit=10000)
 Search the entities of the entity_list for property or properties. Return the
 properties in langsorder order. Duplicated entities are deleted before search.
 }

@@ -2,9 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{w_OccupationCount}
 \alias{w_OccupationCount}
-\title{w_OccupationCount(Qoc)
-Search in WDQS to know the number of Wikidata entities with P106 property
-(occupation) set to Qoc.}
+\title{Gets number of Wikidata entities with an occupation}
 \usage{
 w_OccupationCount(Qoc)
 }
@@ -16,7 +14,6 @@ sociologist, Q2526255 Film director, etc.}
 The number of entities with that occupation (integer).
 }
 \description{
-w_OccupationCount(Qoc)
 Search in WDQS to know the number of Wikidata entities with P106 property
 (occupation) set to Qoc.
 }

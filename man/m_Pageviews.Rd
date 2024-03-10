@@ -2,12 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{m_Pageviews}
 \alias{m_Pageviews}
-\title{m_Pageviews(article, start, end, project="en.wikipedia.org", access="all-access",
-agent="user", granularity="monthly", redirects=FALSE))
-Use the Wikimedia REST API (https://wikimedia.org/api/rest_v1/) to get the
-number of views one article has in a Wikimedia project in a date interval
-(see granularity). If redirect=TRUE, then get the number of views of all
-articles that redirects to the article which is the destiny of actual page.}
+\title{Get number of views of a Wikipedia article}
 \usage{
 m_Pageviews(
   article,
@@ -45,8 +40,6 @@ necessary set redirects=TRUE,  otherwise only you have the views of that page.}
 A vector with the number of visits by granularity.
 }
 \description{
-m_Pageviews(article, start, end, project="en.wikipedia.org", access="all-access",
-agent="user", granularity="monthly", redirects=FALSE))
 Use the Wikimedia REST API (https://wikimedia.org/api/rest_v1/) to get the
 number of views one article has in a Wikimedia project in a date interval
 (see granularity). If redirect=TRUE, then get the number of views of all

@@ -2,9 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{v_Dates}
 \alias{v_Dates}
-\title{v_Dates(viaf)
-Returns bird year and death year from the VIAF cluster record with this
-format byear:dyear. Note that the VIAF record musts be in JSON format.}
+\title{Gets bird and death years from a VIAF record}
 \usage{
 v_Dates(viaf)
 }
@@ -15,7 +13,6 @@ v_Dates(viaf)
 The bird year and death year in format byear:dyear.
 }
 \description{
-v_Dates(viaf)
 Returns bird year and death year from the VIAF cluster record with this
 format byear:dyear. Note that the VIAF record musts be in JSON format.
 }

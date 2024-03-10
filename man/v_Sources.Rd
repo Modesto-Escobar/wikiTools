@@ -2,9 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{v_Sources}
 \alias{v_Sources}
-\title{v_Sources(viaf)
-Return the text of all sources id from the VIAF record. Note that the VIAF
-record musts be in JSON format.}
+\title{Gets text of all sources from a VIAF record}
 \usage{
 v_Sources(viaf)
 }
@@ -15,7 +13,6 @@ v_Sources(viaf)
 A data-frame with text and sources.
 }
 \description{
-v_Sources(viaf)
 Return the text of all sources id from the VIAF record. Note that the VIAF
 record musts be in JSON format.
 }

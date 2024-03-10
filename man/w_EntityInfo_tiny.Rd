@@ -2,13 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{w_EntityInfo_tiny}
 \alias{w_EntityInfo_tiny}
-\title{w_EntityInfo_tiny(entity, langsorder='en', wikilangs="")
-Same as w_EntityInfo function but less properties are requested and
-less checks are done.
-Gets some properties of the Wikidata "entity" related to birth and death
-dates, places, occupations, works, education, awards, identifier in some
-libraries, Wikipedia page titles (which can be limited to the languages in
-the "wikilangs" parameter), etc.}
+\title{Get a few personal properties from a Wikidata entity}
 \usage{
 w_EntityInfo_tiny(entity, langsorder = "en", wikilangs = "")
 }
@@ -32,7 +26,6 @@ pages in any language, not sorted.}
 : A data-frame with the properties of entity.
 }
 \description{
-w_EntityInfo_tiny(entity, langsorder='en', wikilangs="")
 Same as w_EntityInfo function but less properties are requested and
 less checks are done.
 Gets some properties of the Wikidata "entity" related to birth and death

@@ -2,10 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{m_Opensearch}
 \alias{m_Opensearch}
-\title{m_Opensearch(string, project='en.wikipedia.org', profile="engine_autoselect", redirects="resolve")
-Search string in the content of the project page using OpenSearch. Only in
-namespace 0. Please, see https://www.mediawiki.org/wiki/API:Opensearch for
-further information.}
+\title{Open search of a string}
 \usage{
 m_Opensearch(
   string,
@@ -32,7 +29,6 @@ API performs a NFC Unicode normalization on search string.}
 A data-frame of page titles and URL returned. If error, return Null.
 }
 \description{
-m_Opensearch(string, project='en.wikipedia.org', profile="engine_autoselect", redirects="resolve")
 Search string in the content of the project page using OpenSearch. Only in
 namespace 0. Please, see https://www.mediawiki.org/wiki/API:Opensearch for
 further information.

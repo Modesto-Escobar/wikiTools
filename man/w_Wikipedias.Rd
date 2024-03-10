@@ -2,17 +2,12 @@
 % Please edit documentation in R/wiki_utils.R
 \name{w_Wikipedias}
 \alias{w_Wikipedias}
-\title{w_Wikipedias(entity_list, wikilangs="", instanceof="", nlimit=1500)
-Gets from Wikidata all Wikipedia page titles of the Wikidata entities in
-entity_list. If set "instanceof", then only returns the pages for Wikidata
-entities which are instances of that Wikidata class. If wikilangs='', then
-returns all Wikipedia page titles, else only the languages in wikilangs.
-Duplicated entities are deleted before search.}
+\title{Gets Wikipedia pages from a Q list.}
 \usage{
 w_Wikipedias(entity_list, wikilangs = "", instanceof = "", nlimit = 1500)
 }
 \arguments{
-\item{entity_list}{A vector with de Wikidata entities.}
+\item{entity_list}{A vector of Wikidata entities.}
 
 \item{wikilangs}{List of languages to limit the search, using "|" as
 separator. Wikipedias page titles are returned in same order as languages in
@@ -32,7 +27,6 @@ three use "|" as separator. Index of the data-frame is also set to the
 entity_list.
 }
 \description{
-w_Wikipedias(entity_list, wikilangs="", instanceof="", nlimit=1500)
 Gets from Wikidata all Wikipedia page titles of the Wikidata entities in
 entity_list. If set "instanceof", then only returns the pages for Wikidata
 entities which are instances of that Wikidata class. If wikilangs='', then

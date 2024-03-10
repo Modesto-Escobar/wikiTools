@@ -5,12 +5,12 @@
 #### ver. 0.2 2023-07-27
 #### ver. 0.3 2023-09-19
 
-#' General user_agent header for Wikimedia, Wikidata, MediaWiki and VIAF requests
+# General user_agent header for Wikimedia, Wikidata, MediaWiki and VIAF requests ----
 #' See https://meta.wikimedia.org/wiki/User-Agent_policy.
 user_agent <- paste('netCoincidenceAnalysis Bot (<https://sociocav.usal.es/me/GAS/>),', R.version.string)
 
-#' limitRequester
 #' Limits the rate at which a function will execute
+#' 
 #' @param f The original function
 #' @param n Number of allowed events within a period
 #' @param period Length (in seconds) of measurement period
@@ -26,14 +26,15 @@ limitRequester <- function(f, n, period) {
   return(ratelimitr::limit_rate(f, ratelimitr::rate(n = n, period = period)))
 }
 
-# ----------------------------------------------------------------------------
-# WikiData Query Service
+
+# WikiData Query Service ----
 # See https://query.wikidata.org/
 # See https://www.wikidata.org/wiki/Wikidata:SPARQL_tutorial
 # See https://www.mediawiki.org/wiki/Wikidata_Query_Service/User_Manual
-# ----------------------------------------------------------------------------
+# --------------------------------------------------------------------.
 
-#' reqWDQS(sparql_query, format='json', method='GET')
+#' Get responses from Wikidata Query Service
+#' 
 #' Retrieves responses from Wikidata Query Service (WDQS)
 #' @param sparql_query A string with the query in SPARQL language.
 #' @param format  A string with the query response format, mandatory. See
@@ -68,7 +69,8 @@ reqWDQS <- function(sparql_query, format='json', method='GET') {
   else stop(paste0("ERROR: method '", method, "' is not supported."))
 }
 
-#' w_query(sparql_query, format="csv", method="GET", limitRequester=FALSE)
+#' Responses from Wikidata Query Service
+#' 
 #' Retrieves responses from Wikidata Query Service (WDQS). Uses ratelimitr if
 #' param limitRequester = TRUE.
 #' @param sparql_query A string with the query in SPARQL language.
@@ -114,7 +116,8 @@ w_query <- function(sparql_query, format="csv", method="GET",
   )
 }
 
-#' w_isInstanceOf(entity_list, instanceof)
+#' Check if a Wikidata entity is an instance of a class
+#' 
 #' Check using WDQS if the Wikidata entities in entity_list are instances of
 #' "instanceof" Wikidata entity class. For example, if instanceof="Q5", check if
 #' entities are instances of the Wikidata entity class Q5, i.e, are humans.
@@ -152,13 +155,14 @@ w_isInstanceOf <- function(entity_list, instanceof) {
   return(d)
 }
 
-#' w_Wikipedias(entity_list, wikilangs="", instanceof="", nlimit=1500)
+#' Gets Wikipedia pages from a Q list.
+#' 
 #' Gets from Wikidata all Wikipedia page titles of the Wikidata entities in
 #' entity_list. If set "instanceof", then only returns the pages for Wikidata
 #' entities which are instances of that Wikidata class. If wikilangs='', then
 #' returns all Wikipedia page titles, else only the languages in wikilangs.
 #' Duplicated entities are deleted before search.
-#' @param entity_list A vector with de Wikidata entities.
+#' @param entity_list A vector of Wikidata entities.
 #' @param wikilangs List of languages to limit the search, using "|" as
 #' separator. Wikipedias page titles are returned in same order as languages in
 #' this parameter. If wikilangs='' the function returns Wikipedia page titles
@@ -262,7 +266,8 @@ WHERE {\n",
   return(q)
 }
 
-#' w_isValid(entity_list, nlimit=50000)
+#' Check if a Wikidata entity is valid
+#'
 #' Check if the Wikidata entities are valid. A entity is valid if it has a label
 #' or has a description. If one entity exists but is not valid, is possible that
 #' it has a redirection to other entity, in that case, the redirection is
@@ -328,7 +333,8 @@ OPTIONAL {?entity owl:sameAs ?redirection}
   return(r)
 }
 
-#' w_OccupationCount(Qoc)
+#' Gets number of Wikidata entities with an occupation
+#' 
 #' Search in WDQS to know the number of Wikidata entities with P106 property
 #' (occupation) set to Qoc.
 #' @param Qoc The Wikidata entity of the occupation. For example, Q2306091
@@ -344,7 +350,8 @@ w_OccupationCount <- function(Qoc) {
  return(r$count)
 }
 
-#' w_OccupationEntities(Qoc, nlimit=10000)
+#' Gets Wikidata entities with a certain occupation
+#' 
 #' Returns the Wikidata entities which have the occupation indicated in Qoc, the
 #' Wikidata entity for that occupation. Use chunked requests.
 #' @param Qoc The Wikidata entity of the occupation. For example, Q2306091 (sociologist)
@@ -377,8 +384,11 @@ w_OccupationEntities <- function(Qoc, nlimit=10000) {
   return(entity)
 }
 
-#' w_OccupationEntitiesWikipedias(Qoc, nlimit=5000)
-#  Returns the Wikidata entities which have the occupation indicated in Qoc,
+
+#' Gets Wikipedias entries with a certain occupation
+#' 
+#' 
+#' Returns the Wikidata entities which have the occupation indicated in Qoc,
 #' plus the Wikipedia page titles of them. Return all Wikipedias pages, not
 #' limited by languages. Use chunked requests.
 #' Note that w_OccupationEntitiesWikipedias is similar to first launch
@@ -436,7 +446,8 @@ WHERE {
   return(output)
 }
 
-#' w_SearchByLabel_Exact(string, langs='en', instanceof="", Pproperty="")
+#' Search Wikidata entities by exact search
+#' 
 #' Search Wikidata entities by exact search using case sensitive and
 #' differentiate diacritics in label and altLabel ("Also known as") in the
 #' languages indicated in langs.
@@ -527,7 +538,8 @@ paste0(searchlang, '}'),
   return(r)
 }
 
-#' w_SearchByLabel_Startswith(string, lang='en', langsorder='en', instanceof="", Pproperty="")
+#' Search Wikidata entities whose label or alLabel starts with
+#' 
 #' Search Wikidata entities which label or altLabel starts with "string" in
 #' language "lang" (mandatory). It's similar to a wildcard search: "string*".
 #' Diacritics and case are ignored. Search "string" in language "lang" in label,
@@ -622,7 +634,8 @@ if (searchp) group_concat else "",
   return(r)
 }
 
-#' w_SearchByLabel_Inlabel(string, langsorder='en', lang="", instanceof="", Pproperty="")
+#' Search Wikidata entities matching whole words in any position
+#' 
 #' Search Wikidata entities matching whole words in any position in label and
 #' altLabel. Diacritics and case are ignored. If lang has a value (es, en...)
 #' then the search is only in that language, otherwise any.
@@ -722,7 +735,8 @@ paste0(searchlang, '}'),
   return(r)
 }
 
-#' w_Property(entity_list, Pproperty, langsorder='en', nlimit=10000)
+#' Searching for properties of the entity list
+#' 
 #' Search the entities of the entity_list for property or properties. Return the
 #' properties in langsorder order. Duplicated entities are deleted before search.
 #' @param entity_list A vector with de Wikidata entities.
@@ -805,7 +819,8 @@ paste0(search, searchlang, '}'),
   return(r)
 }
 
-#' w_IdentifiersOfAuthority(Pauthority, langsorder='en', instanceof="")
+#' Search for Wikidata entities that have a property identifier
+#' 
 #' Search for Wikidata entities that have an identifier in the Wikidata
 #' authority property "Pauthority". Return the entities and information (label,
 #' description) in the language order indicated in langsorder. If instanceof
@@ -869,7 +884,8 @@ if (filterq) filters else "",
   return(r)
 }
 
-#' w_EntityInfo(entity, langsorder='en', wikilangs="")
+#' Get some personal properties of one Wikidata entity
+#' 
 #' Gets some properties of the Wikidata "entity" related to birth and death
 #' dates, places, occupations, works, education, awards, identifier in some
 #' libraries, Wikipedia page titles (which can be limited to the languages in
@@ -1046,7 +1062,8 @@ WHERE {
   return(r)
 }
 
-#' w_EntityInfo_tiny(entity, langsorder='en', wikilangs="")
+#' Get a few personal properties from a Wikidata entity
+#' 
 #' Same as w_EntityInfo function but less properties are requested and
 #' less checks are done.
 #' Gets some properties of the Wikidata "entity" related to birth and death
@@ -1204,9 +1221,9 @@ WHERE {
   return(r)
 }
 
-#' w_FilmInfo(film_entity, langsorder='en', wikilangs="")
-#' Gets some properties of the Wikidata "film_entity" related to information
-#' about that film entity.
+#' Gets films' properties from Wikidata
+#' 
+#' Gets some properties of the Wikidata "film_entity" related to information about that film entity.
 #' @param film_entity Wikidata entity to search for properties.
 #' @param langsorder Order of languages in which the information will be
 #' returned, separated with '|'. If no information is given in the first
@@ -1358,7 +1375,7 @@ if (wikilangs != '') paste0(";
   rownames(r) <- r$entity
   # Order by wikilangs
   for (entity in r$entity) {
-    if (wikilangs != "") {
+    if (wikilangs != "" & !is.na(r[entity, 'wikilangs'])) {
       l <- strsplit(r[entity, 'wikilangs'], '|', fixed = T)[[1]]
       if (length(l) > 1) {
         o <- match(wikiorder, l)
@@ -1373,11 +1390,11 @@ if (wikilangs != '') paste0(";
   return(r)
 }
 
-# ----------------------------------------------------------------------------
-# MediaWiki API
+
+# MediaWiki API ----
 # See https://www.mediawiki.org/wiki/API:Main_page
 # See https://en.wikipedia.org/w/api.php  (xtools.wmcloud.org)
-# ----------------------------------------------------------------------------
+# -----------------------------------------------------------.
 
 #' reqMediaWiki(query, project='en.wikipedia.org', method='GET', attempts=2)
 #' Uses httr package to retrieve responses using the MediaWiki API.
@@ -1511,7 +1528,8 @@ checkTitles <- function(titles){
   return(TRUE)
 }
 
-#' m_Opensearch(string, project='en.wikipedia.org', profile="engine_autoselect", redirects="resolve")
+#' Open search of a string
+#' 
 #' Search string in the content of the project page using OpenSearch. Only in
 #' namespace 0. Please, see https://www.mediawiki.org/wiki/API:Opensearch for
 #' further information.
@@ -1565,7 +1583,8 @@ m_Opensearch <- function(string, project='en.wikipedia.org',
   return(output)
 }
 
-#' m_WikidataEntity(titles, project='en.wikipedia.org', redirects=TRUE)
+#' Check Wikipedia pages titles
+#' 
 #' Use reqMediaWiki to check if page titles are in a Wikimedia project and returns
 #' the Wikidata entity for them. Automatically resolves redirects if parameter
 #' redirects = TRUE (default). If a page title exists in the Wikimedia project,
@@ -1700,10 +1719,11 @@ m_WikidataEntity <- function(titles, project='en.wikipedia.org',
   }
 }
 
-#' m_Redirects(titles, project="en.wikipedia.org")
-#' Obtains the redirection pages to the article titles in the Wikimedia project
-#' restricted to namespace 0. Return a vector for each title, in each vector the
-#' first element is the page destiny, rest are all pages that redirect to it. If
+#' Get redirections of Wikipedia pages
+#' 
+#' Obtains redirection of pages of the article titles in the Wikimedia project
+#' restricted to namespace 0. Returns a vector for each title, in each vector the
+#' first element is the page destiny, the rest are all pages that redirect to it. If
 #' a title is not in the Wikimedia project its list is NA.
 #' @param titles A vector of page titles to search for.
 #' @param project Wikimedia project, defaults "en.wikipedia.org"
@@ -1793,7 +1813,8 @@ m_Redirects <- function(titles, project="en.wikipedia.org") {
   }
 }
 
-#' m_PagePrimaryImage(titles, project="en.wikipedia.org")
+#' Get image URL of Wikipedia pages
+#' 
 #' Return the URL of the image associated with the Wikipedia pages of the titles,
 #' if pages has one. Automatically resolves redirects, the "normalized" column
 #' of the returned data-frames contains the destiny page of the redirection.
@@ -1911,8 +1932,9 @@ m_PagePrimaryImage <- function(titles, project="en.wikipedia.org") {
   }
 }
 
-#' m_PageFiles(titles, project="en.wikipedia.org", exclude_ext='svg|webp|xcf')
-#' Search for URL of files inserted in the Wikipedia pages. Exclude extensions
+#' Get URL of files in Wikipedia pages
+#' 
+#' Search for URL of files inserted in Wikipedia pages. Exclude extensions
 #' in exclude_ext. Note that the query API named this search as 'images',
 #' but all source files in the page are returned. The function only return URL
 #' that not end with extensions in exclude_ext parameter (case insensitive).
@@ -2052,15 +2074,16 @@ m_PageFiles <- function(titles, project = "en.wikipedia.org",
   }
 }
 
-# ----------------------------------------------------------------------------
-# WikiMedia API - Used to obtain metrics of Wikipedia pages.
+
+# WikiMedia API ----
+# Used to obtain metrics of Wikipedia pages
 # See https://www.mediawiki.org/wiki/Wikimedia_REST_API
 # See https://en.wikipedia.org/api/rest_v1/
 # See https://www.mediawiki.org/wiki/XTools/API/Page (xtools.wmcloud.org)
 #
 # Note that this API uses "article" to refer a page title. We also use this
 # approach. In this API only one article is allowed in each request.
-# ----------------------------------------------------------------------------
+# -------------------------------------------------------------------------.
 
 #' httrGetJSON
 #' Retrieve responses in JSON format using httr::GET. It is a generic function
@@ -2081,8 +2104,8 @@ httrGetJSON <- function(url) {
   )
 }
 
-#' m_Pageviews(article, start, end, project="en.wikipedia.org", access="all-access",
-#' agent="user", granularity="monthly", redirects=FALSE))
+#' Get number of views of a Wikipedia article
+#' 
 #' Use the Wikimedia REST API (https://wikimedia.org/api/rest_v1/) to get the
 #' number of views one article has in a Wikimedia project in a date interval
 #' (see granularity). If redirect=TRUE, then get the number of views of all
@@ -2114,7 +2137,7 @@ httrGetJSON <- function(url) {
 m_Pageviews <- function(article, start, end, project="en.wikipedia.org",
                          access="all-access", agent="user",
                          granularity="monthly", redirects=FALSE) {
-  # httrGetJSON_rated: the limitratedr version of httrGetJSON.
+  # httrGetJSON_rated: the limitated version of httrGetJSON.
   # Limit is 100 req/s (See https://wikimedia.org/api/rest_v1/#/Pageviews%20data)
   httrGetJSON_rated <- limitRequester(httrGetJSON, n=100, period=1)
   article <- gsub(" ", "_", article)
@@ -2152,7 +2175,8 @@ m_Pageviews <- function(article, start, end, project="en.wikipedia.org",
 }
 
 
-#' m_XtoolsInfo(article, infotype="articleinfo", project="en.wikipedia.org", redirects=FALSE)
+#' Gets various information from a Wikimedia page
+#' 
 #' Obtains information in JSON format about an article in the Wikimedia project
 #' or NULL on errors. Use the wmflabs API. The XTools Page API endpoints offer data
 #' related to a single page. See https://www.mediawiki.org/wiki/XTools/API/Page.
@@ -2217,7 +2241,8 @@ m_XtoolsInfo <- function(article, infotype="articleinfo",
   return(d)
 }
 
-#' m_XtoolsInfoAll(article, project="en.wikipedia.org", redirects=FALSE)
+#' Gets more diverse information from a Wikimedia page
+#' 
 #' Obtains information about a page in the Wikimedia project using wmflabs
 #' in JSON format, or NULL on error. The XTools Page API endpoints offer data
 #' related to a single page. See https://www.mediawiki.org/wiki/XTools/API/Page
@@ -2264,12 +2289,13 @@ m_XtoolsInfoAll <- function(article, project="en.wikipedia.org",
   return(r)
 }
 
-# ---------------------------------------------------------------------------
-# VIAF API
-# https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html
-# ---------------------------------------------------------------------------
 
-#' v_AutoSuggest(author)
+# VIAF API ----
+# https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html
+# --------------------------------------------------------------------------.
+
+#' Suggests VIAF id from a name
+#' 
 #' Search the name of the author from the VIAF AutoSuggest API and returns
 #' information in JSON format of the records found. Note that only
 #' returns a maximum of 10 records. Note that those records are not
@@ -2310,7 +2336,8 @@ v_AutoSuggest <- function(author) {
   )
 }
 
-#' v_Search(CQL_Query)
+#' Run a CQL Query in VIAF
+#' 
 #' Run the CQL_Query using the VIAF Search API and return a list of records
 #' found. The search string is formed using the CQL_Query syntax of the API.
 #' Note that returned records use the "info:srw/schema/1/JSON" record schema,
@@ -2387,7 +2414,8 @@ v_Search <- function(CQL_Query) {
   )
 }
 
-#' v_Search_anyField(string)
+#' Run a CQL Query (cql.any) in VIAF
+#' 
 #' This function is a wrapper to v_Search, using this CQL_Query:
 #'   'cql.any = "string"'
 #' Search preferred Name - names which are the preferred form in an authority record
@@ -2407,7 +2435,8 @@ v_Search_anyField <- function(name) {
   return(v_Search(CQL_query))
 }
 
-#' v_Search_allmainHeadingEl(name)
+#' Run a CQL Query (local.mainHeadingEl all) in VIAF
+#' 
 #' This function is a wrapper to v_Search, using this CQL_Query:
 #'   'local.mainHeadingEl all "name"'
 #' Search preferred Name - names which are the preferred form in an authority
@@ -2425,7 +2454,8 @@ v_Search_allmainHeadingEl <- function(name) {
   return(v_Search(CQL_query))
 }
 
-#' v_Search_allNames(name)
+#' Run a CQL Query (local.names all) in VIAF
+#' 
 #' This function is a wrapper to v_Search, using this CQL_Query:
 #'   'local.names all "name"'
 #' Search Names - any name preferred or alternate 1xx, 4xx, 5xx fields of the
@@ -2442,7 +2472,8 @@ v_Search_allNames <- function(name) {
   return(v_Search(CQL_query))
 }
 
-#' v_Search_allPersonalNames(name)
+#' Run a CQL Query (local.personalNames all) in VIAF
+#' 
 #' This function is a wrapper to v_Search, using this CQL_Query:
 #'   'local.personalNames all "name"'
 #' Search Personal Names within the authority record (100, 400, 500 fields of
@@ -2459,7 +2490,8 @@ v_Search_allPersonalNames <- function(name) {
   return(v_Search(CQL_query))
 }
 
-#' v_Search_allTitle(title)
+#' Run a CQL Query (local.title all) in VIAF
+#' 
 #' This function is a wrapper to v_Search, using this CQL_Query:
 #'   'local.title all "title"'
 #' Search for titles.
@@ -2473,7 +2505,8 @@ v_Search_allTitle <- function(name) {
 }
 
 
-#' v_GetRecord(viafid,  record_format='viaf.json')
+#' Gets record clusters
+#' 
 #' Obtains the record cluster identified by viafid from VIAF, in the format
 #' indicated in record_format. Note that the returned record may be a VIAF
 #' cluster record or a redirect/scavenged record: the function returns the
@@ -2509,7 +2542,8 @@ v_GetRecord <- function(viafid, record_format='viaf.json') {
   )
 }
 
-#' v_Titles(viaf)
+#' Gets works titles from a VIAF record
+#' 
 #' Returns titles of works from the VIAF record. Note that the VIAF record musts
 #' be in JSON format.
 #' @param viaf VIAF cluster record (in JSON format).
@@ -2527,7 +2561,8 @@ v_Titles <- function(viaf) {
   return(titles)
 }
 
-#' v_Gender(viaf)
+#' Gets author's gender from a VIAF record
+#' 
 #' Return the gender of the author from the VIAF record. Note that the VIAF
 #' record musts be in JSON format.
 #' @param viaf VIAF cluster record (in JSON format).
@@ -2544,7 +2579,8 @@ v_Gender <- function(viaf) {
     return(viaf$fixed$gender)
 }
 
-#' v_Dates(viaf)
+#' Gets bird and death years from a VIAF record
+#' 
 #' Returns bird year and death year from the VIAF cluster record with this
 #' format byear:dyear. Note that the VIAF record musts be in JSON format.
 #' @param viaf VIAF cluster record (in JSON format).
@@ -2564,7 +2600,8 @@ v_Dates <- function(viaf) {
   return(paste0(byear,":", dyear))
 }
 
-#' v_Occupations(viaf)
+#' Gets occupations from a VIAF record
+#' 
 #' Return the occupations from the VIAF record. Note that the VIAF record musts
 #' be in JSON format.
 #' @param viaf VIAF cluster record (in JSON format).
@@ -2603,7 +2640,8 @@ v_Occupations <- function(viaf) {
   return(df1)
 }
 
-#' v_Sources(viaf)
+#' Gets text of all sources from a VIAF record
+#' 
 #' Return the text of all sources id from the VIAF record. Note that the VIAF
 #' record musts be in JSON format.
 #' @param viaf VIAF cluster record (in JSON format).
@@ -2638,7 +2676,8 @@ v_Sources <- function(viaf) {
   return(df1)
 }
 
-#' v_SourceId(viaf, source)
+#' Gets text and identifier of the source from a VIAF record
+#' 
 #' Return the text and identifier of the source from the VIAF record.
 #' Note that the VIAF record musts be in JSON format.
 #' @param viaf VIAF cluster record (in JSON format).
@@ -2654,7 +2693,8 @@ v_SourceId <- function(viaf, source) {
     return(texts[!is.na(texts[[source]]), c('text', source)])
 }
 
-#' v_Wikipedias(viaf)
+#' Gets Wikipedia pages (URL) from a VIAF record
+#' 
 #' Return the Wikipedia pages (URL) from the VIAF record. Note that the VIAF
 #' record musts be in JSON format.
 #' @param viaf VIAF cluster record (in JSON format).
@@ -2682,4 +2722,3 @@ v_Wikipedias <- function(viaf) {
     return(NULL)
   return(wikis)
 }
-

@@ -2,13 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{v_Search}
 \alias{v_Search}
-\title{v_Search(CQL_Query)
-Run the CQL_Query using the VIAF Search API and return a list of records
-found. The search string is formed using the CQL_Query syntax of the API.
-Note that returned records use the "info:srw/schema/1/JSON" record schema,
-i.e., are complete cluster records packed in JSON format. If the number
-of records found is greater than 250 (API restrictions), successive requests
-are made.}
+\title{Run a CQL Query in VIAF}
 \usage{
 v_Search(CQL_Query)
 }
@@ -20,7 +14,6 @@ See https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html}
 A list with the records found.
 }
 \description{
-v_Search(CQL_Query)
 Run the CQL_Query using the VIAF Search API and return a list of records
 found. The search string is formed using the CQL_Query syntax of the API.
 Note that returned records use the "info:srw/schema/1/JSON" record schema,

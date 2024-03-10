@@ -2,11 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{v_Search_allTitle}
 \alias{v_Search_allTitle}
-\title{v_Search_allTitle(title)
-This function is a wrapper to v_Search, using this CQL_Query:
-'local.title all "title"'
-Search for titles.
-The search is performed with the "all" operator (for all the listed terms).}
+\title{Run a CQL Query (local.title all) in VIAF}
 \usage{
 v_Search_allTitle(name)
 }
@@ -17,7 +13,6 @@ v_Search_allTitle(name)
 A list with the records found.
 }
 \description{
-v_Search_allTitle(title)
 This function is a wrapper to v_Search, using this CQL_Query:
 'local.title all "title"'
 Search for titles.

@@ -2,9 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{v_Titles}
 \alias{v_Titles}
-\title{v_Titles(viaf)
-Returns titles of works from the VIAF record. Note that the VIAF record musts
-be in JSON format.}
+\title{Gets works titles from a VIAF record}
 \usage{
 v_Titles(viaf)
 }
@@ -15,7 +13,6 @@ v_Titles(viaf)
 A list with titles.
 }
 \description{
-v_Titles(viaf)
 Returns titles of works from the VIAF record. Note that the VIAF record musts
 be in JSON format.
 }

@@ -2,13 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{v_AutoSuggest}
 \alias{v_AutoSuggest}
-\title{v_AutoSuggest(author)
-Search the name of the author from the VIAF AutoSuggest API and returns
-information in JSON format of the records found. Note that only
-returns a maximum of 10 records. Note that those records are not
-VIAF cluster records.
-A VIAF record is considered a "cluster record," which is the result of
-combining records from many libraries around the world into a single record.}
+\title{Suggests VIAF id from a name}
 \usage{
 v_AutoSuggest(author)
 }
@@ -22,7 +16,6 @@ A data-frame with four columns from the elements "term", "score",
 "nametype" and "viafid" of the Autosuggest API response.
 }
 \description{
-v_AutoSuggest(author)
 Search the name of the author from the VIAF AutoSuggest API and returns
 information in JSON format of the records found. Note that only
 returns a maximum of 10 records. Note that those records are not

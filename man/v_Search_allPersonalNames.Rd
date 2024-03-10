@@ -2,15 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{v_Search_allPersonalNames}
 \alias{v_Search_allPersonalNames}
-\title{v_Search_allPersonalNames(name)
-This function is a wrapper to v_Search, using this CQL_Query:
-'local.personalNames all "name"'
-Search Personal Names within the authority record (100, 400, 500 fields of
-MARC records):
-100: Main Entry: Personal name
-400: Series entry: Personal name (400)
-500: Note field: General Note.
-The search is performed with the "all" operator (for all the listed terms).}
+\title{Run a CQL Query (local.personalNames all) in VIAF}
 \usage{
 v_Search_allPersonalNames(name)
 }
@@ -21,7 +13,6 @@ v_Search_allPersonalNames(name)
 A list with the records found.
 }
 \description{
-v_Search_allPersonalNames(name)
 This function is a wrapper to v_Search, using this CQL_Query:
 'local.personalNames all "name"'
 Search Personal Names within the authority record (100, 400, 500 fields of

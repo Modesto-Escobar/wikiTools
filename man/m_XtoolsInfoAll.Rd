@@ -2,12 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{m_XtoolsInfoAll}
 \alias{m_XtoolsInfoAll}
-\title{m_XtoolsInfoAll(article, project="en.wikipedia.org", redirects=FALSE)
-Obtains information about a page in the Wikimedia project using wmflabs
-in JSON format, or NULL on error. The XTools Page API endpoints offer data
-related to a single page. See https://www.mediawiki.org/wiki/XTools/API/Page
-Obtains information of articleinfo, prose and links about a page in
-the WikiMedia project.}
+\title{Gets more diverse information from a Wikimedia page}
 \usage{
 m_XtoolsInfoAll(article, project = "en.wikipedia.org", redirects = FALSE)
 }
@@ -27,7 +22,6 @@ The information about the page.
 Note: use the m_XtoolsInfo function.
 }
 \description{
-m_XtoolsInfoAll(article, project="en.wikipedia.org", redirects=FALSE)
 Obtains information about a page in the Wikimedia project using wmflabs
 in JSON format, or NULL on error. The XTools Page API endpoints offer data
 related to a single page. See https://www.mediawiki.org/wiki/XTools/API/Page

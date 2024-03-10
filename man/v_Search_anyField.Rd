@@ -2,14 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{v_Search_anyField}
 \alias{v_Search_anyField}
-\title{v_Search_anyField(string)
-This function is a wrapper to v_Search, using this CQL_Query:
-'cql.any = "string"'
-Search preferred Name - names which are the preferred form in an authority record
-(1xx fields of the MARC records).
-1xx: Main Entry: Personal name (100), corporate name (110), meeting name (111), uniform title (130)
-The search is performed with the "=" operator (all terms are searched, and only
-those ones).}
+\title{Run a CQL Query (cql.any) in VIAF}
 \usage{
 v_Search_anyField(name)
 }
@@ -20,7 +13,6 @@ v_Search_anyField(name)
 A list with the records found.
 }
 \description{
-v_Search_anyField(string)
 This function is a wrapper to v_Search, using this CQL_Query:
 'cql.any = "string"'
 Search preferred Name - names which are the preferred form in an authority record

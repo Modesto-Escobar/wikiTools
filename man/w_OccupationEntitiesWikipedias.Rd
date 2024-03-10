@@ -2,11 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{w_OccupationEntitiesWikipedias}
 \alias{w_OccupationEntitiesWikipedias}
-\title{w_OccupationEntitiesWikipedias(Qoc, nlimit=5000)
-plus the Wikipedia page titles of them. Return all Wikipedias pages, not
-limited by languages. Use chunked requests.
-Note that w_OccupationEntitiesWikipedias is similar to first launch
-w_OccupationEntities and then launch w_Wikipedias, but is more efficient.}
+\title{Gets Wikipedias entries with a certain occupation}
 \usage{
 w_OccupationEntitiesWikipedias(Qoc, nlimit = 5000)
 }
@@ -24,7 +20,7 @@ which they have page, the Wikipedia languages, the page titles, and,
 finally, the URL to the pages. Last three columns concatenated with "|".
 }
 \description{
-w_OccupationEntitiesWikipedias(Qoc, nlimit=5000)
+Returns the Wikidata entities which have the occupation indicated in Qoc,
 plus the Wikipedia page titles of them. Return all Wikipedias pages, not
 limited by languages. Use chunked requests.
 Note that w_OccupationEntitiesWikipedias is similar to first launch

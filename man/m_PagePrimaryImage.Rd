@@ -2,11 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{m_PagePrimaryImage}
 \alias{m_PagePrimaryImage}
-\title{m_PagePrimaryImage(titles, project="en.wikipedia.org")
-Return the URL of the image associated with the Wikipedia pages of the titles,
-if pages has one. Automatically resolves redirects, the "normalized" column
-of the returned data-frames contains the destiny page of the redirection.
-See https://www.mediawiki.org/w/api.php?action=help&modules=query\%2Bpageimages}
+\title{Get image URL of Wikipedia pages}
 \usage{
 m_PagePrimaryImage(titles, project = "en.wikipedia.org")
 }
@@ -20,7 +16,6 @@ A data-frame with original titles, normalized ones, the status of the
 pages and the primary image of the page or NA if it does not exist.
 }
 \description{
-m_PagePrimaryImage(titles, project="en.wikipedia.org")
 Return the URL of the image associated with the Wikipedia pages of the titles,
 if pages has one. Automatically resolves redirects, the "normalized" column
 of the returned data-frames contains the destiny page of the redirection.

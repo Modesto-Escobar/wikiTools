@@ -2,9 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{v_Wikipedias}
 \alias{v_Wikipedias}
-\title{v_Wikipedias(viaf)
-Return the Wikipedia pages (URL) from the VIAF record. Note that the VIAF
-record musts be in JSON format.}
+\title{Gets Wikipedia pages (URL) from a VIAF record}
 \usage{
 v_Wikipedias(viaf)
 }
@@ -15,7 +13,6 @@ v_Wikipedias(viaf)
 A vector with the URL of the Wikipedias.
 }
 \description{
-v_Wikipedias(viaf)
 Return the Wikipedia pages (URL) from the VIAF record. Note that the VIAF
 record musts be in JSON format.
 }

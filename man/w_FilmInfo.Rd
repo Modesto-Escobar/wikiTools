@@ -2,9 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{w_FilmInfo}
 \alias{w_FilmInfo}
-\title{w_FilmInfo(film_entity, langsorder='en', wikilangs="")
-Gets some properties of the Wikidata "film_entity" related to information
-about that film entity.}
+\title{Gets films' properties from Wikidata}
 \usage{
 w_FilmInfo(film_entity, langsorder = "en", wikilangs = "")
 }
@@ -26,9 +24,7 @@ pages in any language, not sorted.}
 : A data-frame with all properties of film_entity
 }
 \description{
-w_FilmInfo(film_entity, langsorder='en', wikilangs="")
-Gets some properties of the Wikidata "film_entity" related to information
-about that film entity.
+Gets some properties of the Wikidata "film_entity" related to information about that film entity.
 }
 \examples{
 \dontrun{

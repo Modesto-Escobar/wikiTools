@@ -2,14 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{m_PageFiles}
 \alias{m_PageFiles}
-\title{m_PageFiles(titles, project="en.wikipedia.org", exclude_ext='svg|webp|xcf')
-Search for URL of files inserted in the Wikipedia pages. Exclude extensions
-in exclude_ext. Note that the query API named this search as 'images',
-but all source files in the page are returned. The function only return URL
-that not end with extensions in exclude_ext parameter (case insensitive).
-Automatically resolves redirects, the "normalized" column of the returned
-data-frame contains the destiny page of the redirection.
-See https://en.wikipedia.org/w/api.php?action=help&modules=query\%2Bimages}
+\title{Get URL of files in Wikipedia pages}
 \usage{
 m_PageFiles(titles, project = "en.wikipedia.org", exclude_ext = "svg|webp|xcf")
 }
@@ -26,8 +19,7 @@ for the page and the URL files of the Wikipedia pages, using use "|" to
 separate ones) or NA if files do not exits or are excluded.
 }
 \description{
-m_PageFiles(titles, project="en.wikipedia.org", exclude_ext='svg|webp|xcf')
-Search for URL of files inserted in the Wikipedia pages. Exclude extensions
+Search for URL of files inserted in Wikipedia pages. Exclude extensions
 in exclude_ext. Note that the query API named this search as 'images',
 but all source files in the page are returned. The function only return URL
 that not end with extensions in exclude_ext parameter (case insensitive).

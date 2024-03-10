@@ -2,14 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{m_WikidataEntity}
 \alias{m_WikidataEntity}
-\title{m_WikidataEntity(titles, project='en.wikipedia.org', redirects=TRUE)
-Use reqMediaWiki to check if page titles are in a Wikimedia project and returns
-the Wikidata entity for them. Automatically resolves redirects if parameter
-redirects = TRUE (default). If a page title exists in the Wikimedia project,
-the status column in the returned data-frame is set to 'OK'. If a page is a
-disambiguation page, that column is set to 'disambiguation', and if a title
-is not in the Wikimedia project, it is set to 'missing' and no Wikidata
-entity is returned.}
+\title{Check Wikipedia pages titles}
 \usage{
 m_WikidataEntity(titles, project = "en.wikipedia.org", redirects = TRUE)
 }
@@ -30,7 +23,6 @@ error=TRUE it does not, last, the Wikidata entity itself or a clarification
 of the error.
 }
 \description{
-m_WikidataEntity(titles, project='en.wikipedia.org', redirects=TRUE)
 Use reqMediaWiki to check if page titles are in a Wikimedia project and returns
 the Wikidata entity for them. Automatically resolves redirects if parameter
 redirects = TRUE (default). If a page title exists in the Wikimedia project,

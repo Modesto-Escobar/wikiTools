@@ -2,13 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{w_isValid}
 \alias{w_isValid}
-\title{w_isValid(entity_list, nlimit=50000)
-Check if the Wikidata entities are valid. A entity is valid if it has a label
-or has a description. If one entity exists but is not valid, is possible that
-it has a redirection to other entity, in that case, the redirection is
-obtained. Other entities may have existed in the past, but have been deleted.
-Duplicated entities in entity_list are deleted before checking. Index of the
-data-frame returned are also set to entity_list.}
+\title{Check if a Wikidata entity is valid}
 \usage{
 w_isValid(entity_list, nlimit = 50000)
 }
@@ -24,7 +18,6 @@ if that entity is valid in Wikidata (TRUE or FALSE), last, if the entity
 redirects to another Wikidata entity, this entity.
 }
 \description{
-w_isValid(entity_list, nlimit=50000)
 Check if the Wikidata entities are valid. A entity is valid if it has a label
 or has a description. If one entity exists but is not valid, is possible that
 it has a redirection to other entity, in that case, the redirection is

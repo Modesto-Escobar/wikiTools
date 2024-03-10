@@ -2,11 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{w_SearchByLabel_Startswith}
 \alias{w_SearchByLabel_Startswith}
-\title{w_SearchByLabel_Startswith(string, lang='en', langsorder='en', instanceof="", Pproperty="")
-Search Wikidata entities which label or altLabel starts with "string" in
-language "lang" (mandatory). It's similar to a wildcard search: "string*".
-Diacritics and case are ignored. Search "string" in language "lang" in label,
-but in any language in altLabel.}
+\title{Search Wikidata entities whose label or alLabel starts with}
 \usage{
 w_SearchByLabel_Startswith(
   string,
@@ -42,7 +38,6 @@ include information of the sex of entities found.}
 Pproperty param.
 }
 \description{
-w_SearchByLabel_Startswith(string, lang='en', langsorder='en', instanceof="", Pproperty="")
 Search Wikidata entities which label or altLabel starts with "string" in
 language "lang" (mandatory). It's similar to a wildcard search: "string*".
 Diacritics and case are ignored. Search "string" in language "lang" in label,
