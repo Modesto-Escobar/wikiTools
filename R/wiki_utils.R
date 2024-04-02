@@ -899,16 +899,17 @@ if (filterq) filters else "",
 #' Note: sometimes not label in any language of langsorder is assigned to an
 #' entity, so an additional search is used to obtain almost one label for it
 #' (?entitylab) with LIMIT 1.
-#' @param wikilangs List of languages to limit the search of Wikipedia pages,
+#' @param wikilangs List of languages to limit the search of Wikipedia pages,fi
 #' using "|" as separator. Wikipedias pages are returned in same order as
 #' languages in this parameter. If wikilangs='' the function returns Wikipedia
 #' pages in any language, not sorted.
+#' @param format Wikipedia address format. By default is reduced, Otherwise, format is regular. 
 #' @return: A data-frame with the properties of the entity.
 #' @examples
 #' df1 <- w_EntityInfo(entity='Q134644', langsorder = 'es|en')
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-w_EntityInfo <- function(entity, langsorder='en', wikilangs="") {
+w_EntityInfo <- function(entity, langsorder='en', wikilangs="", format="reduced") {
   #
   langsorder <- gsub("|", ",", langsorder, fixed = T)
   if (wikilangs != "") {
@@ -1047,7 +1048,7 @@ WHERE {
   rownames(r) <- r$entity
   # Order by wikilangs
   for (entity in r$entity) {
-    if (wikilangs != "") {
+    if (wikilangs != "" && !is.na(r[entity, 'wikilangs'])) {
       l <- strsplit(r[entity, 'wikilangs'], '|', fixed = T)[[1]]
       if (length(l) > 1) {
         o <- match(wikiorder, l)
@@ -1056,6 +1057,9 @@ WHERE {
         l <- strsplit(r[entity, 'wikipedias'], '|', fixed = T)[[1]]
         r[entity, "wikipedias"] <- paste0(l[o], collapse = '|')
       }
+    }
+    if(format=="reduced") {
+      r[entity, "wikipedias"] <- gsub("\\.wikipedia\\.org","\\.m\\.wikipedia\\.org", r[entity, "wikipedias"])
     }
   }
   #
@@ -1082,12 +1086,13 @@ WHERE {
 #' using "|" as separator. Wikipedias pages are returned in same order as
 #' languages in this parameter. If wikilangs='' the function returns Wikipedia
 #' pages in any language, not sorted.
+#' @param format Wikipedia address format. By default is reduced, Otherwise, format is regular. 
 #' @return: A data-frame with the properties of entity.
 #' @examples
 #' df2 <- w_EntityInfo_tiny(entity='Q134644', langsorder = 'es|en')
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-w_EntityInfo_tiny <- function(entity, langsorder='en', wikilangs="") {
+w_EntityInfo_tiny <- function(entity, langsorder='en', wikilangs="", format="reduced") {
   #
   langsorder <- gsub("|", ",", langsorder, fixed = T)
   if (wikilangs != "") {
@@ -1206,7 +1211,7 @@ WHERE {
   rownames(r) <- r$entity
   # Order by wikilangs
   for (entity in r$entity) {
-    if (wikilangs != "") {
+    if (wikilangs != "" & !is.na(r[entity, 'wikilangs'])) {
       l <- strsplit(r[entity, 'wikilangs'], '|', fixed = T)[[1]]
       if (length(l) > 1) {
         o <- match(wikiorder, l)
@@ -1215,6 +1220,9 @@ WHERE {
         l <- strsplit(r[entity, 'wikipedias'], '|', fixed = T)[[1]]
         r[entity, "wikipedias"] <- paste0(l[o], collapse = '|')
       }
+    }
+    if(format=="reduced") {
+      r[entity, "wikipedias"] <- gsub("\\.wikipedia\\.org","\\.m\\.wikipedia\\.org", r[entity, "wikipedias"])
     }
   }
   #
@@ -1234,6 +1242,7 @@ WHERE {
 #' using "|" as separator. Wikipedias pages are returned in same order as
 #' languages in this parameter. If wikilangs='' the function returns Wikipedia
 #' pages in any language, not sorted.
+#' #' @param format Wikipedia address format. By default is reduced, Otherwise, format is regular. 
 #' @return: A data-frame with all properties of film_entity
 #' @examples
 #' \dontrun{
@@ -1246,7 +1255,7 @@ WHERE {
 #' }
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @export
-w_FilmInfo <- function(film_entity, langsorder='en', wikilangs="") {
+w_FilmInfo <- function(film_entity, langsorder='en', wikilangs="", format="reduced") {
   #
   langsorder  <- gsub("|", ",", langsorder, fixed = T)
   if (wikilangs != "") {
@@ -1384,6 +1393,9 @@ if (wikilangs != '') paste0(";
         l <- strsplit(r[entity, 'wikipedias'], '|', fixed = T)[[1]]
         r[entity, "wikipedias"] <- paste0(l[o], collapse = '|')
       }
+    }
+    if(format=="reduced") {
+      r[entity, "wikipedias"] <- gsub("\\.wikipedia\\.org","\\.m\\.wikipedia\\.org", r[entity, "wikipedias"])
     }
   }
   #

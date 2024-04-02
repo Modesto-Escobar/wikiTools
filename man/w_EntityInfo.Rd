@@ -4,7 +4,7 @@
 \alias{w_EntityInfo}
 \title{Get some personal properties of one Wikidata entity}
 \usage{
-w_EntityInfo(entity, langsorder = "en", wikilangs = "")
+w_EntityInfo(entity, langsorder = "en", wikilangs = "", format = "reduced")
 }
 \arguments{
 \item{entity}{The Wikidata entity to search for properties. Only one entity
@@ -18,10 +18,12 @@ Note: sometimes not label in any language of langsorder is assigned to an
 entity, so an additional search is used to obtain almost one label for it
 (?entitylab) with LIMIT 1.}
 
-\item{wikilangs}{List of languages to limit the search of Wikipedia pages,
+\item{wikilangs}{List of languages to limit the search of Wikipedia pages,fi
 using "|" as separator. Wikipedias pages are returned in same order as
 languages in this parameter. If wikilangs='' the function returns Wikipedia
 pages in any language, not sorted.}
+
+\item{format}{Wikipedia address format. By default is reduced, Otherwise, format is regular.}
 }
 \value{
 : A data-frame with the properties of the entity.

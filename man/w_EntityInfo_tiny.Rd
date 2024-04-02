@@ -4,7 +4,12 @@
 \alias{w_EntityInfo_tiny}
 \title{Get a few personal properties from a Wikidata entity}
 \usage{
-w_EntityInfo_tiny(entity, langsorder = "en", wikilangs = "")
+w_EntityInfo_tiny(
+  entity,
+  langsorder = "en",
+  wikilangs = "",
+  format = "reduced"
+)
 }
 \arguments{
 \item{entity}{The Wikidata entity to search for properties.}
@@ -21,6 +26,8 @@ entity, so an additional search is used to obtain almost one label for it
 using "|" as separator. Wikipedias pages are returned in same order as
 languages in this parameter. If wikilangs='' the function returns Wikipedia
 pages in any language, not sorted.}
+
+\item{format}{Wikipedia address format. By default is reduced, Otherwise, format is regular.}
 }
 \value{
 : A data-frame with the properties of entity.
