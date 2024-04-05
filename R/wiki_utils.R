@@ -917,8 +917,8 @@ w_EntityInfo <- function(entity, langsorder='en', wikilangs="", format="reduced"
     wikifilter <- paste0("'",gsub('|', "','", wikilangs, fixed=T), "'")
   }
   #
-  qid <- entity
-  query <- paste0('SELECT DISTINCT ?entity ?entityLabel (LANG(?entitylab) as ?entitylablang) ?entitylab
+  res <- lapply(entity,function(qid){
+    query <- paste0('SELECT DISTINCT ?entity ?entityLabel (LANG(?entitylab) as ?entitylablang) ?entitylab
   ?entityDescription (LANG(?entitydesc) as ?entitydesclang) ?entitydesc
   ?bdate (YEAR(?bdate) AS ?byear) ?bplaceLabel ?bactualplaceLabel ?bplaceCoord ?bcountryLabel
   ?ddate (YEAR(?ddate) AS ?dyear) ?dplaceLabel ?dactualplaceLabel ?dplaceCoord ?dcountryLabel
@@ -1063,7 +1063,10 @@ WHERE {
     }
   }
   #
-  return(r)
+    return(r)
+  })
+  res <- do.call(rbind,res)
+  return(res)
 }
 
 #' Get a few personal properties from a Wikidata entity
@@ -1100,8 +1103,8 @@ w_EntityInfo_tiny <- function(entity, langsorder='en', wikilangs="", format="red
     wikifilter <- paste0("'",gsub('|', "','", wikilangs, fixed=T), "'")
   }
   #
-  qid <- entity
-  query <- paste0('SELECT DISTINCT ?entity ?entityLabel (LANG(?entitylab) as ?entitylablang) ?entitylab
+  res <- lapply(entity,function(qid){
+    query <- paste0('SELECT DISTINCT ?entity ?entityLabel (LANG(?entitylab) as ?entitylablang) ?entitylab
   ?entityDescription (LANG(?entitydesc) as ?entitydesclang) ?entitydesc
   ?bdate (YEAR(?bdate) AS ?byear) ?bplaceLabel ?bplaceCoord ?bcountryLabel
   ?ddate (YEAR(?ddate) AS ?dyear) ?dplaceLabel ?dplaceCoord ?dcountryLabel
@@ -1226,7 +1229,10 @@ WHERE {
     }
   }
   #
-  return(r)
+    return(r)
+  })
+  res <- do.call(rbind,res)
+  return(res)
 }
 
 #' Gets films' properties from Wikidata
@@ -1242,7 +1248,7 @@ WHERE {
 #' using "|" as separator. Wikipedias pages are returned in same order as
 #' languages in this parameter. If wikilangs='' the function returns Wikipedia
 #' pages in any language, not sorted.
-#' #' @param format Wikipedia address format. By default is reduced, Otherwise, format is regular. 
+#' @param format Wikipedia address format. By default is reduced, Otherwise, format is regular. 
 #' @return: A data-frame with all properties of film_entity
 #' @examples
 #' \dontrun{
@@ -1263,8 +1269,8 @@ w_FilmInfo <- function(film_entity, langsorder='en', wikilangs="", format="reduc
     wikifilter <- paste0("'",gsub('|', "','", wikilangs, fixed=T), "'")
   }
   #
-  qid <- film_entity
-  query <- paste0('SELECT DISTINCT ?entity ?entityLabel ?entityLabelES # ?entityDescription ?pubdate
+  res <- lapply(film_entity,function(qid){
+    query <- paste0('SELECT DISTINCT ?entity ?entityLabel ?entityLabelES # ?entityDescription ?pubdate
   (YEAR(?pubdate) AS ?pubyear)
   (GROUP_CONCAT(DISTINCT ?pos;separator="|") as ?poster)
   (GROUP_CONCAT(DISTINCT ?pic;separator="|") as ?pics)
@@ -1399,7 +1405,10 @@ if (wikilangs != '') paste0(";
     }
   }
   #
-  return(r)
+    return(r)
+  })
+  res <- do.call(rbind,res)
+  return(res)
 }
 
 

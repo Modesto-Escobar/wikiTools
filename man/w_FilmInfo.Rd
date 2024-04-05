@@ -18,8 +18,9 @@ Note: additional film title in Spanish is also returned.}
 \item{wikilangs}{List of languages to limit the search of Wikipedia pages,
 using "|" as separator. Wikipedias pages are returned in same order as
 languages in this parameter. If wikilangs='' the function returns Wikipedia
-pages in any language, not sorted.
-#' @param format Wikipedia address format. By default is reduced, Otherwise, format is regular.}
+pages in any language, not sorted.}
+
+\item{format}{Wikipedia address format. By default is reduced, Otherwise, format is regular.}
 }
 \value{
 : A data-frame with all properties of film_entity

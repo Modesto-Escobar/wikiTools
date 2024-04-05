@@ -22,7 +22,7 @@ Create a data.frame with Wikidata of a vector of names.
 \examples{
 ## Obtaining information in English Wikidata
 \dontrun{
-names <- c("William Shakespeare", "Pablo Picasso")
+names <- c("William Shakespeare", "Pedro Almodovar")
 info <- getWikiData(names)
 ## Obtaining information in Spanish Wikidata
 d <- getWikiData(names, language="es")

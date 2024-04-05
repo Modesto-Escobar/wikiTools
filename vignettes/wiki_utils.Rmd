@@ -4,7 +4,7 @@ author: "Angel Zazo, Department of Computer Science and Automatics, University o
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{netCoin package}
+  %\VignetteIndexEntry{wikiTools package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -110,7 +110,7 @@ v_Wikipedias(viaf)
 
 ## Package installation and loading
 
-To install and load the updated version of the netCoin package simply run the following commands:
+To install and load the updated version of the wikiTools package simply run the following commands:
 ```{r eval=FALSE}
 install.packages("wikiTools")
 ```
@@ -190,6 +190,9 @@ Note: depending on connection speed, nlimit parameter musts be adjusted
 ```{r echo=TRUE}
 w_OccupationCount(Qoc='Q2306091')                    # Qoc for Sociologist
 l  <- w_OccupationEntities(Qoc='Q2306091')           # l=entities: vector
+```
+
+```{r echo=TRUE, eval=FALSE}
 lw <- w_OccupationEntitiesWikipedias(Qoc='Q2306091') # lw=dataframe
  # We can obtain the same information using previous function w_Wikipedias:
  lw2 <- w_Wikipedias(entity_list=l, wikilangs='')

@@ -22,7 +22,7 @@ Returns inside the text are omitted.
 }
 \examples{
 ## A text with three names separated with commas is converted into a vector of length 3.
-cc("Pablo Picasso, Diego Velazquez, Salvador Dali")
+cc("Pedro Almodovar, Diego Velazquez, Salvador Dali")
 }
 \author{
 Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See \url{https://sociocav.usal.es/blog/modesto-escobar/}

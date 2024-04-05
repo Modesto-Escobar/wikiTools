@@ -80,7 +80,7 @@ urltoFrame <- function(url){
 #' @return A vector of the split segments of the text.
 #' @examples
 #' ## A text with three names separated with commas is converted into a vector of length 3.
-#' cc("Pablo Picasso, Diego Velazquez, Salvador Dali")
+#' cc("Pedro Almodovar, Diego Velazquez, Salvador Dali")
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @export
 cc <- function(text, sep=",") {
@@ -223,6 +223,17 @@ searchWiki <- function(name, language=c("en", "es", "fr", "it", "de", "pt", "ca"
   return(errores)
 }
 
+# find_item ----
+find_item <- function(name, language = "en", limit = 10){
+    response <- httr::GET(url="https://www.wikidata.org/w/api.php",
+      query=list(action = "wbsearchentities", type = "item",
+      language = language, limit = limit, search = name, format = 'json'))
+    httr::stop_for_status(response)
+    response_text <- httr::content(x = response, as = "text")
+    parsed_text <- jsonlite::fromJSON(txt = response_text, simplifyVector = FALSE)
+    i <- parsed_text$search
+}
+
 # getWikiInf ----
 #' Create a data.frame with Q's and descriptions of a vector of names.
 #' @param names A vector consisting of one or more Wikidata's entry (i.e., topic or person).
@@ -232,7 +243,7 @@ searchWiki <- function(name, language=c("en", "es", "fr", "it", "de", "pt", "ca"
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @examples
 #' ## Obtaining information in English Wikidata
-#' names <- c("William Shakespeare", "Pablo Picasso")
+#' names <- c("William Shakespeare", "Pedro Almodovar")
 #' information <- getWikiInf(names)
 #'
 #' ## Obtaining information in Spanish Wikidata
@@ -240,10 +251,11 @@ searchWiki <- function(name, language=c("en", "es", "fr", "it", "de", "pt", "ca"
 #' informacion <- getWikiInf(names, language="es")
 #' }
 #' @export
-#' @importFrom WikidataR find_item
+#' @importFrom httr GET stop_for_status content
+#' @importFrom jsonlite fromJSON
 getWikiInf <- function(names, number=1, language="en"){
-  get <-function(name, number=1, language=language){
-    i <- find_item(name, language=language)
+  get <-function(name, number, language){
+    i <- find_item(name,language)
     if(length(i)>=number) {
       X <- c(name=name, Q=i[[number]]$id, 
              label=ifelse(is.null(i[[number]]$label),NaN, i[[number]]$label),
@@ -266,13 +278,12 @@ getWikiInf <- function(names, number=1, language="en"){
 #' @examples
 #' ## Obtaining information in English Wikidata
 #' \dontrun{
-#' names <- c("William Shakespeare", "Pablo Picasso")
+#' names <- c("William Shakespeare", "Pedro Almodovar")
 #' info <- getWikiData(names)
 #' ## Obtaining information in Spanish Wikidata
 #' d <- getWikiData(names, language="es")
 #' }
 #' @export
-#' @importFrom WikidataQueryServiceR query_wikidata
 #' @importFrom utils write.csv2
 getWikiData <- function(names, language="en", csv=NULL) {
   petition <-function(q){
@@ -332,26 +343,32 @@ getWikiData <- function(names, language="en", csv=NULL) {
   }
   
   getWiki <-function(nombre){
-    i <- find_item(nombre, language=language, limit=1)
-    if(length(i)>0) {
-      Q <- i[[1]]$id
-      X <- suppressMessages(query_wikidata(petition(Q)))
-      X <- cbind(Q, X[1, ])
-      bcb <- !is.na(X$birthdate) && substring(X$birthdate,1,1)=="-"
-      bcd <- !is.na(X$deathdate) && substring(X$deathdate,1,1)=="-"
-      X$birthdate <- sub("^-","",X$birthdate)
-      X$deathdate <- sub("^-","",X$deathdate)
-      X$birthdate <- as.numeric(format(as.POSIXct(X$birthdate, origin="1960-01-01", optional=TRUE), "%Y"))
-      X$deathdate <- as.numeric(format(as.POSIXct(X$deathdate, origin="1960-01-01", optional=TRUE), "%Y"))
-      if(bcb) X$birthdate <- -X$birthdate
-      if(bcd) X$deathdate <- -X$deathdate
-    }
-    else X <- data.frame(Q=NA, entityLabel=nombre, entityDescription =NA, sexLabel=NA, 
+    emptyX <- data.frame(Q=NA, entityLabel=nombre, entityDescription =NA, sexLabel=NA, 
                          birthdate=NA, birthplaceLabel=NA, birthcountryLabel=NA,
                          deathdate=NA, deathplaceLabel=NA, deathcountryLabel=NA,
                          pics=NA, occupation=NA, movement=NA, genres=NA, 
                          influencedby=NA, influencebyQ=NA, notablework=NA, notableworkQ=NA,
                          stringsAsFactors = FALSE)
+    i <- find_item(nombre, language=language, limit=1)
+    if(length(i)>0) {
+      Q <- i[[1]]$id
+      X <- w_query(petition(Q), format="csv", method='POST', limitRequester=TRUE)
+      if(is.null(dim(X))){
+        X <- emptyX
+      }else{
+        X <- cbind(Q, X[1, ])
+        bcb <- !is.na(X$birthdate) && substring(X$birthdate,1,1)=="-"
+        bcd <- !is.na(X$deathdate) && substring(X$deathdate,1,1)=="-"
+        X$birthdate <- sub("^-","",X$birthdate)
+        X$deathdate <- sub("^-","",X$deathdate)
+        X$birthdate <- as.numeric(format(as.POSIXct(X$birthdate, origin="1960-01-01", optional=TRUE), "%Y"))
+        X$deathdate <- as.numeric(format(as.POSIXct(X$deathdate, origin="1960-01-01", optional=TRUE), "%Y"))
+        if(bcb) X$birthdate <- -X$birthdate
+        if(bcd) X$deathdate <- -X$deathdate
+      }
+    }else{
+      X <- emptyX
+    }
     return(X)
   }
 
@@ -499,7 +516,7 @@ getWikiFiles <- function(X, language=c("es", "en", "fr"), directory="./", maxtim
 #' @param maximum Number maximum of characters to be included when the paragraph is too large.
 #' @examples
 #' ## Obtaining information in English Wikidata
-#' names <- c("William Shakespeare", "Pablo Picasso")
+#' names <- c("William Shakespeare", "Pedro Almodovar")
 #' info <- getWikiInf(names)
 #' info$text <- extractWiki(info$label)
 #' @return a character vector with html formatted (or plain text) Wikipedia paragraphs.

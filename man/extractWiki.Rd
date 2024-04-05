@@ -28,7 +28,7 @@ Extract the first paragraph of a Wikipedia article with a maximum of characters.
 }
 \examples{
 ## Obtaining information in English Wikidata
-names <- c("William Shakespeare", "Pablo Picasso")
+names <- c("William Shakespeare", "Pedro Almodovar")
 info <- getWikiInf(names)
 info$text <- extractWiki(info$label)
 }

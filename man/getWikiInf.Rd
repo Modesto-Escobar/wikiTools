@@ -21,7 +21,7 @@ Create a data.frame with Q's and descriptions of a vector of names.
 }
 \examples{
 ## Obtaining information in English Wikidata
-names <- c("William Shakespeare", "Pablo Picasso")
+names <- c("William Shakespeare", "Pedro Almodovar")
 information <- getWikiInf(names)
 
 ## Obtaining information in Spanish Wikidata
