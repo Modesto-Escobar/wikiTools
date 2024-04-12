@@ -4,7 +4,13 @@
 \alias{w_EntityInfo}
 \title{Get some personal properties of one Wikidata entity}
 \usage{
-w_EntityInfo(entity, langsorder = "en", wikilangs = "", format = "reduced")
+w_EntityInfo(
+  entity,
+  langsorder = "en",
+  wikilangs = "",
+  format = "reduced",
+  mode = c("default", "tiny", "film")
+)
 }
 \arguments{
 \item{entity}{The Wikidata entity to search for properties. Only one entity
@@ -24,9 +30,13 @@ languages in this parameter. If wikilangs='' the function returns Wikipedia
 pages in any language, not sorted.}
 
 \item{format}{Wikipedia address format. By default is reduced, Otherwise, format is regular.}
+
+\item{mode}{The mode to obtain results: 'tiny' less properties are requested
+and less checks are done; 'film' gets some properties of the Wikidata
+"entity" related to information about film ('default' by default).}
 }
 \value{
-: A data-frame with the properties of the entity.
+A data-frame with the properties of the entity.
 }
 \description{
 Gets some properties of the Wikidata "entity" related to birth and death
@@ -36,6 +46,11 @@ the "wikilangs" parameter), etc.
 }
 \examples{
 df1 <- w_EntityInfo(entity='Q134644', langsorder = 'es|en')
+df2 <- w_EntityInfo(entity='Q134644', langsorder = 'es|en', mode = 'tiny')
+\dontrun{
+films <- w_EntityInfo(entity=c('Q180098','Q151895'), langsorder='es|en',
+wikilangs='es|fr|en', mode='film')
+}
 }
 \author{
 Angel Zazo, Department of Computer Science and Automatics, University of Salamanca

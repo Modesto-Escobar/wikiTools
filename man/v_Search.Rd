@@ -4,11 +4,31 @@
 \alias{v_Search}
 \title{Run a CQL Query in VIAF}
 \usage{
-v_Search(CQL_Query)
+v_Search(
+  CQL_Query,
+  mode = c("default", "anyField", "allmainHeadingEl", "allNames", "allPersonalNames",
+    "allTitle")
+)
 }
 \arguments{
-\item{CQL_Query}{String with the search.
+\item{CQL_Query}{String with the search or a name if mode is specified.
 See https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html}
+
+\item{mode}{apply a predefined query:
+'anyField' -> 'cql.any = "string"'
+Search preferred Name - names which are the preferred form in an authority
+record (1xx fields of the MARC records);
+'allmainHeadingEl' -> 'local.mainHeadingEl all "name"'
+Search the same as previous, but all terms are searched;
+'allNames' -> 'local.names all "name"'
+Search Names - any name preferred or alternate (1xx, 4xx, 5xx fields of the
+MARC records);
+'allPersonalNames' -> 'local.personalNames all "name"'
+Search Personal Names within the authority record (100, 400, 500 fields of
+MARC records);
+'allTitle' -> 'local.title all "title"'
+Search for titles.
+By 'default', no predefined query will be applied.}
 }
 \value{
 A list with the records found.

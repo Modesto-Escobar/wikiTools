@@ -35,7 +35,7 @@ Duplicated entities are deleted before search.
 }
 \examples{
 # aux: get a vector of entities (l).
-df <- w_SearchByLabel_Inlabel(string='Iranzo', langsorder='es|en')
+df <- w_SearchByLabel(string='Iranzo', langsorder='es|en', mode='inlabel')
 l <- df$entity
 
 w <- w_Wikipedias(entity_list=l)

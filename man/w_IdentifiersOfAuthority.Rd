@@ -23,7 +23,7 @@ the search are filtered to Wikidata entities of class Q5 (human). Some
 entity classes are allowed, separated with '|'.}
 }
 \value{
-: A data-frame with 'entity', 'entityLabel', 'entityDescription' and
+A data-frame with 'entity', 'entityLabel', 'entityDescription' and
 the identifier in the "Pauthority" database,
 }
 \description{

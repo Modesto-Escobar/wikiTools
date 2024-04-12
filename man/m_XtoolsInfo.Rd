@@ -6,7 +6,7 @@
 \usage{
 m_XtoolsInfo(
   article,
-  infotype = "articleinfo",
+  infotype = c("articleinfo", "prose", "links"),
   project = "en.wikipedia.org",
   redirects = FALSE
 )
@@ -14,7 +14,8 @@ m_XtoolsInfo(
 \arguments{
 \item{article}{The title of the article to search. Only one article is allowed.}
 
-\item{infotype}{The type of information to request: articleinfo, prose, links
+\item{infotype}{The type of information to request: articleinfo, prose, links.
+You also can type 'all' to retrieve all.
 Note that the API also offer theses options: top_editors, assessments,
 bot_data and automated_edits.}
 
@@ -44,6 +45,9 @@ xx <- m_XtoolsInfo(article="Cervantes", infotype="articleinfo", project="es.wiki
 y <-  m_XtoolsInfo(article="Miguel de Cervantes", infotype="links", project="es.wikipedia.org")
 yy <- m_XtoolsInfo(article="Cervantes", infotype="links", project="es.wikipedia.org",
                     redirects=TRUE)
+z  <- m_XtoolsInfo(article="Miguel de Cervantes", infotype="all", project="es.wikipedia.org")
+zz <- m_XtoolsInfo(article="Cervantes", infotype="all", project="es.wikipedia.org",
+                       redirects=TRUE)
 }
 }
 \author{

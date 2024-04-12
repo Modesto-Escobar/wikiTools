@@ -2,14 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{reqMediaWiki}
 \alias{reqMediaWiki}
-\title{reqMediaWiki(query, project='en.wikipedia.org', method='GET', attempts=2)
-Uses httr package to retrieve responses using the MediaWiki API.
-For MediaWiki requests only user_agent is necessary in the request headers.
-See https://www.mediawiki.org/wiki/API:Etiquette. The standard and default
-output format in MediaWiki is JSON. All other formats are discouraged. The
-output format should always be specified using the request param "format"
-in the "query" request.
-See https://www.mediawiki.org/wiki/API:Data_formats#Output.}
+\title{Uses httr package to retrieve responses using the MediaWiki API.}
 \usage{
 reqMediaWiki(query, project = "en.wikipedia.org", method = "GET", attempts = 2)
 }
@@ -33,8 +26,6 @@ retries are done.}
 The response in JSON format or NULL on errors.
 }
 \description{
-reqMediaWiki(query, project='en.wikipedia.org', method='GET', attempts=2)
-Uses httr package to retrieve responses using the MediaWiki API.
 For MediaWiki requests only user_agent is necessary in the request headers.
 See https://www.mediawiki.org/wiki/API:Etiquette. The standard and default
 output format in MediaWiki is JSON. All other formats are discouraged. The
