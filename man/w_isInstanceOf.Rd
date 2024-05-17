@@ -4,25 +4,41 @@
 \alias{w_isInstanceOf}
 \title{Check if a Wikidata entity is an instance of a class}
 \usage{
-w_isInstanceOf(entity_list, instanceof)
+w_isInstanceOf(entity_list, instanceof = "", nlimit = 50000, debug = FALSE)
 }
 \arguments{
-\item{entity_list}{A vector with de Wikidata entities.}
+\item{entity_list}{A vector with the Wikidata entities.}
 
-\item{instanceof}{The Wikidata class to check, mandatory.}
+\item{instanceof}{The Wikidata class to check, mandatory. Some entity classes
+separated by '|' are allowed, in this case, the OR operator is considered.}
+
+\item{nlimit}{If the number of entities exceeds this number, chunked queries
+are done. This is the number of entities requested in each chunk. Please,
+reduce the default value if error is raised.}
+
+\item{debug}{For debugging purposes (default FALSE). If debug='info'
+information about chunked queries is shown. If debug='query' also the query
+launched is shown.}
 }
 \value{
-A data-frame with two columns, first Wikidata entity, second TRUE
-if that entity is instance of the "instanceof" entity, else FALSE. Index of
-data-frame are also set to entity_list.
+A data-frame with three columns, first Wikidata entity, second all
+Wikidata class each instance is instance of them, last TRUE or FALSE if each
+entity is instance of the \code{instanceof} parameter, if this one is set.
 }
 \description{
 Check using WDQS if the Wikidata entities in entity_list are instances of
-"instanceof" Wikidata entity class. For example, if instanceof="Q5", check if
+\code{instanceof} Wikidata entity class. For example, if instanceof="Q5", check if
 entities are instances of the Wikidata entity class Q5, i.e, are humans.
+Some entity classes are allowed, separately by '|'; in this case, the OR
+operator is considered. If instanceof='' then no filter is applied: the
+function returns all Wikidata entities class of which each of the entities in
+the list are instances.
 Duplicated entities are deleted before search.
+Note that no labels or descriptions of the entities are returned. Please, use
+function \code{w_LabelDesc} for this.
 }
 \examples{
+\dontrun{
 # aux: get a vector of entities (l).
 df <- w_SearchByLabel(string='Iranzo', langsorder='es|en', mode='inlabel')
 l <- df$entity
@@ -30,6 +46,7 @@ l <- df$entity
 df <- w_isInstanceOf(entity_list=l, instanceof='Q5')
 # Not TRUE
 df[!df$instanceof_Q5,]
+}
 }
 \author{
 Angel Zazo, Department of Computer Science and Automatics, University of Salamanca

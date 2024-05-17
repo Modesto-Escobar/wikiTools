@@ -2,9 +2,15 @@
 % Please edit documentation in R/wiki_utils.R
 \name{w_Wikipedias}
 \alias{w_Wikipedias}
-\title{Gets Wikipedia pages from a Q list.}
+\title{Get Wikipedia pages of Wikidata entities}
 \usage{
-w_Wikipedias(entity_list, wikilangs = "", instanceof = "", nlimit = 1500)
+w_Wikipedias(
+  entity_list,
+  wikilangs = "",
+  instanceof = "",
+  nlimit = 1500,
+  debug = FALSE
+)
 }
 \arguments{
 \item{entity_list}{A vector of Wikidata entities.}
@@ -18,29 +24,41 @@ in any language, not sorted.}
 of that class. For example, if instanceof='Q5', limit the results to "human".}
 
 \item{nlimit}{If the number of entities exceeds this number, chunked queries
-are done. This is the number of entities requested in each chunk.}
+are done. This is the number of entities requested in each chunk. Please,
+reduce the default value if error is raised.}
+
+\item{debug}{For debugging purposes (default FALSE). If debug='info'
+information about chunked queries is shown. If debug='query' also the query
+launched is shown.}
 }
 \value{
-A data-frame with four columns, first the count of Wikipedia pages,
-second, the the langs, page title, and URL's of the wikipedia pages. Last
-three use "|" as separator. Index of the data-frame is also set to the
-entity_list.
+A data-frame with five columns: entities, instanceof, npages, page
+titles and page URLs. Last three use "|" as separator. Index of data-frame is
+also set to the entity_list.
 }
 \description{
-Gets from Wikidata all Wikipedia page titles of the Wikidata entities in
-entity_list. If set "instanceof", then only returns the pages for Wikidata
-entities which are instances of that Wikidata class. If wikilangs='', then
-returns all Wikipedia page titles, else only the languages in wikilangs.
-Duplicated entities are deleted before search.
+Get from Wikidata all Wikipedia page titles and URL of the Wikidata entities
+in entity_list. If parameter \code{wikilangs}='', then returns all Wikipedia page
+titles, else only the languages in \code{wikilangs}. The returned dataframe also
+includes the Wikidata entity classes of which the searched entity is
+an instance. If set the parameter \code{instanceof}, then only returns the pages
+for Wikidata entities which are instances of the Wikidata class indicated in
+it. The data-frame doesn't return labels or descriptions about entities: the
+function \code{w_LabelDesc} can be used for this. Duplicated entities are deleted
+before search. Index of the data-frame returned are also set to entity_list.
 }
 \examples{
+\dontrun{
 # aux: get a vector of entities (l).
-df <- w_SearchByLabel(string='Iranzo', langsorder='es|en', mode='inlabel')
-l <- df$entity
+df <- w_SearchByLabel(string='Napoleon', langsorder='en', mode='inlabel')
+l <- df$entity  # aprox. 3600
 
-w <- w_Wikipedias(entity_list=l)
-w <- w_Wikipedias(entity_list=l, wikilangs='es|en|fr')
-w <- w_Wikipedias(entity_list=l, wikilangs='es|en|fr', instanceof="Q5")
+w <- w_Wikipedias(entity_list=l, debug='info')
+w <- w_Wikipedias(entity_list=l, wikilangs='es|en|fr', debug='info')
+# Filter instanceof=Q5 (human):
+w_Q5 <- w[grepl("\\\\bQ5\\\\b", w$instanceof), ]
+w_Q5b <- w_Wikipedias(entity_list=l, wikilangs='es|en|fr', instanceof='Q5', debug='info')
+}
 }
 \author{
 Angel Zazo, Department of Computer Science and Automatics, University of Salamanca

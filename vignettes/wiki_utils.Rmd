@@ -13,49 +13,58 @@ vignette: >
 
 ### Functions to obtain a list of Wikidata entities
 
-w_SearchByLabel(string, langsorder='en', lang="", instanceof="", Pproperty="",
-                mode=c("exact","startswith","inlabel"))
+w_SearchByLabel(string, mode='inlabel', langs="", langsorder='',
+                instanceof="", Pproperty="", debug=FALSE)
 
-w_OccupationEntities(Qoc, nlimit=NULL, mode=c('default','count','wikipedias'))
+w_SearchByOccupation(Qoc, mode=c('default','count','wikipedias'),
+                     langsorder='', wikilangs='', nlimit=10000, debug=FALSE)
 
 ### Function to obtain information from a list of Wikidata entities or a single one.
 
-w_isInstanceOf(entity_list, instanceof)
+w_isInstanceOf(entity_list, instanceof='', nlimit=50000, debug=FALSE)
 
-w_Wikipedias(entity_list, wikilangs="", instanceof="", nlimit=1500)
+w_Wikipedias(entity_list, wikilangs="", instanceof='', nlimit=1500, debug=FALSE)
 
-w_isValid(entity_list, nlimit=50000)
+w_isValid(entity_list, nlimit=50000, debug=FALSE)
 
-w_Property(entity_list, Pproperty, langsorder='en', nlimit=10000)
+w_Property(entity_list, Pproperty, includeQ=FALSE, langsorder='en',
+           nlimit=10000, debug=FALSE)
 
-w_IdentifiersOfAuthority(Pauthority, langsorder='en', instanceof="")
+w_SearchByAuthority(Pauthority, langsorder='', instanceof='',
+                    nlimit=10000, debug=FALSE)
 
 Pauthority = Authority Database Property in Wikidata
 
-w_EntityInfo(entity, langsorder='en', wikilangs="", mode=c('default','tiny','film'))
+w_EntityInfo(entity_list, mode='default', langsorder='',
+             wikilangs="",  nlimit=MW_LIMIT, debug=FALSE)
 
 ### Functions to obtain information using the WikiMedia API's
 
-m_Opensearch(string, project='en.wikipedia.org', profile="engine_autoselect", redirects="resolve")
+m_Opensearch(string, project='en.wikipedia.org',
+             profile="engine_autoselect", redirects="resolve")
 
-m_reqMediaWiki(titles, mode=c('wikidataEntity','redirects','pagePrimaryImage','pageFiles'),
+m_reqMediaWiki(titles,
+               mode=c('wikidataEntity','redirects','pagePrimaryImage','pageFiles'),
                project='en.wikipedia.org', redirects=TRUE, exclude_ext='svg|webp|xcf')
 
-m_Pageviews(article, start, end, project="en.wikipedia.org", access="all-access",
-             agent="user", granularity="monthly", redirects=FALSE)
+m_Pageviews(article, start, end, project="en.wikipedia.org",
+            access="all-access", agent="user",
+            granularity="monthly", redirects=FALSE)
 
-m_XtoolsInfo(article, infotype="articleinfo", project="en.wikipedia.org", redirects=FALSE)
+m_XtoolsInfo(article, infotype=c("articleinfo", "prose", "links"),
+             project="en.wikipedia.org", redirects=FALSE)
 
 ### Functions to obtain information (viafID or cluster records) using the VIAF API
 
 v_AutoSuggest(author) : obtains viafID
 
 v_Search(CQL_Query, mode=c('default', 'anyField', 'allmainHeadingEl',
-         'allNames', 'allPersonalNames', 'allTitle')) : obtains clusters records
+                           'allNames', 'allPersonalNames', 'allTitle'),
+         schema=c('brief', 'JSON')) : obtains clusters records
 
 ### Function to retrieve a cluster record using the viafID.
 
-v_GetRecord(viafid,  record_format='viaf.json'): retrieve a cluster record
+v_GetRecord(viafid, record_format='viaf.json'): retrieve a cluster record
 
 ### Function to extract information from a VIAF cluster record
 
@@ -145,24 +154,25 @@ df <- w_Wikipedias(entity_list=l, wikilangs='es|en|fr')
 df <- w_Wikipedias(entity_list=l, wikilangs='es|en|fr', instanceof="Q5")
 ```
 
-#### w_Occupations
+#### w_SearchByOccupation
 Count entities, or get the entities with that occupation, also get Wikipedia pages
 
 Note: depending on connection speed, nlimit parameter musts be adjusted
 ```{r echo=TRUE}
-w_OccupationEntities(Qoc='Q2306091', mode='count') # Qoc for Sociologist
-l  <- w_OccupationEntities(Qoc='Q2306091') # l=entities: vector
+w_SearchByOccupation(Qoc="Q2306091", mode='count') # "Q2306091" Qoc for Sociologist
+q <- w_SearchByOccupation(Qoc="Q2306091")
+l <- q$entity
 ```
 
 ```{r echo=TRUE, eval=FALSE}
-lw <- w_OccupationEntities(Qoc='Q2306091', mode='wikipedias') # lw=dataframe
- # We can obtain the same information using previous function w_Wikipedias:
- lw2 <- w_Wikipedias(entity_list=l, wikilangs='')
- # Verifying:
- all(lw['Q10320558','pages'] == lw2['Q10320558','pages'])
- # Verifying:
- all(sort(strsplit(lw['Q9061', 'pages'], '|', fixed = T)[[1]]) ==
-     sort(strsplit(lw2['Q9061', 'pages'], '|', fixed = T)[[1]]))
+lw <- w_SearchByOccupation(Qoc='Q2306091', mode='wikipedias') # lw=dataframe
+# We can obtain the same information using previous function w_Wikipedias:
+lw2 <- w_Wikipedias(entity_list=l)
+# Verifying:
+all(lw['Q10320558','pages'] == lw2['Q10320558','pages'])
+# Verifying:
+all(sort(strsplit(lw['Q9061', 'pages'], '|', fixed = T)[[1]]) ==
+    sort(strsplit(lw2['Q9061', 'pages'], '|', fixed = T)[[1]]))
 ```
 
 #### w_isValid.
@@ -184,16 +194,16 @@ Obtain properties of entity_list.
 p <- w_Property(l, Pproperty = 'P21|P569|P214', langsorder = 'es|en')
 ```
 
-#### w_IdentifiersOfAuthority
+#### w_SearchByAuthority
 Search for Wikidata entities that have an identifier in the Wikidata authority property "Pauthority".
 
 Optional: instanceOf
 
 Example: Pauthority=P4439 (has identifier in the Museo Nacional Centro de Arte Reina Sofía)
 ```{r echo=TRUE}
-mncars   <- w_IdentifiersOfAuthority(Pauthority="P4439", langsorder = 'es|en')
+mncars   <- w_SearchByAuthority(Pauthority="P4439", langsorder = 'es|en')
 # 1286  [human, groups, etc.]
-mncarsQ5 <- w_IdentifiersOfAuthority(Pauthority="P4439", langsorder = 'es|en',
+mncarsQ5 <- w_SearchByAuthority(Pauthority="P4439", langsorder = 'es|en',
                                      instanceof = 'Q5')  # 1280
 # Entities are not 'human' (Q5) [see entityDescription column):
 mncars[!(mncars$entity %in% mncarsQ5$entity),]  # not instance of Q5.
@@ -202,23 +212,15 @@ mncars[!(mncars$entity %in% mncarsQ5$entity),]  # not instance of Q5.
 #### w_EntityInfo
 Get some properties of a Wikidata entity.
 ```{r echo=TRUE}
-df1 <- w_EntityInfo(entity='Q134644', langsorder = 'es|en')
-# Also a "tiny" version
-df2 <- w_EntityInfo(entity='Q134644', langsorder = 'es|en', mode='tiny')
-# Differences: fields non existing in the tiny row set as "--":
-Aleixandre <- rbind(
-  df1,
-  data.frame(c(df2, sapply(setdiff(names(df1), names(df2)), function(x) "--")),
-             row.names = 'tiny')
-)
-BenHur    <- w_EntityInfo(entity='Q180098', langsorder='es|en',
-                          wikilangs = 'es|fr', mode='film')
-Nosferatu <- w_EntityInfo(entity='Q151895', langsorder='es|en',
-                          wikilangs = 'es|fr|en', mode='film')
-# Nosferatu has a public video:
-Nosferatu$video
-# Combining data-frames:
-films <- rbind(BenHur, Nosferatu)
+df <- w_EntityInfo(entity_list='Q134644', langsorder='es|en')
+df <- w_EntityInfo(entity_list='Q134644', langsorder='es|en', wikilangs='es|en|fr')
+df <- w_EntityInfo(c('Q270510', 'Q1675466', 'Q24871'), mode='film', langsorder='es|en', wikilangs='es|en|fr')
+# Search string 'abba' inlabel
+w <- w_SearchByLabel('abba', mode='inlabel', langsorder = '', instanceof = 'Q5')
+df <- w_EntityInfo(w$entity, langsorder='en', wikilangs='en|es|fr', debug='info')
+# Search 3D films
+w <- w_SearchByInstanceof(instanceof='Q229390', langsorder = 'en|es', debug = 'info')
+df <- w_EntityInfo(w$entity, mode="film", langsorder='en', wikilangs='en', debug='info')
 ```
 
 

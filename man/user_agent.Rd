@@ -3,7 +3,8 @@
 \docType{data}
 \name{user_agent}
 \alias{user_agent}
-\title{See https://meta.wikimedia.org/wiki/User-Agent_policy.}
+\title{See https://meta.wikimedia.org/wiki/User-Agent_policy
+https://www.mediawiki.org/wiki/API:Etiquette}
 \format{
 An object of class \code{character} of length 1.
 }
@@ -11,6 +12,7 @@ An object of class \code{character} of length 1.
 user_agent
 }
 \description{
-See https://meta.wikimedia.org/wiki/User-Agent_policy.
+See https://meta.wikimedia.org/wiki/User-Agent_policy
+https://www.mediawiki.org/wiki/API:Etiquette
 }
 \keyword{datasets}

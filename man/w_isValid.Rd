@@ -2,38 +2,46 @@
 % Please edit documentation in R/wiki_utils.R
 \name{w_isValid}
 \alias{w_isValid}
-\title{Check if a Wikidata entity is valid}
+\title{Check if Wikidata entities are valid}
 \usage{
-w_isValid(entity_list, nlimit = 50000)
+w_isValid(entity_list, nlimit = 50000, debug = FALSE)
 }
 \arguments{
 \item{entity_list}{A vector with de Wikidata entities.}
 
 \item{nlimit}{If the number of entities exceeds this number, chunked queries
-are done. This is the number of entities requested in each chunk.}
+are done. This is the number of entities requested in each chunk. Please,
+reduce the default value if error is raised.}
+
+\item{debug}{For debugging purposes (default FALSE). If debug='info'
+information about chunked queries is shown. If debug='query' also the query
+launched is shown.}
 }
 \value{
-A data-frame with three columns: firts, the entity itself, second,
-if that entity is valid in Wikidata (TRUE or FALSE), last, if the entity
-redirects to another Wikidata entity, this entity.
+A data-frame with four columns: entity, valid (TRUE or FALSE),
+instanceof and redirection (if the entity redirects to another Wikidata
+entity, the redirection column contains the last).
 }
 \description{
-Check if the Wikidata entities are valid. A entity is valid if it has a label
-or has a description. If one entity exists but is not valid, is possible that
-it has a redirection to other entity, in that case, the redirection is
-obtained. Other entities may have existed in the past, but have been deleted.
-Duplicated entities in entity_list are deleted before checking. Index of the
-data-frame returned are also set to entity_list.
+A entity is valid if it has a label or has a description. If one entity
+exists but is not valid, is possible that it has a redirection to other
+entity, in that case, the redirection is obtained. Other entities may have
+existed in the past, but have been deleted. The returned dataframe also
+includes the Wikidata class (another Wikidata entity) of which the searched
+entity are instances of. The data-frame no contains labels or descriptions
+about entities: the function \code{w_LabelDesc} can be used for valid entities.
+Duplicated entities are deleted before search. Index of the data-frame
+returned are also set to entity_list.
 }
 \examples{
 \dontrun{
 w_isValid(c("Q9021", "Q115637688", "Q105660123"))
-
-l  <- w_OccupationEntities(Qoc='Q2306091')
-l2 <- append(l, c("Q115637688", "Q105660123"))  # Note: adding two new entities
+# Large list
+l  <- w_SearchByOccupation(Qoc='Q2306091')
+l2 <- append(l$entity, c("Q115637688", "Q105660123"))  # Note: adding two new entities
 v <- w_isValid(l2)
 # Not valid
-v[!v$valid,]
+v[!v$valid, ]
 }
 }
 \author{

@@ -7,7 +7,8 @@
 v_Search(
   CQL_Query,
   mode = c("default", "anyField", "allmainHeadingEl", "allNames", "allPersonalNames",
-    "allTitle")
+    "allTitle"),
+  schema = c("JSON", "brief")
 )
 }
 \arguments{
@@ -29,6 +30,10 @@ MARC records);
 'allTitle' -> 'local.title all "title"'
 Search for titles.
 By 'default', no predefined query will be applied.}
+
+\item{schema}{The recordSchema of the query: if 'brief' (defaults) the
+records returned are more simple. If 'JSON', then de complete cluster records
+are returned.}
 }
 \value{
 A list with the records found.

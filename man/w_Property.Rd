@@ -2,9 +2,16 @@
 % Please edit documentation in R/wiki_utils.R
 \name{w_Property}
 \alias{w_Property}
-\title{Searching for properties of the entity list}
+\title{Get properties of Wikidata entities}
 \usage{
-w_Property(entity_list, Pproperty, langsorder = "en", nlimit = 10000)
+w_Property(
+  entity_list,
+  Pproperty,
+  includeQ = FALSE,
+  langsorder = "en",
+  nlimit = 10000,
+  debug = FALSE
+)
 }
 \arguments{
 \item{entity_list}{A vector with de Wikidata entities.}
@@ -14,27 +21,47 @@ For example, is Pproperty="P21", the results contain information of the sex
 of entities. If Pproperty="P21|P569" also searches for birthdate. If
 Pproperty='P21|P569|P214' also searches for VIAF identifier.}
 
+\item{includeQ}{If the value is TRUE the function returns the Wikidata entity
+(Qxxx) of the Pproperty. If also \code{langsorder} has language(s), the labels, if
+any, are returned too. Note that includeQ is only effective if \code{Pproperty}
+corresponds with a Wikidata entity, else the same values that label are
+returned.}
+
 \item{langsorder}{Order of languages in which the information will be
 returned, separated with '|'. If no information is given in the first
-language, next is used. This parameter is mandatory, at least one language is
-required, default, 'en'}
+language, next is used. This parameter is mandatory if parameter \code{includeQ}
+if FALSE. If includeQ=TRUE and langsorder='' no labels are returned.}
 
 \item{nlimit}{If the number of entities exceeds this number, chunked queries
-are done. This is the number of entities requested in each chunk.}
+are done. This is the number of entities requested in each chunk. Please,
+reduce the default value if error is raised.}
+
+\item{debug}{For debugging purposes (default FALSE). If debug='info'
+information about chunked queries is shown. If debug='query' also the query
+launched is shown.}
 }
 \value{
-A data-frame with 'entity', 'entityLabel', 'entityDescription' and,
-additionally, the properties of Pproperty. Index of the data-frame is also
-set to entity_list.
+A data-frame with the entity, the entities of the properties and the
+labels in langsorder for them.
 }
 \description{
-Search the entities of the entity_list for property or properties. Return the
-properties in langsorder order. Duplicated entities are deleted before search.
+Search the entities of the \code{entity_list} for property or properties. If
+searched properties can have more than one language, then the parameter
+\code{langsorder} set the order of language used. If parameter \code{includeQ} is TRUE,
+also is returned the Wikidata entities for the properties. The Wikidata class
+of which the entities are instances of are returned too. Duplicated entities
+are deleted before search. Index of the data-frame is also set to
+entity_list.
 }
 \examples{
 \dontrun{
-l <- w_OccupationEntities(Qoc='Q2306091')
-p <- w_Property(l, Pproperty = 'P21|P569|P214', langsorder = 'es|en')
+w_Property(c("Q1252859", "Q712609", "Q381800"), Pproperty='P21|P569|P214', langsorder='en|es')
+# Large list
+df <- w_SearchByOccupation(Qoc='Q2306091') # ~ 20000
+l <- df$entity
+p <- w_Property(l, Pproperty='P21|P569|P214', langsorder='es|en', debug='info')
+# Get birth-place (P19)
+p <- w_Property(l, Pproperty='P19', langsorder='es|en', includeQ=TRUE, debug='info')
 }
 }
 \author{

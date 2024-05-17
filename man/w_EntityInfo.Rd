@@ -2,54 +2,70 @@
 % Please edit documentation in R/wiki_utils.R
 \name{w_EntityInfo}
 \alias{w_EntityInfo}
-\title{Get some personal properties of one Wikidata entity}
+\title{Get information about a Wikimedia entity (human or film)}
 \usage{
 w_EntityInfo(
-  entity,
-  langsorder = "en",
+  entity_list,
+  mode = "default",
+  langsorder = "",
   wikilangs = "",
-  format = "reduced",
-  mode = c("default", "tiny", "film")
+  nlimit = MW_LIMIT,
+  debug = FALSE
 )
 }
 \arguments{
-\item{entity}{The Wikidata entity to search for properties. Only one entity
-is allowed.}
+\item{entity_list}{The Wikidata entities to search for properties (person or
+films.}
+
+\item{mode}{In "default" mode, the list of entities is expected to correspond
+to person, obtaining information related to person. If the mode is "film",
+information related to films will be requested.}
 
 \item{langsorder}{Order of languages in which the information will be
-returned, separated with '|'. If no information exists in the first language,
-next is used. This parameter is mandatory, at least one language is required,
-default, 'en'.
-Note: sometimes not label in any language of langsorder is assigned to an
-entity, so an additional search is used to obtain almost one label for it
-(?entitylab) with LIMIT 1.}
+returned, separated with '|'. If no information is given in the first
+language, next is used. For label and description, English is used for
+language failback, if they are not in English, then information is returned
+in any else language. The language for label and description are also
+returned. If langsorder=='', then no other information than labels or
+descriptions are returned in any language, only Wikidata entities, else,
+use the order in this parameter to retrieve information.}
 
-\item{wikilangs}{List of languages to limit the search of Wikipedia pages,fi
+\item{wikilangs}{List of languages to limit the search of Wikipedia pages,
 using "|" as separator. Wikipedias pages are returned in same order as
 languages in this parameter. If wikilangs='' the function returns Wikipedia
 pages in any language, not sorted.}
 
-\item{format}{Wikipedia address format. By default is reduced, Otherwise, format is regular.}
+\item{nlimit}{If the number of entities exceeds this number, chunked queries
+are done. This is the number of entities requested in each chunk. Please,
+reduce the default value if error is raised.}
 
-\item{mode}{The mode to obtain results: 'tiny' less properties are requested
-and less checks are done; 'film' gets some properties of the Wikidata
-"entity" related to information about film ('default' by default).}
+\item{debug}{For debugging (info or query)}
 }
 \value{
-A data-frame with the properties of the entity.
+A data-frame with the properties of the entity. Also index is set to
+entity_list.
 }
 \description{
-Gets some properties of the Wikidata "entity" related to birth and death
-dates, places, occupations, works, education, awards, identifier in some
-libraries, Wikipedia page titles (which can be limited to the languages in
-the "wikilangs" parameter), etc.
+Get labels, descriptions and some properties of the Wikidata entities in
+entity_list, for person or films. If person, the information returned is
+about labels, descriptions, birth and death dates and places, occupations,
+works, education sites, awards, identifiers in some databases, Wikipedia page
+titles (which can be limited to the languages in the \code{wikilangs} parameter,
+etc. If films, information is about title, directors, screenwriter,
+castmember, producers, etc.
 }
 \examples{
-df1 <- w_EntityInfo(entity='Q134644', langsorder = 'es|en')
-df2 <- w_EntityInfo(entity='Q134644', langsorder = 'es|en', mode = 'tiny')
 \dontrun{
-films <- w_EntityInfo(entity=c('Q180098','Q151895'), langsorder='es|en',
-wikilangs='es|fr|en', mode='film')
+df <- w_EntityInfo(entity_list='Q134644', langsorder='es|en')
+df <- w_EntityInfo(entity_list='Q134644', langsorder='es|en', wikilangs='es|en|fr')
+df <- w_EntityInfo(c('Q270510', 'Q1675466', 'Q24871'), mode='film',
+                   langsorder='es|en', wikilangs='es|en|fr')
+# Search string 'abba' inlabel
+w <- w_SearchByLabel('abba', mode='inlabel', langsorder = '', instanceof = 'Q5')
+df <- w_EntityInfo(w$entity, langsorder='en', wikilangs='en|es|fr', debug='info')
+# Search 3D films
+w <- w_SearchByInstanceof(instanceof='Q229390', langsorder = 'en|es', debug = 'info')
+df <- w_EntityInfo(w$entity, mode="film", langsorder='en', wikilangs='en', debug='info')
 }
 }
 \author{

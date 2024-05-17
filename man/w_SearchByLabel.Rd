@@ -2,44 +2,75 @@
 % Please edit documentation in R/wiki_utils.R
 \name{w_SearchByLabel}
 \alias{w_SearchByLabel}
-\title{Search Wikidata entities}
+\title{Search Wikidata entities by string (usually labels)}
 \usage{
 w_SearchByLabel(
   string,
-  langsorder = "en",
-  lang = "",
+  mode = "inlabel",
+  langs = "",
+  langsorder = "",
   instanceof = "",
   Pproperty = "",
-  mode = c("exact", "startswith", "inlabel")
+  debug = FALSE
 )
 }
 \arguments{
-\item{string}{string (label or altLabel) to search.}
+\item{string}{String (label or altLabel) to search. Note that single
+quotation mark must be escaped (string="O\\'Donell"), otherwise an error will
+be raised.}
+
+\item{mode}{The mode to perform search. Default 'inlabel' mode.
+\itemize{
+\item 'exact' for an exact search in label or altLabel using case sensitive
+search and differentiate diacritics. Languages in the parameter \code{lang} are
+used, so this parameter is mandatory using this mode.
+\item 'startswith' for entities which label or altLabel starts with the string,
+similar to a wildcard search "string*". The string is searched in label in
+the languages of \code{lang} parameter, but in any language in altLabel, so
+parameter \code{lang} is also mandatory in this mode. Diacritics and case are
+ignored in this mode.
+\item 'cirrus' search words in any order in any part of the entity (which must
+be a string), not only in label or altLabel. Diacritics and case are
+ignored. It is a full text search using the ElasticSearch engine.
+Phrase search can be used if launched with double quotation marks, for
+example, string='"Antonio Saura"'. Also fuzzy search is possible, for
+example, string="algermon~1" or string="algernon~2". Also REGEX search can
+be used (but it is a very limited functionality) using this format:
+string="insource:/regex/i" (i: is for ignore case, optional).
+In this mode, parameter \code{langs} is ignored.
+\item 'inlabel' is an special case of 'cirrus' search for matching whole words
+(in any order) in any position in label or altLabel. With this mode no
+fuzzy search can be used, but some languages can be set in the \code{lang}
+parameter.
+Modes 'inlabel' and 'cirrus' use the CirrusSearch of the Wikidata API.
+Please, for more examples, see https://www.mediawiki.org/wiki/Help:CirrusSearch
+and https://www.mediawiki.org/wiki/Help:Extension:WikibaseCirrusSearch
+}}
+
+\item{langs}{Languages in which the information will be searched, using "|"
+as separator. In 'exact' or 'startswith' modes this parameter is mandatory,
+at least one language is required. In 'inlabel'mode, if the parameter \code{langs}
+is set, then the search is restricted to languages in this parameter,
+otherwise any language. In 'cirrus' mode this parameter is ignored.}
 
 \item{langsorder}{Order of languages in which the information will be
-returned, separated with '|'. If no information is given in the first
-language, next is used. This parameter is mandatory, at least one language is
-required, default, 'en'.}
-
-\item{lang}{The language to search, only one. If lang="" and mode="inlabel",
-search is in any language. Mandatory in mode="startswith", no effects in
-mode="exact".}
+returned, using "|" as separator. If \code{langsorder}='', no labels or
+descriptions will be returned, otherwise, they are returned in the order of
+languages in this parameter, if any.}
 
 \item{instanceof}{Wikidata entity of which the entities searched for are an
-example or member of it (class). For example, if instanceof=Q5 the
+example or member of it (class). For example, if instanceof='Q5' the
 search are filtered to Wikidata entities of class Q5 (human). Some
 entity classes are allowed, separated with '|'.}
 
-\item{Pproperty}{Wikidata properties, separated with '|', to optionally
-include in the search. For example, is Pproperty="P21", the results
-include information of the sex of entities found as STRING.}
+\item{Pproperty}{Wikidata properties to search, separated with '|', mandatory.
+For example, is Pproperty="P21", the results contain information of the sex
+of entities. If Pproperty="P21|P569" also searches for birthdate. If
+Pproperty='P21|P569|P214' also searches for VIAF identifier.}
 
-\item{mode}{The mode to perform search: 'exact' for search using case
-sensitive and differentiate diacritics; 'startswith' for entities which label
-or altLabel starts with "string", similar to a wildcard search "string*",
-searchs "string" in language "lang" in label, but in any language in
-altLabel; 'inlabel' for matching whole words in any position. ('exact' by
-default).}
+\item{debug}{For debugging purposes (default FALSE). If debug='query' the
+query launched is shown. If debug='count' the function only returns the
+number of entities with that occupation.}
 }
 \value{
 A data-frame with 'entity', 'entityLabel', 'entityDescription',
@@ -47,23 +78,21 @@ A data-frame with 'entity', 'entityLabel', 'entityDescription',
 and additionally the properties of Pproperty.
 }
 \description{
-Search Wikidata entities in label and altLabel ("Also known as")
+Search Wikidata entities in label and altLabel ("Also known as") or in any
+part of the entity using different approaches.
 }
 \examples{
-df <- w_SearchByLabel(string='Iranzo', langsorder='es|en', mode="exact")
-df <- w_SearchByLabel(string='Iranzo', langsorder='es|en', instanceof = 'Q5|Q101352', mode="exact")
+\dontrun{
+df <- w_SearchByLabel(string='Iranzo', mode="exact", langs='es|en')
+df <- w_SearchByLabel(string='Iranzo', mode="exact", langs='es|en',
+                      langsorder='es|en', instanceof = 'Q5|Q101352')
 ## Search entities which label or altLabel starts with "string"
-df <- w_SearchByLabel(string='Iranzo', lang='en', langsorder='es|en',
-mode='startswith')
-df <- w_SearchByLabel(string='Iranzo', lang='en', langsorder='en',
-instanceof = 'Q5', Pproperty = 'P21|P569|P570', mode='startswith')
+df <- w_SearchByLabel(string='Iranzo', mode='startswith', lang='en', langsorder='es|en')
 ## Search in any position in Label or AltLabel (diacritics and case are ignored)
-# If lang=='' search in any language, else the search is performed only in the
-# language indicated.
-df <- w_SearchByLabel(string='Iranzo', langsorder='es|en', mode='inlabel')
-# Search in Chinese (Simplified) (language code: zh):
-df <- w_SearchByLabel(string='Iranzo', langsorder='zh|es', lang='zh',
-mode='inlabel')
+df <- w_SearchByLabel(string='Iranzo', mode='inlabel', langsorder='es|en')
+## Search in Chinese (Simplified) (language code: zh) in any part of entity:
+df <- w_SearchByLabel(string='\u4F0A\u5170\u4f50', mode='cirrus', langsorder='es|zh|en')
+}
 }
 \author{
 Angel Zazo, Department of Computer Science and Automatics, University of Salamanca

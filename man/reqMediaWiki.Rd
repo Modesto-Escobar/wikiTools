@@ -4,12 +4,19 @@
 \alias{reqMediaWiki}
 \title{Uses httr package to retrieve responses using the MediaWiki API.}
 \usage{
-reqMediaWiki(query, project = "en.wikipedia.org", method = "GET", attempts = 2)
+reqMediaWiki(
+  query,
+  project = "en.wikipedia.org",
+  method = "GET",
+  attempts = 2,
+  debug = FALSE
+)
 }
 \arguments{
 \item{query}{A list with de (key, values) pairs with the search.
 Note that if titles are included in the query, the MediaWiki API has a
-limit of 50 titles en each query. In that case a error response is achieved.}
+limit of 50 titles in each query. If number of titles is greater than this
+limit a error is raised.}
 
 \item{project}{The Wikimedia project to search. Default en.wikipedia.org.}
 
@@ -21,9 +28,13 @@ GET requests if possible, not POST, as the latter are not cacheable."}
 \item{attempts}{On ratelimit errors, the number of times the request is
 retried using a 60 seconds interval between retries. Default 2. If 0 no
 retries are done.}
+
+\item{debug}{For debugging purposes (default FALSE). If debug='info'
+information about chunked queries is shown. If debug='query' also the query
+launched is shown.}
 }
 \value{
-The response in JSON format or NULL on errors.
+The response in JSON format, raise exception on errors.
 }
 \description{
 For MediaWiki requests only user_agent is necessary in the request headers.

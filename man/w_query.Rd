@@ -2,7 +2,7 @@
 % Please edit documentation in R/wiki_utils.R
 \name{w_query}
 \alias{w_query}
-\title{Responses from Wikidata Query Service}
+\title{Response from Wikidata Query Service}
 \usage{
 w_query(sparql_query, format = "csv", method = "GET", limitRequester = FALSE)
 }
@@ -22,7 +22,7 @@ Default 'GET'.}
 The response in selected format or NULL on errors.
 }
 \description{
-Retrieves responses from Wikidata Query Service (WDQS). Uses ratelimitr if
+Retrieve responses from Wikidata Query Service (WDQS). Uses ratelimitr if
 param limitRequester = TRUE.
 }
 \author{

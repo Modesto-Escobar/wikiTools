@@ -4,7 +4,7 @@
 \alias{checkTitles}
 \title{checkTitles(titles)
 Check if titles are valid. Return TRUE is all titles are valid, else FALSE.
-See:See https://en.wikipedia.org/wiki/Wikipedia:Page_name#Technical_restrictions_and_limitations}
+See https://en.wikipedia.org/wiki/Wikipedia:Page_name#Technical_restrictions_and_limitations}
 \usage{
 checkTitles(titles)
 }
@@ -14,5 +14,5 @@ checkTitles(titles)
 \description{
 checkTitles(titles)
 Check if titles are valid. Return TRUE is all titles are valid, else FALSE.
-See:See https://en.wikipedia.org/wiki/Wikipedia:Page_name#Technical_restrictions_and_limitations
+See https://en.wikipedia.org/wiki/Wikipedia:Page_name#Technical_restrictions_and_limitations
 }

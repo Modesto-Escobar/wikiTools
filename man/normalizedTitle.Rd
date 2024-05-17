@@ -2,23 +2,26 @@
 % Please edit documentation in R/wiki_utils.R
 \name{normalizedTitle}
 \alias{normalizedTitle}
-\title{normalizedTitle(title, q)
-Return de normalized or redirect title (also normalized) from the query part
-of the JSON response of a MediaWiki search that uses titles.}
+\title{Return the normalized and redirect title from the response}
 \usage{
 normalizedTitle(title, q)
 }
 \arguments{
-\item{title}{the title to possibly found in q.}
+\item{title}{The title likely to be found in q.}
 
-\item{q}{(j$query) Query part of the JSON response from a Mediawiki search.}
+\item{q}{The query part of the JSON response (j['query']) from a Mediawiki
+search. Note that this part contains some titles, so it is necessary to
+search the original "title" in that part.}
 }
 \value{
-The normalized or redirect title found in q for title, else title
-itself.
+A vector with the normalized or redirected page title (target, also
+normalized) found for the title.
 }
 \description{
-normalizedTitle(title, q)
-Return de normalized or redirect title (also normalized) from the query part
-of the JSON response of a MediaWiki search that uses titles.
+Return the normalized and the redirect title (also normalized), if any, from
+the query part of the JSON response of a MediaWiki search. The response of
+the MediaWiki API query (https://www.mediawiki.org/wiki/API:Query) includes
+original page titles and possibily normalized and redirected titles, if the
+API needs to obtain them. For a original title, this function returns them,
+if any.
 }

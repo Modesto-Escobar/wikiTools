@@ -7,20 +7,20 @@
 reqWDQS(sparql_query, format = "json", method = "GET")
 }
 \arguments{
-\item{sparql_query}{A string with the query in SPARQL language.}
+\item{sparql_query}{A string with the query in SPARQL language (SELECT query).}
 
 \item{format}{A string with the query response format, mandatory. See
 https://www.mediawiki.org/wiki/Wikidata_Query_Service/User_Manual#SPARQL_endpoint.
 Only  'json', 'xml' or 'csv' formats are allowed, default 'json'.}
 
 \item{method}{The method used in the httr request, GET or POST, mandatory.
-Default 'GET'.}
+Default 'GET'. Use 'POST' method for long SELECT clauses.}
 }
 \value{
 The response in the format selected. Please check httr::stop_for_status(response)
 }
 \description{
-Retrieves responses from Wikidata Query Service (WDQS)
+Retrieve responses from Wikidata Query Service (WDQS)
 }
 \note{
 For short queries GET method is better, POST for long ones. Only GET queries as cached.
