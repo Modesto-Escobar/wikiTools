@@ -19,7 +19,8 @@ films.}
 
 \item{mode}{In "default" mode, the list of entities is expected to correspond
 to person, obtaining information related to person. If the mode is "film",
-information related to films will be requested.}
+information related to films will be requested. If the mode is "tiny" less
+properties are requested.}
 
 \item{langsorder}{Order of languages in which the information will be
 returned, separated with '|'. If no information is given in the first

@@ -1466,7 +1466,8 @@ w_SearchByLabel <- function(string, mode='inlabel', langs="", langsorder='',
 #' films.
 #' @param mode In "default" mode, the list of entities is expected to correspond
 #' to person, obtaining information related to person. If the mode is "film",
-#' information related to films will be requested.
+#' information related to films will be requested. If the mode is "tiny" less
+#' properties are requested.
 #' @param langsorder Order of languages in which the information will be
 #' returned, separated with '|'. If no information is given in the first
 #' language, next is used. For label and description, English is used for
@@ -1856,7 +1857,16 @@ w_EntityInfo <- function(entity_list, mode='default', langsorder='',
     }
   }
   # Finally, convert the dict of dicts to a dataframe
-  df <- do.call(rbind, lapply(d, function(x) x$as_list()))
+  df <- as.data.frame(do.call(rbind,lapply(d, function(x) unlist(x$as_list()))))
+
+  if(mode=="tiny"){
+    tinycolumns <- c('entity', 'labellang', 'label', 'descriptionlang', 'description', 'sex',
+        'bdate', 'byear', 'bplace', 'bplaceLat', 'bplaceLon', 'bcountry',
+        'ddate', 'dyear', 'dplace', 'dplaceLat', 'dplaceLon', 'dcountry',
+        'occupationQ', 'occupation', 'viafid', 'bneid', 'mncarsid', 'pic', 'wikipedias')
+    df <- df[,intersect(tinycolumns,colnames(df))]
+  }
+
   return(df)
 }
 
