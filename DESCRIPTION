@@ -1,13 +1,13 @@
 Package: wikiTools
 Type: Package
-Version: 1.2.6
-Date: 2024-05-24
+Version: 1.2.7
+Date: 2024-07-25
 Title: Tools for Wikidata and Wikipedia
 Description: A set of wrappers intended to check, read and download information from the Wikimedia sources. It is specifically created to work with names of celebrities, in which case their information and statistics can be downloaded. Additionally, it also builds links and snippets to use in combination with the function gallery() in netCoin package.
 License: GPL-3
 Depends: R (>= 3.5.0)
 Encoding: UTF-8
-Imports: httr, jsonlite, ratelimitr, collections
+Imports: curl, httr, jsonlite, ratelimitr, collections
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 NeedsCompilation: no

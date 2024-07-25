@@ -13,10 +13,15 @@
 #' validUrl(url="https://es.wikipedia.org/wiki/Weber,_Max", time=2)
 #' @export
 validUrl <- function(url, time=2){
-  con <- url(url)
-  check <- suppressWarnings(try(open.connection(con,open="rt",timeout=time),silent=T)[1])
-  suppressWarnings(try(close.connection(con),silent=T))
-  ifelse(is.null(check),TRUE,FALSE)
+  if(curl::has_internet()){
+    con <- url(url)
+    check <- suppressWarnings(try(open.connection(con,open="rt",timeout=time),silent=T)[1])
+    suppressWarnings(try(close.connection(con),silent=T))
+    ifelse(is.null(check),TRUE,FALSE)
+  }else{
+    message("No internet connection.")
+    return(FALSE)
+  }
 }
 
 # urltoHtml ----
@@ -225,13 +230,19 @@ searchWiki <- function(name, language=c("en", "es", "fr", "it", "de", "pt", "ca"
 
 # find_item ----
 find_item <- function(name, language = "en", limit = 10){
-    response <- httr::GET(url="https://www.wikidata.org/w/api.php",
-      query=list(action = "wbsearchentities", type = "item",
-      language = language, limit = limit, search = name, format = 'json'))
-    httr::stop_for_status(response)
-    response_text <- httr::content(x = response, as = "text")
-    parsed_text <- jsonlite::fromJSON(txt = response_text, simplifyVector = FALSE)
-    i <- parsed_text$search
+    url <- "https://www.wikidata.org/w/api.php"
+    if(curl::has_internet() && !httr::http_error(url)){
+      response <- httr::GET(url = url,
+        query=list(action = "wbsearchentities", type = "item",
+        language = language, limit = limit, search = name, format = 'json'))
+      httr::stop_for_status(response)
+      response_text <- httr::content(x = response, as = "text")
+      parsed_text <- jsonlite::fromJSON(txt = response_text, simplifyVector = FALSE)
+      return(parsed_text$search)
+    }else{
+      message("No internet connection or data source broken.")
+      return(NULL)
+    }
 }
 
 # getWikiInf ----
@@ -529,8 +540,12 @@ extractWiki <- function(names, language=c("en", "es", "fr", "de", "it"), plain=F
     json <- list(query=list(pages=-1))
     explain <- ifelse(plain, "&explaintext", "")
     for(I in 1:length(language)) {
-      json <- jsonlite::fromJSON(paste0("https://", language[I], ".wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro", explain,"&redirects=1&titles=",name))
-      if(names(json$query$pages)!="-1") break
+      json <- tryCatch({
+        jsonlite::fromJSON(paste0("https://", language[I], ".wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro", explain,"&redirects=1&titles=",name))
+      }, error=function(x){
+        message("No internet connection or data source broken.")
+      })
+      if(length(json) && names(json$query$pages)!="-1") break
     }
     ascii <- json[["query"]][["pages"]][[1]][["extract"]]
     ascii <- gsub("\\[.*?\\]","", ascii)

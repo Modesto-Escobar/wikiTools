@@ -54,6 +54,7 @@ doChunks <- function(f, x, chunksize, ...){
   l <- list(...)  # to obtain `debug` parameter
   n <- length(x)
   nlim <- as.integer(n/chunksize)
+  output <- NULL
   for (k in 0:nlim){
     offset <- k*chunksize
     if ((offset+1) > n)
@@ -114,16 +115,22 @@ reqWDQS <- function(sparql_query, format='json', method='GET') {
   else if (format=='csv')  wdqs_format <- "text/csv"
   else stop(paste0("ERROR: format '", format, "' is not supported."))
 
+  url <- 'https://query.wikidata.org/sparql'
+  if(!curl::has_internet() || httr::http_error(url)){
+    message("No internet connection or data source broken.")
+    return(NULL)
+  }
+
   if (method=='GET')
     httr::GET(
-      url = 'https://query.wikidata.org/sparql',
+      url = url,
       query = list(query = sparql_query),
       httr::user_agent(user_agent),
       httr::add_headers(Accept = wdqs_format)
     )
   else if (method=='POST')
     httr::POST(
-      url = 'https://query.wikidata.org/sparql',
+      url = url,
       body = list(query = sparql_query),
       httr::add_headers(Accept = wdqs_format, user_agent = user_agent),
       encode = 'form'
@@ -159,6 +166,9 @@ w_query <- function(sparql_query, format="csv", method="GET",
   tryCatch(
     {
       r <- reqWDQS_rated(sparql_query, format=format, method=method)
+      if(is.null(r)){
+        return(NULL)
+      }
       httr::stop_for_status(r)
       content <- httr::content(r, as = "text", encoding = "UTF-8")
       rtype <- httr::http_type(r)
@@ -244,6 +254,9 @@ WHERE {
     cat(query, file=stderr())
   #
   r <- w_query(query, format='csv', method='POST')
+  if(is.null(r)){
+    return(NULL)
+  }
   r$entity <- sub('^http://www.wikidata.org/entity/', '', r$entity)
   r$instanceof <- gsub('http://www.wikidata.org/entity/', '', r$instanceof)
   #
@@ -344,6 +357,9 @@ WHERE {
     cat(query, file=stderr())
   #
   r <- w_query(query, format='csv', method='POST')
+  if(is.null(r)){
+    return(NULL)
+  }
   r$entity <- sub('^http://www.wikidata.org/entity/', '', r$entity)
   r$instanceof <- gsub('http://www.wikidata.org/entity/', '', r$instanceof)
   # Filter instanceof
@@ -441,6 +457,9 @@ WHERE {
     cat(query, file=stderr())
   #
   r <- w_query(query, format = "csv", method = 'POST')
+  if(is.null(r)){
+    return(NULL)
+  }
   #
   for (q in c('entity', 'instanceof', 'redirection'))
     r[[q]] <- gsub('http://www.wikidata.org/entity/', '', r[[q]])
@@ -556,6 +575,9 @@ WHERE {
     cat(query, file=stderr())
   #
   r <- w_query(query, format = "csv", method = 'POST')
+  if(is.null(r)){
+    return(NULL)
+  }
   if (includeQ) {
     for (p in props)
       r[[p]] <- gsub('http://www.wikidata.org/entity/', '', r[[p]])
@@ -656,6 +678,9 @@ WHERE {
     cat(query, file=stderr())
   #
   r <- w_query(query, format='csv', method='POST')
+  if(is.null(r)){
+    return(NULL)
+  }
   r$place   <- sub('^http://www.wikidata.org/entity/', '', r$place)
   r$country <- sub('^http://www.wikidata.org/entity/', '', r$country)
   #
@@ -741,6 +766,9 @@ WHERE {
     cat(query, file=stderr())
   #
   r <- w_query(query, format='csv', method='POST')
+  if(is.null(r)){
+    return(NULL)
+  }
   r$entity <- sub('^http://www.wikidata.org/entity/', '', r$entity)
   rownames(r) <- r$entity
   return(r)
@@ -801,6 +829,9 @@ w_SearchByOccupation <- function(Qoc, mode=c('default','count','wikipedias'),
   # First: known the number of entities
   query <- paste0('SELECT (COUNT(DISTINCT ?entity) AS ?count) WHERE {?entity wdt:P106 wd:',Qoc,'}')
   d <- w_query(query, method='GET', format="csv")
+  if(is.null(d)){
+    return(NULL)
+  }
   nq <- d$count[1]
   #
   if (debug!=FALSE) {
@@ -828,6 +859,7 @@ w_SearchByOccupation <- function(Qoc, mode=c('default','count','wikipedias'),
   nlim <- as.integer(nq/nlimit)
   if (nlim>0 && debug!=FALSE)
     cat(paste0("INFO: The number of entities (",nq ,") exceeds chunksize (", nlimit, ").\n"), file=stderr())
+  output <- NULL
   for (k in 0:nlim){
     offset <- k*nlimit
     if ((offset+1) > nq)
@@ -855,6 +887,9 @@ WHERE {
       cat(query, file=stderr())
     #
     r <- w_query(query, format='csv', method='POST')
+    if(is.null(r)){
+      next
+    }
     r$entity  <- gsub('http://www.wikidata.org/entity/', '', r$entity)
     r$instanceof  <- gsub('http://www.wikidata.org/entity/', '', r$instanceof)
     rownames(r) <- r$entity
@@ -980,6 +1015,9 @@ WHERE {
     cat(query, file=stderr())
   #
   r <- w_query(query, format='csv', method='POST')
+  if(is.null(r)){
+    return(NULL)
+  }
 
   r$entity  <- gsub('http://www.wikidata.org/entity/', '', r$entity)
   r$instanceof  <- gsub('http://www.wikidata.org/entity/', '', r$instanceof)
@@ -1078,6 +1116,9 @@ w_SearchByAuthority <- function(Pauthority, langsorder='', instanceof='', nlimit
   # First: known the number of entities
   query <- paste0('SELECT (COUNT(DISTINCT ?entity) AS ?count) WHERE {?entity wdt:',Pauthority,' [].}')
   d <- w_query(query, method='GET', format="csv")
+  if(is.null(d)){
+    return(NULL)
+  }
   nq <- d$count[1]
   #
   if (debug=='count') {
@@ -1088,6 +1129,7 @@ w_SearchByAuthority <- function(Pauthority, langsorder='', instanceof='', nlimit
   nlim <- as.integer(nq/nlimit)
   if (nlim>0 && debug!=FALSE)
     cat(paste0("INFO: The number of entities (", nq, ") exceeds chunksize (", nlimit, ").\n"), file=stderr())
+  output <- NULL
   for (k in 0:nlim){
     offset <- k*nlimit
     if ((offset+1) > nq)
@@ -1116,6 +1158,9 @@ WHERE {
       cat(query, file=stderr())
     #
     r <- w_query(query, format='csv', method='POST')
+    if(is.null(r)){
+      next
+    }
     r$entity  <- gsub('http://www.wikidata.org/entity/', '', r$entity)
     r$instanceof  <- gsub('http://www.wikidata.org/entity/', '', r$instanceof)
     rownames(r) <- r$entity
@@ -1211,6 +1256,9 @@ w_SearchByInstanceof <- function(instanceof, langsorder='', nlimit=2500, debug=F
   }
 
   d <- w_query(query, method='GET', format="csv")
+  if(is.null(d)){
+    return(NULL)
+  }
   nq <- d$count[1]
   #
   if (debug=='count') {
@@ -1221,6 +1269,7 @@ w_SearchByInstanceof <- function(instanceof, langsorder='', nlimit=2500, debug=F
   nlim <- as.integer(nq/nlimit)
   if (nlim>0 && debug!=FALSE)
     cat(paste0("INFO: The number of entities (", nq, ") exceeds chunksize (", nlimit, ").\n"), file=stderr())
+  output <- NULL
   for (k in 0:nlim){
     offset <- k*nlimit
     if ((offset+1) > nq)
@@ -1247,6 +1296,9 @@ WHERE {
       cat(query, file=stderr())
     #
     r <- w_query(query, format='csv', method='POST')
+    if(is.null(r)){
+      next
+    }
     r$entity  <- gsub('http://www.wikidata.org/entity/', '', r$entity)
     r$instanceof  <- gsub('http://www.wikidata.org/entity/', '', r$instanceof)
     rownames(r) <- r$entity
@@ -1434,6 +1486,9 @@ w_SearchByLabel <- function(string, mode='inlabel', langs="", langsorder='',
     cat(query, file=stderr())
   #
   r <- w_query(query, format = "csv", method="GET")
+  if(is.null(r)){
+    return(NULL)
+  }
   if (nrow(r) == 0)
     return(r)
   #
@@ -1922,6 +1977,10 @@ reqMediaWiki <- function(query, project='en.wikipedia.org', method='GET',
   }
   #
   url = paste0('https://', project, "/w/api.php")
+  if(!curl::has_internet() || httr::http_error(url,query = query)){
+    message("No internet connection or data source broken.")
+    return(NULL)
+  }
   nt <- 0
   tryCatch( {
     repeat {
@@ -2181,6 +2240,7 @@ m_WikidataEntity <- function(titles, project='en.wikipedia.org',
   # Check the limit on number of titles of Wikidata API (50 titles)
   n <- length(titles)
   nlimit <- 50
+  output <- NULL
   if (n > nlimit) {
     cat(paste0("INFO: The number of titles (", n,") exceeds Wikipedia API limit (",
                nlimit,"): doing chunked queries.\n"),
@@ -2370,6 +2430,7 @@ m_PagePrimaryImage <- function(titles, project="en.wikipedia.org") {
   # Check the limit on number of titles of Wikidata API (50 titles)
   n <- length(titles)
   nlimit = 50
+  output <- NULL
   if (n > nlimit) {
     cat(paste0("INFO: The number of titles (", n,") exceeds Wikipedia API limit (",
                nlimit,"): doing chunked queries.\n"),
@@ -2479,6 +2540,7 @@ m_PageFiles <- function(titles, project = "en.wikipedia.org",
   # Check the limit on number of titles of Wikidata API (50 titles)
   n <- length(titles)
   nlimit = 50
+  output <- NULL
   if (n > nlimit) {
     cat(paste0("INFO: The number of titles (", n,") exceeds Wikipedia API limit (",
                nlimit,"): doing chunked queries.\n"),
@@ -2614,11 +2676,16 @@ m_PageFiles <- function(titles, project = "en.wikipedia.org",
 #' @note Used in m_Pageviews
 httrGetJSON <- function(url) {
   # URL must be encode
-  httr::GET(
-    url = URLencode(url),
-    httr::user_agent(user_agent),
-    httr::add_headers(Accept = "application/json")
-  )
+  url <- URLencode(url)
+  if(curl::has_internet() && !httr::http_error(url)){
+    httr::GET(
+      url = url,
+      httr::user_agent(user_agent),
+      httr::add_headers(Accept = "application/json")
+    )
+  }else{
+    message("No internet connection or data source broken.")
+  }
 }
 
 #' Get number of views of a Wikipedia article
@@ -2682,11 +2749,13 @@ m_Pageviews <- function(article, start, end, project="en.wikipedia.org",
   }
   else {
     r <- httrGetJSON_rated(url)
-    httr::stop_for_status(r)
-    content <- httr::content(r, as = "text", encoding = "UTF-8")
-    j <- jsonlite::fromJSON(content, simplifyVector = FALSE)
-    for (v in j$items)
-      a[v$timestamp] <- v$views
+    if(!is.null(r)){
+      httr::stop_for_status(r)
+      content <- httr::content(r, as = "text", encoding = "UTF-8")
+      j <- jsonlite::fromJSON(content, simplifyVector = FALSE)
+      for (v in j$items)
+        a[v$timestamp] <- v$views
+    }
   }
   return(a)
 }
@@ -2758,6 +2827,9 @@ m_XtoolsInfoDefault <- function(article, infotype=c("articleinfo", "prose", "lin
   url <- 'https://xtools.wmcloud.org/api/page'
   url <- paste(url, infotype, project, article, sep="/", collapse = "")
   r <- httrGetJSON_rated(url)
+  if(is.null(r)){
+    return(NULL)
+  }
   httr::stop_for_status(r)
   content <- httr::content(r, as = "text", encoding = "UTF-8")
   d <- jsonlite::fromJSON(content, simplifyVector = FALSE)
@@ -2831,6 +2903,10 @@ m_XtoolsInfoAll <- function(article, project="en.wikipedia.org",
 v_AutoSuggest <- function(author) {
   url <- "https://www.viaf.org/viaf/AutoSuggest"
   query <- list(query = author)
+  if(!curl::has_internet() || httr::http_error(url,query=query)){
+    message("No internet connection or data source broken.")
+    return(NULL)
+  }
   #
   tryCatch(
     {
@@ -2933,6 +3009,10 @@ v_Search <- function(CQL_Query, mode=c('default', 'anyField', 'allmainHeadingEl'
                   recordSchema = recordSchema,
                   startRecord = 1,
                   query = cql_query)
+    if(!curl::has_internet() || httr::http_error(url,query=query)){
+      message("No internet connection or data source broken.")
+      return(NULL)
+    }
     #
     tryCatch(
       {
@@ -2983,8 +3063,13 @@ v_Search <- function(CQL_Query, mode=c('default', 'anyField', 'allmainHeadingEl'
 #' @return The VIAF record cluster in the format indicated in record_format.
 #' @export
 v_GetRecord <- function(viafid, record_format='viaf.json') {
+  url <- paste0("https://viaf.org/viaf/", viafid, '/', record_format)
+  if(!curl::has_internet() || httr::http_error(url)){
+    message("No internet connection or data source broken.")
+    return(NULL)
+  }
   r <- httr::GET(
-    url = url <- paste0("https://viaf.org/viaf/", viafid, '/', record_format),
+    url = url,
     httr::user_agent(user_agent)
   )
   #
