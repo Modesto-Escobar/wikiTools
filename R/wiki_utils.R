@@ -17,7 +17,7 @@ user_agent <- paste('wikiTools Package, ', R.version.string)
 MW_LIMIT <- 50
 
 # VIAF API restriction is 250 maximum returned records.
-# See https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html
+# See https://developer.api.oclc.org/viaf-api#/Authority%20Cluster
 VIAF_LIMIT <- 250
 
 #' Limits the rate at which a function will execute
@@ -2879,7 +2879,7 @@ m_XtoolsInfoAll <- function(article, project="en.wikipedia.org",
 
 
 # VIAF API ----
-# https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html
+# https://developer.api.oclc.org/viaf-api#/Authority%20Cluster
 # --------------------------------------------------------------------------.
 
 #' Suggests VIAF id from a name
@@ -2895,7 +2895,7 @@ m_XtoolsInfoAll <- function(article, project="en.wikipedia.org",
 #'   author: last name, first name\[,\] \[(\[year_of_bird\]\[-year_of_death\])\]
 #' @return A data-frame with four columns from the elements "term", "score",
 #' "nametype" and "viafid" of the Autosuggest API response.
-#' @seealso https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html
+#' @seealso https://developer.api.oclc.org/viaf-api#/Authority%20Cluster
 #' @examples
 #' v_AutoSuggest('Iranzo')
 #' v_AutoSuggest('Esparza, María')
@@ -2937,7 +2937,7 @@ v_AutoSuggest <- function(author) {
 #' of records found is greater than 250 (API restrictions), successive requests
 #' are made.
 #' @param CQL_Query String with the search or a name if mode is specified.
-#' See https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html
+#' See https://developer.api.oclc.org/viaf-api#/Authority%20Cluster
 #' @param mode apply a predefined query:
 #' 'anyField' -> 'cql.any = "string"'
 #' Search preferred Name - names which are the preferred form in an authority
@@ -3061,7 +3061,7 @@ v_Search <- function(CQL_Query, mode=c('default', 'anyField', 'allmainHeadingEl'
 #' record as is.
 #' @param viafid The VIAF identifier.
 #' @param record_format 'viaf.json' (default) or others in
-#' https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html.
+#' https://developer.api.oclc.org/viaf-api#/Authority%20Cluster
 #' @return The VIAF record cluster in the format indicated in record_format.
 #' @export
 v_GetRecord <- function(viafid, record_format='viaf.json') {
