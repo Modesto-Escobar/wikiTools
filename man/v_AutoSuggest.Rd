@@ -30,5 +30,5 @@ v_AutoSuggest('Esparza, María')
 v_AutoSuggest('Escobar, Modesto')
 }
 \seealso{
-https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html
+https://developer.api.oclc.org/viaf-api#/Authority\%20Cluster
 }

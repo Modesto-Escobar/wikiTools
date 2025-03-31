@@ -10,7 +10,7 @@ v_GetRecord(viafid, record_format = "viaf.json")
 \item{viafid}{The VIAF identifier.}
 
 \item{record_format}{'viaf.json' (default) or others in
-https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html.}
+https://developer.api.oclc.org/viaf-api#/Authority\%20Cluster}
 }
 \value{
 The VIAF record cluster in the format indicated in record_format.

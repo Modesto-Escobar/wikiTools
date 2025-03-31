@@ -13,7 +13,7 @@ v_Search(
 }
 \arguments{
 \item{CQL_Query}{String with the search or a name if mode is specified.
-See https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html}
+See https://developer.api.oclc.org/viaf-api#/Authority\%20Cluster}
 
 \item{mode}{apply a predefined query:
 'anyField' -> 'cql.any = "string"'

@@ -321,8 +321,6 @@ v_AutoSuggest('Escobar, Modesto')
 #### v_Search
 Search using CQL_Query
 
-See https://www.oclc.org/developer/api/oclc-apis/viaf/authority-cluster.en.html
-
 ```{r echo=TRUE}
 # Auxiliary function that extracts specific information from each record.
 showVIAF <- function(r) {
