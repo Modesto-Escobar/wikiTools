@@ -928,10 +928,10 @@ WHERE {
 #' databases can be also used in the parameter 'Pauthority':
 #'
 #' library   : VIAF, LC,   BNE , ISNI, JPG,  ULAN, BNF,  GND, DNB,
-#' Pauthority: P214, P244, P950, P213, P245, P245, P268, P227,P227,
+#' Pauthority: P214, P244, P950, P213, P245, P245, P268, P227, P1292
 #'
-#' library   : SUDOC, NTA,  J9U,   ELEM,  NUKAT, MNCARS
-#' Pauthority: P269, P1006, P8189, P1565, P1207, P4439
+#' library   : SUDOC, NTA,  J9U,   ELEM,  NUKAT, MNCARS, RAH
+#' Pauthority: P269, P1006, P8189, P1565, P1207, P4439, P13371
 #'
 #' @param langsorder Order of languages in which the information will be
 #' returned, separated with '|'. If no information is given in the first
@@ -960,11 +960,11 @@ w_SearchByIdentifiers <- function(id_list, Pauthority, langsorder='', nlimit=300
   authorities <- c('P214', 'P244', 'P950', 'P213', 'P245', 'P245', 'P268',
                    'P227', 'P227', 'P269', 'P269', 'P1006', 'P8189',
                    'P1565', 'P1207', 'P3065', 'P8179', 'P4787', 'P1015',
-                   'P1015', 'P9984','P9984', 'P7293', 'P409', 'P4439')
+                   'P1015', 'P9984','P9984', 'P7293', 'P409', 'P4439', 'P13371')
   names(authorities) <- c('VIAF', 'LC', 'BNE', 'ISNI', 'JPG', 'ULAN', 'BNF',
                           'GND', 'DNB', 'SUDOC', 'idRefID', 'NTA', 'J9U',
                           'ELEM', 'NUKAT', 'RERO', 'CAOONL', 'NII', 'BIBSYS',
-                          'NORAF', 'BNC', 'CANTIC', 'PLWABN', 'NLA', 'MNCARS')
+                          'NORAF', 'BNC', 'CANTIC', 'PLWABN', 'NLA', 'MNCARS', 'RAH')
   #
   if (!grepl("^P\\d+$",Pauthority)) {
     if (!Pauthority %in% names(authorities))
@@ -1043,10 +1043,10 @@ WHERE {
 #' databases can be also used in the parameter 'Pauthority':
 #'
 #' library   : VIAF, LC,   BNE , ISNI, JPG,  ULAN, BNF,  GND, DNB,
-#' Pauthority: P214, P244, P950, P213, P245, P245, P268, P227,P227,
+#' Pauthority: P214, P244, P950, P213, P245, P245, P268, P227, P227,
 #'
-#' library   : SUDOC, NTA,  J9U,   ELEM,  NUKAT, MNCARS
-#' Pauthority: P269, P1006, P8189, P1565, P1207, P4439
+#' library   : SUDOC, NTA,  J9U,   ELEM,  NUKAT, MNCARS, RAH
+#' Pauthority: P269, P1006, P8189, P1565, P1207, P4439, 13371
 #'
 #' @param langsorder Order of languages in which the information will be
 #' returned, separated with '|'. If no information is given in the first
@@ -1086,11 +1086,11 @@ w_SearchByAuthority <- function(Pauthority, langsorder='', instanceof='', nlimit
   authorities <- c('P214', 'P244', 'P950', 'P213', 'P245', 'P245', 'P268',
                    'P227', 'P227', 'P269', 'P269', 'P1006', 'P8189',
                    'P1565', 'P1207', 'P3065', 'P8179', 'P4787', 'P1015',
-                   'P1015', 'P9984','P9984', 'P7293', 'P409', 'P4439')
+                   'P1015', 'P9984','P9984', 'P7293', 'P409', 'P4439', 'P13371')
   names(authorities) <- c('VIAF', 'LC', 'BNE', 'ISNI', 'JPG', 'ULAN', 'BNF',
                           'GND', 'DNB', 'SUDOC', 'idRefID', 'NTA', 'J9U',
                           'ELEM', 'NUKAT', 'RERO', 'CAOONL', 'NII', 'BIBSYS',
-                          'NORAF', 'BNC', 'CANTIC', 'PLWABN', 'NLA', 'MNCARS')
+                          'NORAF', 'BNC', 'CANTIC', 'PLWABN', 'NLA', 'MNCARS', 'RAH')
   #
   if (!grepl("^P\\d+$",Pauthority)) {
     if (!Pauthority %in% names(authorities))
@@ -1599,12 +1599,12 @@ w_EntityInfo <- function(entity_list, mode='default', langsorder='',
     # For these claims, more than one occurrences separated with '|' are token, except
     # for fields in fieldsonlyone, in which only the most referenced is taken
     fields <- c('P31', 'P18', 'P21', 'P69', 'P106', 'P101', 'P135', 'P136',
-                'P737', 'P800', 'P463', 'P166', 'P214', 'P950', 'P4439',
+                'P737', 'P800', 'P463', 'P166', 'P214', 'P950', 'P4439', 'P13371',
                 'P19', 'P20', 'P569', 'P570')
     names(fields) <- c('instanceof', 'pic', 'sex', 'educatedat', 'occupation',
                        'fieldofwork', 'movement', 'genre', 'influencedby', 'notablework',
-                       'memberof', 'award', 'viafid', 'bneid', 'mncarsid', 'bplace',
-                       'dplace', 'bdate', 'ddate')
+                       'memberof', 'award', 'viafid', 'bneid', 'mncarsid', 'histhispid',
+                       'bplace', 'dplace', 'bdate', 'ddate')
     # For this claims, only the most referred is taken (note, however that the
     # preferred has priority).
     fieldsonlyone <- c('P19', 'P20', 'P569', 'P570')
@@ -1616,7 +1616,7 @@ w_EntityInfo <- function(entity_list, mode='default', langsorder='',
                  'occupationQ', 'occupation', 'notableworkQ', 'notablework', 'educatedatQ', 'educatedat',
                  'fieldofworkQ', 'fieldofwork', 'movementQ', 'movement', 'genreQ', 'genre',
                  'influencedbyQ', 'influencedby', 'memberofQ', 'memberof', 'awardQ', 'award',
-                 'viafid', 'bneid', 'mncarsid', 'pic', 'wikipedias')
+                 'viafid', 'bneid', 'mncarsid', 'histhispid', 'pic', 'wikipedias')
   }
   #
   llangs <- strsplit(langsorder, '|', fixed = T)[[1]]
@@ -1920,7 +1920,7 @@ w_EntityInfo <- function(entity_list, mode='default', langsorder='',
     tinycolumns <- c('entity', 'labellang', 'label', 'descriptionlang', 'description', 'sex',
         'bdate', 'byear', 'bplace', 'bplaceLat', 'bplaceLon', 'bcountry',
         'ddate', 'dyear', 'dplace', 'dplaceLat', 'dplaceLon', 'dcountry',
-        'occupationQ', 'occupation', 'viafid', 'bneid', 'mncarsid', 'pic', 'wikipedias')
+        'occupationQ', 'occupation', 'viafid', 'bneid', 'mncarsid', 'histhispid', 'pic', 'wikipedias')
     df <- df[,intersect(tinycolumns,colnames(df))]
   }
 

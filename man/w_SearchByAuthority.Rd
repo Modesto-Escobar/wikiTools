@@ -20,10 +20,10 @@ Sofía) database are returnd. Following libraries abbreviation for the
 databases can be also used in the parameter 'Pauthority':
 
 library   : VIAF, LC,   BNE , ISNI, JPG,  ULAN, BNF,  GND, DNB,
-Pauthority: P214, P244, P950, P213, P245, P245, P268, P227,P227,
+Pauthority: P214, P244, P950, P213, P245, P245, P268, P227, P227,
 
-library   : SUDOC, NTA,  J9U,   ELEM,  NUKAT, MNCARS
-Pauthority: P269, P1006, P8189, P1565, P1207, P4439}
+library   : SUDOC, NTA,  J9U,   ELEM,  NUKAT, MNCARS, RAH
+Pauthority: P269, P1006, P8189, P1565, P1207, P4439, 13371}
 
 \item{langsorder}{Order of languages in which the information will be
 returned, separated with '|'. If no information is given in the first

@@ -556,3 +556,45 @@ extractWiki <- function(names, language=c("en", "es", "fr", "de", "it"), plain=F
   return(sapply(names, extract, language=language, plain=plain, maximum=maximum))
 }
 
+#' Convert names of a wikiTools data frame to English or Spanish
+#'
+#' @param dbase dataframe obtained by a wikiTools function .
+#' @param fields names of the dataframe to be translated (default: names of dbase).
+#' @param language default: "en". Also accept "es".
+#' @return the input dataframe with changed names
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca
+#' @export
+
+
+selectLang <- function(dbase, fields=names(dbase), language="en") {
+  names <- c("entity", "status", "labellang", "label", "descriptionlang", "description", "instanceofQ", "instanceof", "sexQ", "sex", 
+             "bdate", "byear", "bplaceQ", "bplace", "bplaceLat", "bplaceLon", "bcountryQ", "bcountry", 
+             "ddate", "dyear", "dplaceQ", "dplace", "dplaceLat", "dplaceLon", "dcountryQ", "dcountry", 
+             "occupationQ", "occupation", "notableworkQ", "notablework", "educatedatQ", "educatedat", 
+             "fieldofworkQ", "fieldofwork", "movementQ", "movement", "genreQ", "genre", "influencedbyQ", "influencedby", 
+             "memberofQ", "memberof", "awardQ", "award", 
+             "viafid", "bneid", "mncarsid", "histhispid", "pic", "wikipedias")
+  en <- c("Entity", "Status", "labellang", "Label", "descriptionlang", "Description", "instanceofQ", "instanceof", "sexQ", "Sex", 
+          "Birth date", "Birth year", "bplaceQ", "Birth place", "bLat", "bLon", "bcountryQ", "Birth country", 
+          "Death date", "Death year", "dplaceQ", "Death place", "dLat", "dLon", "dcountryQ", "Death country", 
+          "occupationQ", "Occupation", "notableworkQ", "Notable work", "educatedatQ", "Educated at", 
+          "fieldofworkQ", "Field of work", "movementQ", "Movement", "genreQ", "Genre", "influencedbyQ", "Influenced by", 
+          "memberofQ", "Member of", "awardQ", "Award", 
+          "VIAF", "BNE", "MNCAR", "RAH" ,"pic", "wikipedias")
+  es <- c("Entidad", "Estatus", "Lengua", "Etiqueta", "l_Descripcion", "Descripci\u00f3n", "q_Instancia", "Instancia", "q_Genero", "G\u00e9nero", 
+          "Fecha nacimiento", "A\u00f1o nacimiento", "q_Lugar nacimiento", "Lugar nacimiento", "bLat", "dLon", "q_Pais_nacimiento", "Pa\u00eds nacimiento", 
+          "Fecha defunci\u00f3n", "A\u00f1o defunci\u00f3n", "q_Lugar defuncion", "Lugar defunci\u00f3n", "dLat", "dLon", "q_Pais defuncion", "Pa\u00eds defunci\u00f3n", 
+          "q_Ocupacion", "Ocupaci\u00f3n", "q_Obras", "Obras", "q_Educado", "Educado en", 
+          "q_Campos", "Campos", "q_Movimientos", "Movimientos", "q_Generos", "G\u00e9neros", "q_Influido por", "Influido por", 
+          "q_Miembro de", "Miembro de", "q_Premios", "Premios", 
+          "VIAF", "BNE", "MNCAR", "RAH", "imagen", "wikis")
+  rest <- setdiff(names(dbase), names)
+  lbase <- data.frame(en=en, es=es)
+  row.names(lbase) <- names
+  fields <- intersect(fields, names)
+  campos <- lbase[fields, language]
+  nueva <- dbase[, intersect(fields, names)]
+  names(nueva) <- campos
+  nueva <- cbind(nueva, dbase[, rest])
+  return(nueva)
+}
