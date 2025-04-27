@@ -526,10 +526,12 @@ getWikiFiles <- function(X, language=c("es", "en", "fr"), directory="./", maxtim
 #' @param plain If TRUE, the results are delivered in plain format.
 #' @param maximum Number maximum of characters to be included when the paragraph is too large.
 #' @examples
+#' \dontrun{
 #' ## Obtaining information in English Wikidata
 #' names <- c("William Shakespeare", "Pedro Almodovar")
 #' info <- getWikiInf(names)
 #' info$text <- extractWiki(info$label)
+#' }
 #' @return a character vector with html formatted (or plain text) Wikipedia paragraphs.
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @importFrom jsonlite fromJSON

@@ -10,7 +10,7 @@ w_Exhibit(
   langsorder = "en",
   wikilangs = langsorder,
   links = c("wikidata", "wiki", "BNE", "RAH"),
-  info = TRUE,
+  info = FALSE,
   imgpath = NULL,
   nlimit = MW_LIMIT,
   debug = FALSE,
@@ -40,11 +40,15 @@ pages in any language, not sorted.}
 
 \item{info}{Add the first paragraph of Wikipedia in the template.}
 
+\item{imgpath}{Name of the directory where there are image files.}
+
 \item{nlimit}{If the number of entities exceeds this number, chunked queries
 are done. This is the number of entities requested in each chunk. Please,
 reduce the default value if error is raised.}
 
-\item{debug}{For debugging (info or query)}
+\item{debug}{For debugging (info or query).}
+
+\item{...}{Same arguments as in netCoin::exhibit().}
 }
 \value{
 An object of gallery_rd3 class.
@@ -53,10 +57,12 @@ An object of gallery_rd3 class.
 Extract the first paragraph of a Wikipedia article with a maximum of characters.
 }
 \examples{
+\dontrun{
 ## Obtaining information in English Wikidata
 names <- c("William Shakespeare", "Pedro Almodovar")
 info <- getWikiInf(names)
-w_exhibit(info$Q)
+w_Exhibit(info$Q)
+}
 }
 \author{
 Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See \url{https://sociocav.usal.es/blog/modesto-escobar/}

@@ -27,10 +27,12 @@ a character vector with html formatted (or plain text) Wikipedia paragraphs.
 Extract the first paragraph of a Wikipedia article with a maximum of characters.
 }
 \examples{
+\dontrun{
 ## Obtaining information in English Wikidata
 names <- c("William Shakespeare", "Pedro Almodovar")
 info <- getWikiInf(names)
 info$text <- extractWiki(info$label)
+}
 }
 \author{
 Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See \url{https://sociocav.usal.es/blog/modesto-escobar/}

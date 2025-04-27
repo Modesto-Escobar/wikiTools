@@ -19,21 +19,24 @@
 #' pages in any language, not sorted.
 #' @param links Vector of IDs for linking to its catalog. V.gr. c("Wikidata", "Wikipedia", "BNE", "RAH)
 #' @param info Add the first paragraph of Wikipedia in the template.
+#' @param imgpath Name of the directory where there are image files.
 #' @param nlimit If the number of entities exceeds this number, chunked queries
 #' are done. This is the number of entities requested in each chunk. Please,
 #' reduce the default value if error is raised.
-#' @param debug For debugging (info or query)
+#' @param debug For debugging (info or query).
+#' @param ... Same arguments as in netCoin::exhibit().
 #' @examples
+#' \dontrun{
 #' ## Obtaining information in English Wikidata
 #' names <- c("William Shakespeare", "Pedro Almodovar")
 #' info <- getWikiInf(names)
-#' w_exhibit(info$Q)
+#' w_Exhibit(info$Q)
+#' }
 #' @return An object of gallery_rd3 class. 
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @export
-#' 
 w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = langsorder,
-                      links=c("wikidata", "wiki", "BNE", "RAH"), info=TRUE,
+                      links=c("wikidata", "wiki", "BNE", "RAH"), info=FALSE,
                       imgpath=NULL, nlimit = MW_LIMIT, debug=FALSE, ...) {
   # Control
   if(is.data.frame(entities) && "Q" %in% names(entities)) Qs <- entities[["Q"]] else
@@ -69,17 +72,20 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
     return(sub("^\\|", "", frame[["nolinks"]]))
   }
   
-  # Preparación
+  # Preparation
   L <- w_EntityInfo(Qs, langsorder=langsorder, wikilangs=wikilangs)
   L$pic <- gsub("\\|.*","", L$pic)
   lang <- regmatches(langsorder, regexpr("(?<=^|\\|)(es|en)(?=\\||$)", langsorder, perl = TRUE))
   if(nchar(lang)==0) lang="en"
   
-  ### Baja imágenes
-  if(FALSE) {
-    L[!is.na(L$pic), c("entity", "pic")]
-    getFiles(L, path=imgpath, ext="jpg")
+  ### Image loading
+  if(!is.null(imgpath)) {
+    getFiles(L[!is.na(L$pic), c("entity", "pic")], path=imgpath, ext="jpg")
   }
+  
+  L$description <- toupper1(L$description)
+  L$occupation   <- toupper2(L$occupation)
+
   
   P <- selectLang(L, language=lang)
   P$wiki <- sub("\\|.*","", P$wikis)
@@ -89,14 +95,12 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
   if(lang=="es") {
     Name <- "Nombre"
     Field <- "Entidad"
-    fields=c("Entidad", "Nombre", "Descripción", "Carencias", "Género",
-                          "Año nacimiento", "Lugar nacimiento", "País nacimiento",
-                          "Año defunción", "Lugar defunción", "País defunción",
-                          "Ocupación", "Géneros", "BNE", "RAH", "img", "wikis")
-    P$Descripción <- toupper1(P$Descripción)
-    P$Ocupación   <- toupper2(P$Ocupación)
+    fields=c("Entidad", "Nombre", "Descripci\u00f3n", "Carencias", "G\u00e9nero",
+                          "A\u00f1o nacimiento", "Lugar nacimiento", "Pa\u00eds nacimiento",
+                          "A\u00f1o defunci\u00f3n", "Lugar defunci\u00f3n", "Pa\u00eds defunci\u00f3n",
+                          "Ocupaci\u00f3n", "G\u00e9neros", "BNE", "RAH", "img", "wikis")
     P$Carencias   <- nolinks(P, links)
-    P$img      <- ifelse(is.na(P$img), paste0(imgpath, "/Q0.png"), paste0(imgpath,"/", P[[Field]],".jpg"))
+    P$img       <- ifelse(is.na(P$img), paste0(imgpath, "/Q0.png"), paste0(imgpath,"/", P[[Field]],".jpg"))
   }
   if(lang=="en") {
     Name <- "Name"
@@ -105,8 +109,6 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
              "Birth year", "Birth place", "Birth country",
              "Death year", "Death place", "Death country",
              "Occupation", "Genre", "BNE", "RAH", "img", "wikis")
-    P$Description <- toupper1(P$Description)
-    P$Occupation   <- toupper2(P$Occupation)
     P$Missing   <- nolinks(P, links)
     P$img       <- ifelse(is.na(P$img), paste0(imgpath, "/Q0.png"), paste0(imgpath,"/", P[[Field]],".jpg"))
   }
@@ -115,10 +117,10 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
  
   D <- netCoin::pop_up(P, title = Name, entity=Field, wikilangs=wikilangs, links=links, info=info)
   
-  if(lang=="es") fields <- c("Nombre", "Entidad", "Descripción", "Carencias", "Género",
-                             "Año nacimiento", "Lugar nacimiento", "País nacimiento",
-                             "Año defunción", "Lugar defunción", "País defunción",
-                             "Ocupación", "Géneros", "img", "pop_up") else {
+  if(lang=="es") fields <- c("Nombre", "Entidad", "Descripci\u00f3n", "Carencias", "G\u00e9nero",
+                             "A\u00f1o nacimiento", "Lugar nacimiento", "Pa\u00eds nacimiento",
+                             "A\u00f1o defunci\u00f3n", "Lugar defunci\u00f3n", "Pa\u00eds defunci\u00f3n",
+                             "Ocupaci\u00f3n", "G\u00e9neros", "img", "pop_up") else {
                  fields <- c("Name", "Entity", "Description", "Missing", "Sex",
                              "Birth year", "Birth place", "Birth country",
                              "Death year", "Death place", "Death country",
