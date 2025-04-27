@@ -4,7 +4,6 @@ Version: 1.2.10
 Date: 2025-04-27
 Title: Tools for Wikidata and Wikipedia
 Description: A set of wrappers intended to check, read and download information from the Wikimedia sources. It is specifically created to work with names of celebrities, in which case their information and statistics can be downloaded. Additionally, it also builds links and snippets to use in combination with the function gallery() in netCoin package.
-Acknolegments: The authors wishs to thank the Ministerio de Ciencia, Innovación y Universidades, and European Union Funds (grants CSO2013-49278-EXP, PGC2018-093755-B100, PDC2022-133355-100, PID2023-147358NB-100) for supporting this research financially.
 License: GPL-3
 Depends: R (>= 3.5.0)
 Encoding: UTF-8
@@ -22,3 +21,4 @@ Authors@R: c(
 Maintainer: Modesto Escobar <modesto@usal.es>
 Roxygen: list(markdown=TRUE)
 RoxygenNote: 7.3.2
+Acknowledgments: The authors wish to thank the Ministerio de Ciencia, Innovación y Universidades, and European Union Funds (grants CSO2013-49278-EXP, PGC2018-093755-B100, PDC2022-133355-100, PID2023-147358NB-100) for supporting this research financially.
