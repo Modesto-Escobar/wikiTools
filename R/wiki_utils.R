@@ -1599,11 +1599,11 @@ w_EntityInfo <- function(entity_list, mode='default', langsorder='',
     # For these claims, more than one occurrences separated with '|' are token, except
     # for fields in fieldsonlyone, in which only the most referenced is taken
     fields <- c('P31', 'P18', 'P21', 'P69', 'P106', 'P101', 'P135', 'P136',
-                'P737', 'P800', 'P463', 'P166', 'P214', 'P950', 'P4439', 'P13371',
+                'P737', 'P800', 'P463', 'P166', 'P213', 'P214', 'P950', 'P4439', 'P13371', 'P244',
                 'P19', 'P20', 'P569', 'P570')
     names(fields) <- c('instanceof', 'pic', 'sex', 'educatedat', 'occupation',
                        'fieldofwork', 'movement', 'genre', 'influencedby', 'notablework',
-                       'memberof', 'award', 'viafid', 'bneid', 'mncarsid', 'histhispid',
+                       'memberof', 'award', 'isnid', 'viafid', 'bneid', 'mncarsid', 'histhispid', 'locid',
                        'bplace', 'dplace', 'bdate', 'ddate')
     # For this claims, only the most referred is taken (note, however that the
     # preferred has priority).
@@ -1616,7 +1616,7 @@ w_EntityInfo <- function(entity_list, mode='default', langsorder='',
                  'occupationQ', 'occupation', 'notableworkQ', 'notablework', 'educatedatQ', 'educatedat',
                  'fieldofworkQ', 'fieldofwork', 'movementQ', 'movement', 'genreQ', 'genre',
                  'influencedbyQ', 'influencedby', 'memberofQ', 'memberof', 'awardQ', 'award',
-                 'viafid', 'bneid', 'mncarsid', 'histhispid', 'pic', 'wikipedias')
+                 'isnid', 'viafid', 'bneid', 'mncarsid', 'histhispid', 'locid', 'pic', 'wikipedias')
   }
   #
   llangs <- strsplit(langsorder, '|', fixed = T)[[1]]
@@ -1920,7 +1920,7 @@ w_EntityInfo <- function(entity_list, mode='default', langsorder='',
     tinycolumns <- c('entity', 'labellang', 'label', 'descriptionlang', 'description', 'sex',
         'bdate', 'byear', 'bplace', 'bplaceLat', 'bplaceLon', 'bcountry',
         'ddate', 'dyear', 'dplace', 'dplaceLat', 'dplaceLon', 'dcountry',
-        'occupationQ', 'occupation', 'viafid', 'bneid', 'mncarsid', 'histhispid', 'pic', 'wikipedias')
+        'occupation', 'isnid', 'bneid', 'histhispid', 'locid', 'pic', 'wikipedias')
     df <- df[,intersect(tinycolumns,colnames(df))]
   }
 
