@@ -41,15 +41,15 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
   # Control
   if(is.data.frame(entities) && "Q" %in% names(entities)) Qs <- entities[["Q"]] else
     if(is.data.frame(entities) && grepl("Q\\d*", entities[[1]][1])) Qs <- entities[[1]] else
-      if(is.data.frame(entities)) return("Frame entities has to have a Qs' field") else
+      if(is.data.frame(entities)) stop("Frame entities has to have a Qs' field") else
         if(is.vector(entities) && grepl("Q\\d", entities[1])) Qs <- entities else
           stop("Argument entities must contain a vector of Qs")
-  
+
   # Functions
   toupper1 <-function(text) {
     return(ifelse(is.na(text),  "", paste0(toupper(substr(text, 1, 1)),substr(text, 2, nchar(text)))))
   }
-  
+
   toupper2 <- function(text) {
     sapply(text, function(x) {
       if (is.na(x)) return(NA_character_)
@@ -62,74 +62,169 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
       paste(partes_cap, collapse = "|")
     }, USE.NAMES = FALSE)
   }
-  
-  
-  nolinks <- function(frame, links=intersect(names(frame), links)) {
+
+  nolinks <- function(frame, links=intersect(names(frame), links), lang="en") {
+    text <- "No"
+    if(lang=="es"){
+      text <- "Sin"
+    }
     frame[["nolinks"]]=""
     for(x in links) {
-      frame[["nolinks"]] <- ifelse(is.na(frame[[x]]), paste0(frame[["nolinks"]], "|Sin ", x), frame[["nolinks"]])
+      frame[["nolinks"]] <- ifelse(is.na(frame[[x]]), paste0(frame[["nolinks"]], "|",text," ", x), frame[["nolinks"]])
     }
     return(sub("^\\|", "", frame[["nolinks"]]))
   }
-  
+
   # Preparation
-  L <- w_EntityInfo(Qs, langsorder=langsorder, wikilangs=wikilangs)
+  L <- w_EntityInfo(Qs, mode=mode, langsorder=langsorder, wikilangs=wikilangs, nlimit=nlimit, debug=debug)
   L$pic <- gsub("\\|.*","", L$pic)
   lang <- regmatches(langsorder, regexpr("(?<=^|\\|)(es|en)(?=\\||$)", langsorder, perl = TRUE))
   if(nchar(lang)==0) lang="en"
-  
+
   ### Image loading
   if(!is.null(imgpath)) {
     getFiles(L[!is.na(L$pic), c("entity", "pic")], path=imgpath, ext="jpg")
   }
-  
+
   L$description <- toupper1(L$description)
   L$occupation   <- toupper2(L$occupation)
 
-  
-  P <- selectLang(L, language=lang)
-  P$wiki <- sub("\\|.*","", P$wikis)
-  P$wikidata <- P[[1]]
-  
-## Data transformations ----
+  L$wiki <- sub("\\|.*","", L$wikipedias)
+  L$wikidata <- L[[1]]
+
+  ## Data transformations ----
+  linksid1 <- c("BNE","RAH","VIAF","LOC")
+  linksid2 <- c("bneid","histhispid","viafid","locid")
+  for(i in seq_along(linksid1)){
+    names(L)[names(L)==linksid2[i]] <- linksid1[i]
+  }
+
+  L$Missing   <- nolinks(L, links, lang)
+  L$pic       <- ifelse(is.na(L$pic), paste0(imgpath, "/Q0.png"), paste0(imgpath,"/", L[["entity"]],".jpg"))
+  L$wikidata <- ifelse(is.na(L[['entity']]), NA, paste0())
+
+  fields <- c("label", "entity", "description", "Missing", "sex",
+             "byear", "bplace", "bcountry",
+             "dyear", "dplace", "dcountry",
+             "occupation", "genre",
+             "BNE", "RAH", "VIAF", "LOC", "pic", "wikipedias")
+  L <- L[, intersect(names(L),fields)]
+  D <- pop_up(L, title = "label", entity="entity", wikilangs=wikilangs, links=links, info=info)
+
+  fields <- c(fields[1:13], "pic", "pop_up")
+
+  Dnames <- names(D)
+  D <- D[,fields]
+  if(is.data.frame(entities)){
+    D <- cbind(D, entities[,setdiff(names(entities), Dnames)])
+  }
+
+  P <- selectLang(D, language=lang)
+  Name <- "Name"
   if(lang=="es") {
     Name <- "Nombre"
-    Field <- "Entidad"
-    fields=c("Entidad", "Nombre", "Descripci\u00f3n", "Carencias", "G\u00e9nero",
-                          "A\u00f1o nacimiento", "Lugar nacimiento", "Pa\u00eds nacimiento",
-                          "A\u00f1o defunci\u00f3n", "Lugar defunci\u00f3n", "Pa\u00eds defunci\u00f3n",
-                          "Ocupaci\u00f3n", "G\u00e9neros", "BNE", "RAH", "img", "wikis")
-    P$Carencias   <- nolinks(P, links)
-    P$img       <- ifelse(is.na(P$img), paste0(imgpath, "/Q0.png"), paste0(imgpath,"/", P[[Field]],".jpg"))
+    names(P)[names(P)=="Missing"] <- "Carencias"
   }
-  if(lang=="en") {
-    Name <- "Name"
-    Field <- "Entity"
-    fields=c("Entity", "Name", "Description", "Missing", "Sex",
-             "Birth year", "Birth place", "Birth country",
-             "Death year", "Death place", "Death country",
-             "Occupation", "Genre", "BNE", "RAH", "img", "wikis")
-    P$Missing   <- nolinks(P, links)
-    P$img       <- ifelse(is.na(P$img), paste0(imgpath, "/Q0.png"), paste0(imgpath,"/", P[[Field]],".jpg"))
-  }
-  P$wikidata <- ifelse(is.na(P[[Field]]), NA, paste0())
-    P <- P[, fields]
- 
-  D <- netCoin::pop_up(P, title = Name, entity=Field, wikilangs=wikilangs, links=links, info=info)
-  
-  if(lang=="es") fields <- c("Nombre", "Entidad", "Descripci\u00f3n", "Carencias", "G\u00e9nero",
-                             "A\u00f1o nacimiento", "Lugar nacimiento", "Pa\u00eds nacimiento",
-                             "A\u00f1o defunci\u00f3n", "Lugar defunci\u00f3n", "Pa\u00eds defunci\u00f3n",
-                             "Ocupaci\u00f3n", "G\u00e9neros", "img", "pop_up") else {
-                 fields <- c("Name", "Entity", "Description", "Missing", "Sex",
-                             "Birth year", "Birth place", "Birth country",
-                             "Death year", "Death place", "Death country",
-                             "Occupation", "Genre", "img", "pop_up")
-                             }
-  
-  if(is.data.frame(entities)) D <- cbind(D[, fields], entities[,setdiff(names(entities), names(D))]) else D <- D[,fields]
-  
-  E <- netCoin::exhibit(D, name=Name, ntext="pop_up", image="img", language = lang, ...)
-  
+  E <- netCoin::exhibit(P, name=Name, ntext="pop_up", image="img", language = lang, ...)
+
   return(E)
+}
+
+# pop_up
+#' Create a drop-down vignette for nodes from different items (for galleries).
+#' @param data Data frame which contains the data.
+#' @param title Column name which contains the first title of the vignette.
+#' @param title2 Column name which contains the secondary title of the vignette.
+#' @param info Extract the first paragraph of a Wikipedia article.
+#' @param entity Column name which contains a vector of Wikidata entities.
+#' @param links Column names which contains the URLs for the vignette.
+#' 'wikidata' and 'wiki' by default, if this columns are missing,
+#' they will be generated through 'entity' argument.
+#' @param wikilangs List of languages to limit the search, using "|" as
+#' separator. Wikipedias page titles are returned in same order as languages in
+#' this parameter. If wikilangs='' the function returns Wikipedia page titles
+#' in any language, not sorted.
+#' @examples
+#' \dontrun{
+#' library(netCoin)
+#' data("sociologists")
+#' sociologists$entity <- sub(".png","",sociologists$picture)
+#' sociologists <- pop_up(sociologists, title="name",
+#'   title2="birth_country", entity="entity")
+#' plot(exhibit(sociologists, label="name", ntext="pop_up"))
+#' }
+#' @return a character vector of html formatted vignettes attached to 'data' in a column named 'pop_up'. 
+#' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
+#' @export
+pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", links=c("wikidata", "wiki"), 
+                   wikilangs="en") {
+  data <- as.data.frame(data)
+  sites <- data.frame(
+    url=c("wikipedia.org","wikidata.org","brumario.usal.es","museoreinasofia.es","viaf.org", "bne.es", "historia-hispanica.rah.es", "id.loc.gov", "isni.org"),
+    name=c("Wikipedia","Wikidata","USAL","MNCARS","VIAF", "BNE", "RAH", "LOC", "ISNI"),
+    icon=c("https://www.wikipedia.org/static/favicon/wikipedia.ico","https://www.wikidata.org/static/favicon/wikidata.ico",
+           "https://sociocav.usal.es/me/pics/LogoBUSAL.png",
+           "https://static5.museoreinasofia.es/sites/all/themes/mrs_twitter_bootstrap/images/misc/favicon-32x32.png",
+           "https://sociocav.usal.es/me/pics/VIAF.png", 
+           "https://sociocav.usal.es/me/pics/BNE.png",
+           "https://sociocav.usal.es/me/pics/RAH.png",           
+           "https://sociocav.usal.es/me/pics/LOC.png",           
+           "https://isni.org/images/isni-logo.png"),
+    target=c("mainframe","mainframe","mainframe","mainframe","_blank","mainframe","mainframe","_blank","mainframe")
+  )
+  
+  langs <- unlist(strsplit(wikilangs, "\\|"))
+  for(e in links) {
+    if(e=="wikidata" & !is.element(e, names(data))) {
+      data$wikidata <- ifelse(substr(data[[entity]], 1, 1)!="Q", NA, paste0("https://m.wikidata.org/wiki/", data[[entity]]))
+    }
+    if(e=="wiki" & !is.element(e, names(data))){
+      wikis <- w_Wikipedias(data[[entity]], wikilangs=wikilangs)[,c(1,6)]
+      wikis$wiki <- sub("\\.wikipedia",".m.wikipedia", sub("\\|.*","", wikis$pages))
+      if (info) {
+        names <- ifelse(is.na(wikis$wiki) | wikis$wiki=="", " ", sub(".*/","", wikis$wiki))
+        wikis$info <- sub("character\\(0\\)", "", as.character(extractWiki(names,language=langs)))
+      }else{
+        wikis$info <- NA
+      }
+      data <- merge(data, wikis, by.x=entity, by.y="entity", all.x=TRUE, sort=FALSE)
+      data$wiki <- ifelse(is.na(data$wiki) | data$wiki=="", NA, data$wiki)
+      data$info <- ifelse(is.na(data$info), "", data$info)
+      data$pages <- wikis <- names <- NULL
+    }
+    if(e=="BNE") {
+      data$BNE <- ifelse(is.na(data[["BNE"]]) | data[["BNE"]]=="", NA, 
+                         sub("\\|.*", "", paste0("https://datos.bne.es/persona/", data[["BNE"]])))
+    }
+    if(e=="RAH") {
+      data$RAH <- ifelse(is.na(data[["RAH"]]) | data[["RAH"]]=="", NA, 
+                         sub("\\|.*", "", paste0("https://historia-hispanica.rah.es/", data[["RAH"]])))
+    }
+    if(e=="MNCARS") {
+      data$MNCARS <- ifelse(is.na(data[["MNCARS"]]) | data[["MNCARS"]]=="", NA,
+                          sub("\\|.*", "", paste0("https://museoreinasofia.es/coleccion/autor/", data[["MNCARS"]])))
+    }
+    if(e=="LOC") {
+      data$LOC <- ifelse(is.na(data[["LOC"]]) | data[["LOC"]]=="", NA, 
+                         sub("\\|.*", "", paste0("https://id.loc.gov/authorities/names/", data[["LOC"]])))
+    }
+    if(e=="VIAF") {
+      data$VIAF <- ifelse(is.na(data[["VIAF"]]) | data[["VIAF"]]=="", NA, 
+                         sub("\\|.*", "", paste0("https://viaf.org/viaf/", data[["VIAF"]])))
+    }
+  }
+
+  linksname <- "LINKS"
+  if(langs[1]=="es"){
+    linksname <- "ENLACES"
+  }else if(langs[1]=="ca"){
+    linksname <- "ENLLA\uC7OS"
+  }
+
+  linksList <- netCoin::renderLinks(data, links, NULL, "mainframe", sites=sites)
+  data$links <- ifelse(is.na(data$wiki) & is.na(data$wikidata), data$info,
+                       paste0(data$info, '</p><h3>',linksname,':</h3>', linksList))
+  data$pop_up <- netCoin::get_template2(data, title=title, title2=title2, text="links")
+  data[, union(c("links", "linksList", "info", "names", "wiki", "wikidata"), links)] <- NULL
+  return(data)
 }
