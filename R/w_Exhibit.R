@@ -160,18 +160,21 @@ pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", 
                    wikilangs="en") {
   data <- as.data.frame(data)
   sites <- data.frame(
-    url=c("wikipedia.org","wikidata.org","brumario.usal.es","museoreinasofia.es","viaf.org", "bne.es", "historia-hispanica.rah.es", "id.loc.gov", "isni.org"),
-    name=c("Wikipedia","Wikidata","USAL","MNCARS","VIAF", "BNE", "RAH", "LOC", "ISNI"),
-    icon=c("https://www.wikipedia.org/static/favicon/wikipedia.ico","https://www.wikidata.org/static/favicon/wikidata.ico",
+    url=c("wikipedia.org","wikidata.org","brumario.usal.es", "museodelprado.es", "museoreinasofia.es", "viaf.org", "bne.es", "historia-hispanica.rah.es", "id.loc.gov", "isni.org", "vocab.getty.edu"),
+    name=c("Wikipedia","Wikidata","USAL", "MNP", "MNCARS","VIAF", "BNE", "RAH", "LOC", "ISNI", "ULAN"),
+    icon=c("https://www.wikipedia.org/static/favicon/wikipedia.ico",
+           "https://www.wikidata.org/static/favicon/wikidata.ico",
            "https://sociocav.usal.es/me/pics/LogoBUSAL.png",
+           "https://sociocav.usal.es/me/pics/MP.png",
            "https://static5.museoreinasofia.es/sites/all/themes/mrs_twitter_bootstrap/images/misc/favicon-32x32.png",
            "https://sociocav.usal.es/me/pics/VIAF.png", 
            "https://sociocav.usal.es/me/pics/BNE.png",
            "https://sociocav.usal.es/me/pics/RAH.png",           
            "https://sociocav.usal.es/me/pics/LOC.png",           
-           "https://isni.org/images/isni-logo.png"),
-    target=c("mainframe","mainframe","mainframe","mainframe","_blank","mainframe","mainframe","_blank","mainframe")
-  )
+           "https://isni.org/images/isni-logo.png",
+           "https://sociocav.usal.es/me/pics/ULAN.png"),
+    target=c("mainframe","mainframe","mainframe","mainframe", "mainframe","_blank","mainframe","mainframe","_blank","mainframe", "_blank")
+  )  
   
   langs <- unlist(strsplit(wikilangs, "\\|"))
   for(e in links) {
@@ -181,15 +184,18 @@ pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", 
     if(e=="wiki" & !is.element(e, names(data))){
       wikis <- w_Wikipedias(data[[entity]], wikilangs=wikilangs)[,c(1,6)]
       wikis$wiki <- sub("\\.wikipedia",".m.wikipedia", sub("\\|.*","", wikis$pages))
-      if (info) {
-        names <- ifelse(is.na(wikis$wiki) | wikis$wiki=="", " ", sub(".*/","", wikis$wiki))
-        wikis$info <- sub("character\\(0\\)", "", as.character(extractWiki(names,language=langs)))
-      }else{
-        wikis$info <- NA
+      if (class(info)=="character") {
+        # wikis <- merge(wikis, data[,c("entity", info)], by="entity")
+      } else {
+        if (info) {
+          names <- ifelse(is.na(wikis$wiki) | wikis$wiki=="", " ", sub(".*/","", wikis$wiki))
+          wikis$info <- sub("character\\(0\\)", "", as.character(extractWiki(names,language=langs)))
+        } else{
+          wikis$info <- NA
+        }
       }
       data <- merge(data, wikis, by.x=entity, by.y="entity", all.x=TRUE, sort=FALSE)
       data$wiki <- ifelse(is.na(data$wiki) | data$wiki=="", NA, data$wiki)
-      data$info <- ifelse(is.na(data$info), "", data$info)
       data$pages <- wikis <- names <- NULL
     }
     if(e=="BNE") {
@@ -199,6 +205,10 @@ pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", 
     if(e=="RAH") {
       data$RAH <- ifelse(is.na(data[["RAH"]]) | data[["RAH"]]=="", NA, 
                          sub("\\|.*", "", paste0("https://historia-hispanica.rah.es/", data[["RAH"]])))
+    }
+    if(e=="MNP") {
+      data$MNP <- ifelse(is.na(data[["MNP"]]) | data[["MNP"]]=="", NA,
+                            sub("\\|.*", "", paste0("https://www.museodelprado.es/coleccion/artista/wd/", data[["MNP"]])))
     }
     if(e=="MNCARS") {
       data$MNCARS <- ifelse(is.na(data[["MNCARS"]]) | data[["MNCARS"]]=="", NA,
@@ -212,6 +222,14 @@ pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", 
       data$VIAF <- ifelse(is.na(data[["VIAF"]]) | data[["VIAF"]]=="", NA, 
                          sub("\\|.*", "", paste0("https://viaf.org/viaf/", data[["VIAF"]])))
     }
+    if(e=="ULAN") {
+      data$ULAN <- ifelse(is.na(data[["ULAN"]]) | data[["ULAN"]]=="", NA, 
+                          sub("\\|.*", "", paste0("https://vocab.getty.edu/page/ulan/", data[["ULAN"]])))
+    }
+    if(e=="ISNI") {
+      data$ISNI <- ifelse(is.na(data[["ISNI"]]) | data[["ISNI"]]=="", NA, 
+                          sub("\\|.*", "", paste0("https://isni.org/isni/", data[["ISNI"]])))
+    }
   }
 
   linksname <- "LINKS"
@@ -222,8 +240,8 @@ pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", 
   }
 
   linksList <- netCoin::renderLinks(data, links, NULL, "mainframe", sites=sites)
-  data$links <- ifelse(is.na(data$wiki) & is.na(data$wikidata), data$info,
-                       paste0(data$info, '</p><h3>',linksname,':</h3>', linksList))
+  data$links <- ifelse(is.na(data$wiki) & is.na(data$wikidata), data[[info]],
+                       paste0(data[[info]], '</p><h3 style="margin-top:8px">',linksname,':</h3>', linksList))
   data$pop_up <- netCoin::get_template2(data, title=title, title2=title2, text="links")
   data[, union(c("links", "linksList", "info", "names", "wiki", "wikidata"), links)] <- NULL
   return(data)
