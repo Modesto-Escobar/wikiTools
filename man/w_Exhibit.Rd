@@ -9,7 +9,7 @@ w_Exhibit(
   mode = "default",
   langsorder = "en",
   wikilangs = langsorder,
-  links = c("wikidata", "wiki", "BNE", "RAH"),
+  links = c("wikidata", "wiki", "BNE", "RAH", "ISNI"),
   info = FALSE,
   imgpath = NULL,
   nlimit = MW_LIMIT,

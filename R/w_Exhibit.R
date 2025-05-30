@@ -36,7 +36,7 @@
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @export
 w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = langsorder,
-                      links=c("wikidata", "wiki", "BNE", "RAH"), info=FALSE,
+                      links=c("wikidata", "wiki", "BNE", "RAH", "ISNI"), info=FALSE,
                       imgpath=NULL, nlimit = MW_LIMIT, debug=FALSE, ...) {
   # Control
   if(is.data.frame(entities) && "Q" %in% names(entities)) Qs <- entities[["Q"]] else
@@ -93,8 +93,8 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
   L$wikidata <- L[[1]]
 
   ## Data transformations ----
-  linksid1 <- c("BNE","RAH","VIAF","LOC")
-  linksid2 <- c("bneid","histhispid","viafid","locid")
+  linksid1 <- c("BNE","RAH","VIAF","LOC","ISNI")
+  linksid2 <- c("bneid","histhispid","viafid","locid","isnid")
   for(i in seq_along(linksid1)){
     names(L)[names(L)==linksid2[i]] <- linksid1[i]
   }
@@ -107,7 +107,7 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
              "byear", "bplace", "bcountry",
              "dyear", "dplace", "dcountry",
              "occupation", "genre",
-             "BNE", "RAH", "VIAF", "LOC", "pic", "wikipedias")
+             "BNE", "RAH", "VIAF", "LOC", "ISNI", "pic", "wikipedias")
   L <- L[, intersect(names(L),fields)]
   D <- pop_up(L, title = "label", entity="entity", wikilangs=wikilangs, links=links, info=info)
 
@@ -174,61 +174,56 @@ pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", 
            "https://isni.org/images/isni-logo.png",
            "https://sociocav.usal.es/me/pics/ULAN.png"),
     target=c("mainframe","mainframe","mainframe","mainframe", "mainframe","_blank","mainframe","mainframe","_blank","mainframe", "_blank")
-  )  
-  
+  )
+
+  formatterurls <- c("",
+  "https://m.wikidata.org/wiki/$1",
+  "",
+  "https://www.museodelprado.es/coleccion/artista/wd/$1",
+  "https://www.museoreinasofia.es/coleccion/autor/$1",
+  "https://viaf.org/viaf/$1",
+  "https://datos.bne.es/resource/$1",
+  "https://historia-hispanica.rah.es/$1",
+  "https://id.loc.gov/authorities/$1",
+  "https://isni.org/isni/$1",
+  "https://vocab.getty.edu/page/ulan/$1")
+  names(formatterurls) <- sites[,"name"]
+
   langs <- unlist(strsplit(wikilangs, "\\|"))
   for(e in links) {
-    if(e=="wikidata" & !is.element(e, names(data))) {
-      data$wikidata <- ifelse(substr(data[[entity]], 1, 1)!="Q", NA, paste0("https://m.wikidata.org/wiki/", data[[entity]]))
-    }
-    if(e=="wiki" & !is.element(e, names(data))){
-      wikis <- w_Wikipedias(data[[entity]], wikilangs=wikilangs)[,c(1,6)]
-      wikis$wiki <- sub("\\.wikipedia",".m.wikipedia", sub("\\|.*","", wikis$pages))
-      if (class(info)=="character") {
-        # wikis <- merge(wikis, data[,c("entity", info)], by="entity")
-      } else {
-        if (info) {
-          names <- ifelse(is.na(wikis$wiki) | wikis$wiki=="", " ", sub(".*/","", wikis$wiki))
-          wikis$info <- sub("character\\(0\\)", "", as.character(extractWiki(names,language=langs)))
-        } else{
-          wikis$info <- NA
-        }
+    if(e=="wikidata"){
+      if(!is.element(e, names(data))) {
+        data$wikidata <- ifelse(substr(data[[entity]], 1, 1)!="Q", NA, paste0("https://m.wikidata.org/wiki/", data[[entity]]))
       }
-      data <- merge(data, wikis, by.x=entity, by.y="entity", all.x=TRUE, sort=FALSE)
-      data$wiki <- ifelse(is.na(data$wiki) | data$wiki=="", NA, data$wiki)
-      data$pages <- wikis <- names <- NULL
-    }
-    if(e=="BNE") {
-      data$BNE <- ifelse(is.na(data[["BNE"]]) | data[["BNE"]]=="", NA, 
-                         sub("\\|.*", "", paste0("https://datos.bne.es/persona/", data[["BNE"]])))
-    }
-    if(e=="RAH") {
-      data$RAH <- ifelse(is.na(data[["RAH"]]) | data[["RAH"]]=="", NA, 
-                         sub("\\|.*", "", paste0("https://historia-hispanica.rah.es/", data[["RAH"]])))
-    }
-    if(e=="MNP") {
-      data$MNP <- ifelse(is.na(data[["MNP"]]) | data[["MNP"]]=="", NA,
-                            sub("\\|.*", "", paste0("https://www.museodelprado.es/coleccion/artista/wd/", data[["MNP"]])))
-    }
-    if(e=="MNCARS") {
-      data$MNCARS <- ifelse(is.na(data[["MNCARS"]]) | data[["MNCARS"]]=="", NA,
-                          sub("\\|.*", "", paste0("https://museoreinasofia.es/coleccion/autor/", data[["MNCARS"]])))
-    }
-    if(e=="LOC") {
-      data$LOC <- ifelse(is.na(data[["LOC"]]) | data[["LOC"]]=="", NA, 
-                         sub("\\|.*", "", paste0("https://id.loc.gov/authorities/names/", data[["LOC"]])))
-    }
-    if(e=="VIAF") {
-      data$VIAF <- ifelse(is.na(data[["VIAF"]]) | data[["VIAF"]]=="", NA, 
-                         sub("\\|.*", "", paste0("https://viaf.org/viaf/", data[["VIAF"]])))
-    }
-    if(e=="ULAN") {
-      data$ULAN <- ifelse(is.na(data[["ULAN"]]) | data[["ULAN"]]=="", NA, 
-                          sub("\\|.*", "", paste0("https://vocab.getty.edu/page/ulan/", data[["ULAN"]])))
-    }
-    if(e=="ISNI") {
-      data$ISNI <- ifelse(is.na(data[["ISNI"]]) | data[["ISNI"]]=="", NA, 
-                          sub("\\|.*", "", paste0("https://isni.org/isni/", data[["ISNI"]])))
+    }else if(e=="wiki"){
+      if(!is.element(e, names(data))){
+        wikis <- w_Wikipedias(data[[entity]], wikilangs=wikilangs)[,c(1,6)]
+        wikis$wiki <- sub("\\.wikipedia",".m.wikipedia", sub("\\|.*","", wikis$pages))
+        if (inherits(info,"character")) {
+          # wikis <- merge(wikis, data[,c("entity", info)], by="entity")
+        } else {
+          if (info) {
+            names <- ifelse(is.na(wikis$wiki) | wikis$wiki=="", " ", sub(".*/","", wikis$wiki))
+            wikis$info <- sub("character\\(0\\)", "", as.character(extractWiki(names,language=langs)))
+          } else{
+            wikis$info <- NA
+          }
+        }
+        data <- merge(data, wikis, by.x=entity, by.y="entity", all.x=TRUE, sort=FALSE)
+        data$wiki <- ifelse(is.na(data$wiki) | data$wiki=="", NA, data$wiki)
+        data$pages <- wikis <- names <- NULL
+      }
+    }else{
+      if(e %in% sites[,"name"] && formatterurls[e]!=""){
+        data[[e]] <- vapply(data[[e]],function(x){
+          x <- sub("\\|.*", "", x)
+          if(is.na(x) || x==""){
+            return(NA)
+          }else{
+            return(sub("$1",x,formatterurls[e],fixed=TRUE))
+          }
+        },character(1))
+      }
     }
   }
 
