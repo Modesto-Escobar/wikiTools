@@ -206,7 +206,7 @@ pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", 
             names <- ifelse(is.na(wikis$wiki) | wikis$wiki=="", " ", sub(".*/","", wikis$wiki))
             wikis$info <- sub("character\\(0\\)", "", as.character(extractWiki(names,language=langs)))
           } else{
-            wikis$info <- NA
+            wikis$info <- ""
           }
         }
         data <- merge(data, wikis, by.x=entity, by.y="entity", all.x=TRUE, sort=FALSE)
@@ -215,14 +215,14 @@ pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", 
       }
     }else{
       if(e %in% sites[,"name"] && formatterurls[e]!=""){
-        data[[e]] <- vapply(data[[e]],function(x){
+        data[[e]] <- sapply(data[[e]],function(x){
           x <- sub("\\|.*", "", x)
           if(is.na(x) || x==""){
             return(NA)
           }else{
             return(sub("$1",x,formatterurls[e],fixed=TRUE))
           }
-        },character(1))
+        })
       }
     }
   }
@@ -235,8 +235,8 @@ pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", 
   }
 
   linksList <- netCoin::renderLinks(data, links, NULL, "mainframe", sites=sites)
-  data$links <- ifelse(is.na(data$wiki) & is.na(data$wikidata), data[[info]],
-                       paste0(data[[info]], '</p><h3 style="margin-top:8px">',linksname,':</h3>', linksList))
+  data$links <- ifelse(is.na(data$wiki) & is.na(data$wikidata), data[['info']],
+                       paste0(data[['info']], '</p><h3 style="margin-top:8px">',linksname,':</h3>', linksList))
   data$pop_up <- netCoin::get_template2(data, title=title, title2=title2, text="links")
   data[, union(c("links", "linksList", "info", "names", "wiki", "wikidata"), links)] <- NULL
   return(data)
