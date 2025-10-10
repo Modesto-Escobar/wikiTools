@@ -16,13 +16,13 @@ Only  'json', 'xml' or 'csv' formats are allowed, default 'csv'.}
 \item{method}{The method used in the httr request, GET or POST, mandatory.
 Default 'GET'.}
 
-\item{limitRequester}{If True, uses ratelimitr to limit the requests.}
+\item{limitRequester}{If True, uses a rate limiter to limit the requests.}
 }
 \value{
 The response in selected format or NULL on errors.
 }
 \description{
-Retrieve responses from Wikidata Query Service (WDQS). Uses ratelimitr if
+Retrieve responses from Wikidata Query Service (WDQS). Uses a rate limiter if
 param limitRequester = TRUE.
 }
 \author{

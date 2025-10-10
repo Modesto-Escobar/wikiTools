@@ -31,10 +31,20 @@ VIAF_LIMIT <- 250
 #' same names and signatures, but collectively bound by a shared rate limit.
 #' Used only for WikiData Query Service (WDQS).
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
-#' @seealso ratelimitr
-#' @importFrom ratelimitr limit_rate rate
 limitRequester <- function(f, n, period) {
-  return(ratelimitr::limit_rate(f, ratelimitr::rate(n = n, period = period)))
+  last_times <- numeric(0)
+  
+  function(...) {
+    now <- Sys.time()
+    last_times <<- c(last_times, now)
+    last_times <<- last_times[difftime(now, last_times, units = "secs") < period]
+    
+    if (length(last_times) > n) {
+      wait <- period - as.numeric(difftime(now, last_times[1], units = "secs"))
+      Sys.sleep(wait)
+    }
+    f(...)
+  }
 }
 
 #' Execute a function in chunks.
@@ -140,7 +150,7 @@ reqWDQS <- function(sparql_query, format='json', method='GET') {
 
 #' Response from Wikidata Query Service
 #'
-#' Retrieve responses from Wikidata Query Service (WDQS). Uses ratelimitr if
+#' Retrieve responses from Wikidata Query Service (WDQS). Uses a rate limiter if
 #' param limitRequester = TRUE.
 #' @param sparql_query A string with the query in SPARQL language.
 #' @param format A string with the query response format. Mandatory.
@@ -148,7 +158,7 @@ reqWDQS <- function(sparql_query, format='json', method='GET') {
 #' Only  'json', 'xml' or 'csv' formats are allowed, default 'csv'.
 #' @param method The method used in the httr request, GET or POST, mandatory.
 #' Default 'GET'.
-#' @param limitRequester If True, uses ratelimitr to limit the requests.
+#' @param limitRequester If True, uses a rate limiter to limit the requests.
 #' @return The response in selected format or NULL on errors.
 #' @author Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 #' @importFrom httr stop_for_status content
@@ -156,7 +166,6 @@ reqWDQS <- function(sparql_query, format='json', method='GET') {
 #' @importFrom utils read.csv
 w_query <- function(sparql_query, format="csv", method="GET",
                     limitRequester=FALSE) {
-  # reqWDQS_rated: The ratelimitr version of reqWDQS
   # https://www.mediawiki.org/wiki/Wikidata_Query_Service/User_Manual#SPARQL_endpoint
   if (limitRequester)
     reqWDQS_rated <- limitRequester(reqWDQS, n=60, period=60)

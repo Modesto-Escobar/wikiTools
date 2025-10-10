@@ -23,9 +23,6 @@ Used only for WikiData Query Service (WDQS).
 \description{
 Limits the rate at which a function will execute
 }
-\seealso{
-ratelimitr
-}
 \author{
 Angel Zazo, Department of Computer Science and Automatics, University of Salamanca
 }
