@@ -1,6 +1,6 @@
 # w_Exhibit
 # Modesto Escobar
-# Sun Apr 13 17:22:56 2025 ------------------------------
+# Sat Dec 6 17:22:56 2025 ------------------------------
 # w_Exhibit ----
 #' Extract the first paragraph of a Wikipedia article with a maximum of characters.
 #' @param entities A vector or data.frame of entities, whose entries have to be extracted.
@@ -17,7 +17,13 @@
 #' using "|" as separator. Wikipedias pages are returned in same order as
 #' languages in this parameter. If wikilangs='' the function returns Wikipedia
 #' pages in any language, not sorted.
-#' @param links Vector of IDs for linking to its catalog. V.gr. c("Wikidata", "Wikipedia", "BNE", "RAH)
+#' @param links Vector of IDs for linking to its catalog. V.gr. c("Wikidata", "Wikipedia", "BNE", "RAH"). 
+#' These four are those by default. Others possibles are c("BVMC", "VIAF", "LOC","ISNI", "ULAN", "OPENL", 
+#' "MNCARS", "MNP", "SUDOC", "BRITISH", "BRITANNICA", "OXFORD", "WORLDCAT", "WEBCAT", "WEBGALL", "WIKIART")
+#' @param map List of options to create a map (center, zoom, zoomStep, provider, defaultColor, controls,
+#' color, jittered).
+#' Its first parameter (status) can be "none", "only", "first" or "last". Default is none, except
+#' if there is an elemente in the list in which case default is "last".
 #' @param info Add the first paragraph of Wikipedia in the template.
 #' @param imgpath Name of the directory where there are image files.
 #' @param nlimit If the number of entities exceeds this number, chunked queries
@@ -36,7 +42,8 @@
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @export
 w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = langsorder,
-                      links=c("wikidata", "wiki", "BNE", "RAH", "ISNI"), info=FALSE,
+                      links=c("wikidata", "wiki", "BNE", "RAH", "ISNI"), 
+                      map=list(status=c("none", "first", "last", "only")), info=FALSE, 
                       imgpath=NULL, nlimit = MW_LIMIT, debug=FALSE, ...) {
   # Control
   if(is.data.frame(entities) && "Q" %in% names(entities)) Qs <- entities[["Q"]] else
@@ -74,9 +81,18 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
     }
     return(sub("^\\|", "", frame[["nolinks"]]))
   }
+  
+  yeslinks <- function(frame, links=intersect(names(frame), links)) {
+    frame[["yeslinks"]]=""
+    for(x in links) {
+      frame[["yeslinks"]] <- ifelse(is.na(frame[[x]]), frame[["yeslinks"]], paste0(frame[["yeslinks"]], "|", x))
+    }
+    return(sub("^\\|", "", frame[["yeslinks"]]))
+  }
 
   # Preparation
   L <- w_EntityInfo(Qs, mode=mode, langsorder=langsorder, wikilangs=wikilangs, nlimit=nlimit, debug=debug)
+  coords <- data.frame(bLong=L$bplaceLon, bLati=L$bplaceLat, dLong=L$dplaceLon, dLati=L$dplaceLat)
   L$pic <- gsub("\\|.*","", L$pic)
   lang <- regmatches(langsorder, regexpr("(?<=^|\\|)(es|en)(?=\\||$)", langsorder, perl = TRUE))
   if(nchar(lang)==0) lang="en"
@@ -93,26 +109,32 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
   L$wikidata <- L[[1]]
 
   ## Data transformations ----
-  linksid1 <- c("BNE","RAH","VIAF","LOC","ISNI")
-  linksid2 <- c("bneid","histhispid","viafid","locid","isnid")
+  linksid1 <- c("BNE","BVMC", "RAH","VIAF","LOC","ISNI", "ULAN", "OPENL", "MNCARS", "MNP", "SUDOC", 
+                "BRITISH", "BRITANNICA", "OXFORD", "WORLDCAT", "WEBGALL", "WIKIART")
+  linksid2 <- c("bneid","bvmcid", "histhispid","viafid","locid","isnid", "ulanid", "openlid", "mncarsid", "mnpid", "sudocid",
+                "bmid", "britannid", "oxfid", "worldcatid", "webgallid", "wikiartid")
   for(i in seq_along(linksid1)){
     names(L)[names(L)==linksid2[i]] <- linksid1[i]
   }
-
+  L$Links     <- yeslinks(L, links)
   L$Missing   <- nolinks(L, links, lang)
   L$pic       <- ifelse(is.na(L$pic), paste0(imgpath, "/Q0.png"), paste0(imgpath,"/", L[["entity"]],".jpg"))
   L$wikidata <- ifelse(is.na(L[['entity']]), NA, paste0())
-
-  fields <- c("label", "entity", "description", "Missing", "sex",
+  
+  fields <- c("label", "description", "Links", "Missing", "sex",
              "byear", "bplace", "bcountry",
              "dyear", "dplace", "dcountry",
              "occupation", "genre",
-             "BNE", "RAH", "VIAF", "LOC", "ISNI", "pic", "wikipedias")
-  L <- L[, intersect(names(L),fields)]
+             "BNE", "BVMC", "RAH", "VIAF", "LOC", "SUDOC", "ISNI", "ULAN", "OPENL",
+             "MNCARS", "MNP", "BRITISH", "BRITANNICA", "OXFORD", "WORLDCAT", "WEBGALL", "WIKIART",
+             "pic", "wikipedias")
+  L <- L[, intersect(names(L),c(fields, "entity"))]
+  links <- union(links, c("wiki", "wikidata"))
+  
   D <- pop_up(L, title = "label", entity="entity", wikilangs=wikilangs, links=links, info=info)
 
-  fields <- c(fields[1:13], "pic", "pop_up")
-
+  fields <- c(fields[1:12], "pic", "pop_up")
+  
   Dnames <- names(D)
   D <- D[,fields]
   if(is.data.frame(entities)){
@@ -121,12 +143,44 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
 
   P <- selectLang(D, language=lang)
   Name <- "Name"
+  Map <- "Map"
+  Gallery <- "Galerry"
   if(lang=="es") {
     Name <- "Nombre"
+    Map <- "Mapa"
+    Gallery <- "Galería"
     names(P)[names(P)=="Missing"] <- "Carencias"
+    names(P)[names(P)=="Links"] <- "Enlaces"
   }
+# Exit ----
   E <- netCoin::exhibit(P, name=Name, ntext="pop_up", image="img", language = lang, ...)
-
+  E$coords <- coords
+  if(map[[1]][1]!="none") {
+    data <- cbind(E$nodes, E$coords[,1:2])
+    if(!exists("provider", map)) map$provider="OpenStreetMap"
+    if(!exists("controls", map)) map$controls=1:4
+    if(!exists("mode",     map)) map$mode=2
+    if(!exists("defaultColor", map)) map$defaultColor="#2f7bee"
+    M <- evolMap::create_map(language="es", controls=map$controls, mode=map$mode,  
+                             zoom=map$zoom, 
+                             center=map$center, 
+                             provider=map$provider,
+                             defaultColor=map$defaultColor,
+                             ...)
+    M <- evolMap::add_markers(M, data, "bLati", "bLong", name=Name, info="pop_up", 
+                              color=map$color, jittered=map$jittered, image= "img")
+    if(map[[1]][1]=="only") {
+      E<-M
+    }
+    if(map[[1]][1]=="first") {
+      if(langsorder=="es") E <- netCoin::multigraphCreate(Mapa=M, Galería=E)
+      else E <- netCoin::multigraphCreate(Map=M, Gallery=E)
+    }
+    else {
+      if(langsorder=="es") E <- netCoin::multigraphCreate(Galería=E, Mapa=M)
+      else E <- netCoin::multigraphCreate(Map=M, Gallery=E)
+    }
+  }
   return(E)
 }
 
@@ -160,20 +214,33 @@ pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", 
                    wikilangs="en") {
   data <- as.data.frame(data)
   sites <- data.frame(
-    url=c("wikipedia.org","wikidata.org","brumario.usal.es", "museodelprado.es", "museoreinasofia.es", "viaf.org", "bne.es", "historia-hispanica.rah.es", "id.loc.gov", "isni.org", "vocab.getty.edu"),
-    name=c("Wikipedia","Wikidata","USAL", "MNP", "MNCARS","VIAF", "BNE", "RAH", "LOC", "ISNI", "ULAN"),
+    url=c("wikipedia.org","wikidata.org","brumario.usal.es", "museodelprado.es", "museoreinasofia.es", "viaf.org", "bne.es", "historia-hispanica.rah.es", "id.loc.gov", "isni.org", "vocab.getty.edu",
+          "cervantesvirtual.com", "openlibrary.org", "idref.fr", "britishmuseum.org", "britannica.com", "oxfordreference.com",
+          "oclc.org", "wga.hu", "wikiart.org"),
+    name=c("Wikipedia","Wikidata","USAL", "MNP", "MNCARS","VIAF", "BNE", "RAH", "LOC", "ISNI", "ULAN",
+           "BVMC", "OPENL", "SUDOC", "BRITISH", "BRITANNICA", "OXFORD", "WORLDCAT", "WEBGALL", "WIKIART"),
     icon=c("https://www.wikipedia.org/static/favicon/wikipedia.ico",
            "https://www.wikidata.org/static/favicon/wikidata.ico",
            "https://sociocav.usal.es/me/pics/LogoBUSAL.png",
            "https://sociocav.usal.es/me/pics/MP.png",
-           "https://static5.museoreinasofia.es/sites/all/themes/mrs_twitter_bootstrap/images/misc/favicon-32x32.png",
+           "https://sociocav.usal.es/me/pics/ReinaSofia.png",
            "https://sociocav.usal.es/me/pics/VIAF.png", 
            "https://sociocav.usal.es/me/pics/BNE.png",
            "https://sociocav.usal.es/me/pics/RAH.png",           
            "https://sociocav.usal.es/me/pics/LOC.png",           
-           "https://isni.org/images/isni-logo.png",
-           "https://sociocav.usal.es/me/pics/ULAN.png"),
-    target=c("mainframe","mainframe","mainframe","mainframe", "mainframe","_blank","mainframe","mainframe","_blank","mainframe", "_blank")
+           "https://sociocav.usal.es/me/pics/ISNI.png",
+           "https://sociocav.usal.es/me/pics/ULAN.png",
+           "https://sociocav.usal.es/me/pics/BVMC.png",
+           "https://sociocav.usal.es/me/pics/OpenL.png",
+           "https://sociocav.usal.es/me/pics/SUDOC.png",
+           "https://sociocav.usal.es/me/pics/BM.png",
+           "https://sociocav.usal.es/me/pics/Britannica.png",
+           "https://sociocav.usal.es/me/pics/Oxford.png",
+           "https://sociocav.usal.es/me/pics/WorldCat.png",
+           "https://sociocav.usal.es/me/pics/WebGallery.png",
+           "https://sociocav.usal.es/me/pics/WikiArt.png"),
+    target=c("mainframe","mainframe","mainframe","mainframe", "mainframe","_blank","mainframe","mainframe","_blank","_blank", "_blank",
+             "_blank","mainframe","mainframe", "_blank","mainframe", "_blank", "mainframe", "_blank", "mainframe")
   )
 
   formatterurls <- c("",
@@ -186,7 +253,17 @@ pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", 
   "https://historia-hispanica.rah.es/$1",
   "https://id.loc.gov/authorities/$1",
   "https://isni.org/isni/$1",
-  "https://vocab.getty.edu/page/ulan/$1")
+  "https://vocab.getty.edu/page/ulan/$1",
+  "https://data.cervantesvirtual.com/person/$1",
+  "https://entities.oclc.org/worldcat/entity/$1",
+  "https://www.idref.fr/$1",
+  "https://www.britishmuseum.org/collection/term/BIOG$1",
+  "https://www.britannica.com/$1",
+  "https://www.oxfordreference.com/display/10.1093/oi/authority.$1",
+  "https://entities.oclc.org/worldcat/entity/$1",
+  "https://www.wga.hu/frames-e.html?/html/$1",
+  "https://www.wikiart.org/es/$1"
+  )
   names(formatterurls) <- sites[,"name"]
 
   langs <- unlist(strsplit(wikilangs, "\\|"))

@@ -1607,13 +1607,19 @@ w_EntityInfo <- function(entity_list, mode='default', langsorder='',
   else {
     # For these claims, more than one occurrences separated with '|' are token, except
     # for fields in fieldsonlyone, in which only the most referenced is taken
-    fields <- c('P31', 'P18', 'P21', 'P69', 'P106', 'P101', 'P135', 'P136',
-                'P737', 'P800', 'P463', 'P166', 'P213', 'P214', 'P245', 'P950', 'P5321', 'P4439', 'P13371', 'P244',
+    fields <- c('P31', 'P18', 'P21', 'P69', 'P106', 
+                'P101', 'P135', 'P136', 'P737', 'P800', 
+                'P463', 'P166', 'P213', 'P214', 'P245', 'p648', 
+                'P950', 'P2799', 'P4439', 'P5321', 'P13371', 'P244', 'P269',
+                'P1711', 'P1417', 'P12582', 'P10832', 'P1882', 'P6002',
                 'P19', 'P20', 'P569', 'P570')
     names(fields) <- c('instanceof', 'pic', 'sex', 'educatedat', 'occupation',
                        'fieldofwork', 'movement', 'genre', 'influencedby', 'notablework',
-                       'memberof', 'award', 'isnid', 'viafid', 'ulanid', 'bneid', 'mnpid', 'mncarsid', 'histhispid', 'locid',
+                       'memberof', 'award', 'isnid', 'viafid', 'ulanid', 'openlid', 
+                       'bneid', 'bvmcid', 'mncarsid', 'mnpid', 'histhispid', 'locid', 'sudocid', 
+                       'bmid', 'britannid', 'oxfid', 'worldcatid', 'webgallid', 'wikiartid',
                        'bplace', 'dplace', 'bdate', 'ddate')
+    
     # For this claims, only the most referred is taken (note, however that the
     # preferred has priority).
     fieldsonlyone <- c('P19', 'P20', 'P569', 'P570')
@@ -1625,7 +1631,10 @@ w_EntityInfo <- function(entity_list, mode='default', langsorder='',
                  'occupationQ', 'occupation', 'notableworkQ', 'notablework', 'educatedatQ', 'educatedat',
                  'fieldofworkQ', 'fieldofwork', 'movementQ', 'movement', 'genreQ', 'genre',
                  'influencedbyQ', 'influencedby', 'memberofQ', 'memberof', 'awardQ', 'award',
-                 'isnid', 'viafid', 'ulanid', 'bneid', 'mnpid', 'mncarsid', 'histhispid', 'locid', 'pic', 'wikipedias')
+                 'isnid', 'viafid', 'ulanid', 'openlid', 
+                 'bneid', 'bvmcid', 'mncarsid', 'mnpid', 'histhispid', 'locid', 'sudocid', 
+                 'bmid', 'britannid', 'oxfid', 'worldcatid', 'webgallid', 'wikiartid', 
+                 'pic', 'wikipedias')
   }
   #
   llangs <- strsplit(langsorder, '|', fixed = T)[[1]]
