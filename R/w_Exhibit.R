@@ -144,11 +144,11 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
   P <- selectLang(D, language=lang)
   Name <- "Name"
   Map <- "Map"
-  Gallery <- "Galerry"
+  Gallery <- "Gallery"
   if(lang=="es") {
     Name <- "Nombre"
     Map <- "Mapa"
-    Gallery <- "Galería"
+    Gallery <- "Galer\u00EDa"
     names(P)[names(P)=="Missing"] <- "Carencias"
     names(P)[names(P)=="Links"] <- "Enlaces"
   }
@@ -173,11 +173,11 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
       E<-M
     }
     if(map[[1]][1]=="first") {
-      if(langsorder=="es") E <- netCoin::multigraphCreate(Mapa=M, Galería=E)
+      if(langsorder=="es") E <- netCoin::multigraphCreate("Mapa"=M, "Galer\u00EDa"=E)
       else E <- netCoin::multigraphCreate(Map=M, Gallery=E)
     }
     else {
-      if(langsorder=="es") E <- netCoin::multigraphCreate(Galería=E, Mapa=M)
+      if(langsorder=="es") E <- netCoin::multigraphCreate("Galer\u00EDa"=E, "Mapa"=M)
       else E <- netCoin::multigraphCreate(Map=M, Gallery=E)
     }
   }
