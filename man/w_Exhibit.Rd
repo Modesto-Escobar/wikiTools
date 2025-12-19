@@ -10,7 +10,7 @@ w_Exhibit(
   langsorder = "en",
   wikilangs = langsorder,
   links = c("wikidata", "wiki", "BNE", "RAH", "ISNI"),
-  map = list(status = c("none", "first", "last", "only")),
+  map = c("none", "first", "last", "only"),
   info = FALSE,
   imgpath = NULL,
   nlimit = MW_LIMIT,
@@ -41,10 +41,7 @@ pages in any language, not sorted.}
 These four are those by default. Others possibles are c("BVMC", "VIAF", "LOC","ISNI", "ULAN", "OPENL",
 "MNCARS", "MNP", "SUDOC", "BRITISH", "BRITANNICA", "OXFORD", "WORLDCAT", "WEBCAT", "WEBGALL", "WIKIART")}
 
-\item{map}{List of options to create a map (center, zoom, zoomStep, provider, defaultColor, controls,
-color, jittered).
-Its first parameter (status) can be "none", "only", "first" or "last". Default is none, except
-if there is an elemente in the list in which case default is "last".}
+\item{map}{A map should be created? This parameter can be "none", "only", "first" or "last".}
 
 \item{info}{Add the first paragraph of Wikipedia in the template.}
 
@@ -56,7 +53,7 @@ reduce the default value if error is raised.}
 
 \item{debug}{For debugging (info or query).}
 
-\item{...}{Same arguments as in netCoin::exhibit().}
+\item{...}{Arguments for netCoin::exhibit(), evolMap::create_map() and evolMap::add_markers().}
 }
 \value{
 An object of gallery_rd3 class.

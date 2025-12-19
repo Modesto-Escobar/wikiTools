@@ -20,17 +20,14 @@
 #' @param links Vector of IDs for linking to its catalog. V.gr. c("Wikidata", "Wikipedia", "BNE", "RAH"). 
 #' These four are those by default. Others possibles are c("BVMC", "VIAF", "LOC","ISNI", "ULAN", "OPENL", 
 #' "MNCARS", "MNP", "SUDOC", "BRITISH", "BRITANNICA", "OXFORD", "WORLDCAT", "WEBCAT", "WEBGALL", "WIKIART")
-#' @param map List of options to create a map (center, zoom, zoomStep, provider, defaultColor, controls,
-#' color, jittered).
-#' Its first parameter (status) can be "none", "only", "first" or "last". Default is none, except
-#' if there is an elemente in the list in which case default is "last".
+#' @param map A map should be created? This parameter can be "none", "only", "first" or "last".
 #' @param info Add the first paragraph of Wikipedia in the template.
 #' @param imgpath Name of the directory where there are image files.
 #' @param nlimit If the number of entities exceeds this number, chunked queries
 #' are done. This is the number of entities requested in each chunk. Please,
 #' reduce the default value if error is raised.
 #' @param debug For debugging (info or query).
-#' @param ... Same arguments as in netCoin::exhibit().
+#' @param ... Arguments for netCoin::exhibit(), evolMap::create_map() and evolMap::add_markers().
 #' @examples
 #' \dontrun{
 #' ## Obtaining information in English Wikidata
@@ -43,7 +40,7 @@
 #' @export
 w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = langsorder,
                       links=c("wikidata", "wiki", "BNE", "RAH", "ISNI"), 
-                      map=list(status=c("none", "first", "last", "only")), info=FALSE, 
+                      map=c("none", "first", "last", "only"), info=FALSE, 
                       imgpath=NULL, nlimit = MW_LIMIT, debug=FALSE, ...) {
   # Control
   if(is.data.frame(entities) && "Q" %in% names(entities)) Qs <- entities[["Q"]] else
@@ -153,32 +150,46 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
     names(P)[names(P)=="Links"] <- "Enlaces"
   }
 # Exit ----
-  E <- netCoin::exhibit(P, name=Name, ntext="pop_up", image="img", language = lang, ...)
+
+  args <- list(...)
+  exhibitArgsNames <- intersect(names(formals(netCoin::exhibit)),names(args))
+
+  exhibitArgs <- args[exhibitArgsNames]
+  exhibitArgs[['nodes']] <- P
+  exhibitArgs[['name']] <- Name
+  exhibitArgs[['ntext']] <- "pop_up"
+  exhibitArgs[['image']] <- "img"
+  exhibitArgs[['language']] <- lang
+  exhibitArgs[['zoom']] <- NULL
+  E <- do.call(netCoin::exhibit,exhibitArgs)
   E$coords <- coords
-  if(map[[1]][1]!="none") {
-    data <- cbind(E$nodes, E$coords[,1:2])
-    if(!exists("provider", map)) map$provider="OpenStreetMap"
-    if(!exists("controls", map)) map$controls=1:4
-    if(!exists("mode",     map)) map$mode=2
-    if(!exists("defaultColor", map)) map$defaultColor="#2f7bee"
-    M <- evolMap::create_map(language="es", controls=map$controls, mode=map$mode,  
-                             zoom=map$zoom, 
-                             center=map$center, 
-                             provider=map$provider,
-                             defaultColor=map$defaultColor,
-                             ...)
-    M <- evolMap::add_markers(M, data, "bLati", "bLong", name=Name, info="pop_up", 
-                              color=map$color, jittered=map$jittered, image= "img")
-    if(map[[1]][1]=="only") {
+  if(map[1]!="none") {
+    mapArgsNames <- intersect(names(formals(evolMap::create_map)),names(args))
+    mapArgs <- args[mapArgsNames]
+    mapArgs[['mode']] <- 2
+    mapArgs[['language']] <- lang
+    M <- do.call(evolMap::create_map,mapArgs)
+
+    markersArgsNames <- intersect(names(formals(evolMap::add_markers)),names(args))
+    markersArgs <- args[markersArgsNames]
+    markersArgs[['map']] <- M
+    markersArgs[['data']] <- cbind(E$nodes, E$coords[,1:2])
+    markersArgs[['latitude']] <- "bLati"
+    markersArgs[['longitude']] <- "bLong"
+    markersArgs[['name']] <- Name
+    markersArgs[['info']] <- "pop_up"
+    markersArgs[['image']] <- "img"
+    M <- do.call(evolMap::add_markers,markersArgs)
+    if(map[1]=="only") {
       E<-M
-    }
-    if(map[[1]][1]=="first") {
-      if(langsorder=="es") E <- netCoin::multigraphCreate("Mapa"=M, "Galer\u00EDa"=E)
-      else E <- netCoin::multigraphCreate(Map=M, Gallery=E)
-    }
-    else {
-      if(langsorder=="es") E <- netCoin::multigraphCreate("Galer\u00EDa"=E, "Mapa"=M)
-      else E <- netCoin::multigraphCreate(Map=M, Gallery=E)
+    }else{
+      multiArgs <- list()
+      multiArgs[[Gallery]] <- E
+      multiArgs[[Map]] <- M
+      if(map[1]=="first"){
+        multiArgs <- multiArgs[c(2,1)]
+      }
+      E <- do.call(netCoin::multigraphCreate,multiArgs)
     }
   }
   return(E)
