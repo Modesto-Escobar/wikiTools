@@ -20,17 +20,14 @@
 #' @param links Vector of IDs for linking to its catalog. V.gr. c("Wikidata", "Wikipedia", "BNE", "RAH"). 
 #' These four are those by default. Others possibles are c("BVMC", "VIAF", "LOC","ISNI", "ULAN", "OPENL", 
 #' "MNCARS", "MNP", "SUDOC", "BRITISH", "BRITANNICA", "OXFORD", "WORLDCAT", "WEBCAT", "WEBGALL", "WIKIART")
-#' @param map List of options to create a map (center, zoom, zoomStep, provider, defaultColor, controls,
-#' color, jittered).
-#' Its first parameter (status) can be "none", "only", "first" or "last". Default is none, except
-#' if there is an elemente in the list in which case default is "last".
+#' @param map A map should be created? This parameter can be "none", "only", "first" or "last".
 #' @param info Add the first paragraph of Wikipedia in the template.
 #' @param imgpath Name of the directory where there are image files.
 #' @param nlimit If the number of entities exceeds this number, chunked queries
 #' are done. This is the number of entities requested in each chunk. Please,
 #' reduce the default value if error is raised.
 #' @param debug For debugging (info or query).
-#' @param ... Same arguments as in netCoin::exhibit().
+#' @param ... Arguments for netCoin::exhibit(), evolMap::create_map() and evolMap::add_markers().
 #' @examples
 #' \dontrun{
 #' ## Obtaining information in English Wikidata
@@ -43,7 +40,7 @@
 #' @export
 w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = langsorder,
                       links=c("wikidata", "wiki", "BNE", "RAH", "ISNI"), 
-                      map=list(status=c("none", "first", "last", "only")), info=FALSE, 
+                      map=c("none", "first", "last", "only"), info=FALSE, 
                       imgpath=NULL, nlimit = MW_LIMIT, debug=FALSE, ...) {
   # Control
   if(is.data.frame(entities) && "Q" %in% names(entities)) Qs <- entities[["Q"]] else
@@ -109,9 +106,9 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
   L$wikidata <- L[[1]]
 
   ## Data transformations ----
-  linksid1 <- c("BNE","BVMC", "RAH","VIAF","LOC","ISNI", "ULAN", "OPENL", "MNCARS", "MNP", "SUDOC", 
+  linksid1 <- c("BNE","BVMC", "RAH","VIAF","LOC","ISNI", "ULAN", "OPENL", "MNCARS", "MNP", "SUDOC", "DNB", "BNPT",
                 "BRITISH", "BRITANNICA", "OXFORD", "WORLDCAT", "WEBGALL", "WIKIART")
-  linksid2 <- c("bneid","bvmcid", "histhispid","viafid","locid","isnid", "ulanid", "openlid", "mncarsid", "mnpid", "sudocid",
+  linksid2 <- c("bneid","bvmcid", "histhispid","viafid","locid","isnid", "ulanid", "openlid", "mncarsid", "mnpid", "sudocid", "dnbid", "ptbnpid",
                 "bmid", "britannid", "oxfid", "worldcatid", "webgallid", "wikiartid")
   for(i in seq_along(linksid1)){
     names(L)[names(L)==linksid2[i]] <- linksid1[i]
@@ -125,7 +122,7 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
              "byear", "bplace", "bcountry",
              "dyear", "dplace", "dcountry",
              "occupation", "genre",
-             "BNE", "BVMC", "RAH", "VIAF", "LOC", "SUDOC", "ISNI", "ULAN", "OPENL",
+             "BNE", "BVMC", "RAH", "VIAF", "LOC", "SUDOC", "DNB", "BNPT", "ISNI", "ULAN", "OPENL",
              "MNCARS", "MNP", "BRITISH", "BRITANNICA", "OXFORD", "WORLDCAT", "WEBGALL", "WIKIART",
              "pic", "wikipedias")
   L <- L[, intersect(names(L),c(fields, "entity"))]
@@ -153,32 +150,46 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
     names(P)[names(P)=="Links"] <- "Enlaces"
   }
 # Exit ----
-  E <- netCoin::exhibit(P, name=Name, ntext="pop_up", image="img", language = lang, ...)
+
+  args <- list(...)
+  exhibitArgsNames <- intersect(names(formals(netCoin::exhibit)),names(args))
+
+  exhibitArgs <- args[exhibitArgsNames]
+  exhibitArgs[['nodes']] <- P
+  exhibitArgs[['name']] <- Name
+  exhibitArgs[['ntext']] <- "pop_up"
+  exhibitArgs[['image']] <- "img"
+  exhibitArgs[['language']] <- lang
+  exhibitArgs[['zoom']] <- NULL
+  E <- do.call(netCoin::exhibit,exhibitArgs)
   E$coords <- coords
-  if(map[[1]][1]!="none") {
-    data <- cbind(E$nodes, E$coords[,1:2])
-    if(!exists("provider", map)) map$provider="OpenStreetMap"
-    if(!exists("controls", map)) map$controls=1:4
-    if(!exists("mode",     map)) map$mode=2
-    if(!exists("defaultColor", map)) map$defaultColor="#2f7bee"
-    M <- evolMap::create_map(language="es", controls=map$controls, mode=map$mode,  
-                             zoom=map$zoom, 
-                             center=map$center, 
-                             provider=map$provider,
-                             defaultColor=map$defaultColor,
-                             ...)
-    M <- evolMap::add_markers(M, data, "bLati", "bLong", name=Name, info="pop_up", 
-                              color=map$color, jittered=map$jittered, image= "img")
-    if(map[[1]][1]=="only") {
+  if(map[1]!="none") {
+    mapArgsNames <- intersect(names(formals(evolMap::create_map)),names(args))
+    mapArgs <- args[mapArgsNames]
+    mapArgs[['mode']] <- 2
+    mapArgs[['language']] <- lang
+    M <- do.call(evolMap::create_map,mapArgs)
+
+    markersArgsNames <- intersect(names(formals(evolMap::add_markers)),names(args))
+    markersArgs <- args[markersArgsNames]
+    markersArgs[['map']] <- M
+    markersArgs[['data']] <- cbind(E$nodes, E$coords[,1:2])
+    markersArgs[['latitude']] <- "bLati"
+    markersArgs[['longitude']] <- "bLong"
+    markersArgs[['name']] <- Name
+    markersArgs[['info']] <- "pop_up"
+    markersArgs[['image']] <- "img"
+    M <- do.call(evolMap::add_markers,markersArgs)
+    if(map[1]=="only") {
       E<-M
-    }
-    if(map[[1]][1]=="first") {
-      if(langsorder=="es") E <- netCoin::multigraphCreate("Mapa"=M, "Galer\u00EDa"=E)
-      else E <- netCoin::multigraphCreate(Map=M, Gallery=E)
-    }
-    else {
-      if(langsorder=="es") E <- netCoin::multigraphCreate("Galer\u00EDa"=E, "Mapa"=M)
-      else E <- netCoin::multigraphCreate(Map=M, Gallery=E)
+    }else{
+      multiArgs <- list()
+      multiArgs[[Gallery]] <- E
+      multiArgs[[Map]] <- M
+      if(map[1]=="first"){
+        multiArgs <- multiArgs[c(2,1)]
+      }
+      E <- do.call(netCoin::multigraphCreate,multiArgs)
     }
   }
   return(E)
@@ -215,10 +226,10 @@ pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", 
   data <- as.data.frame(data)
   sites <- data.frame(
     url=c("wikipedia.org","wikidata.org","brumario.usal.es", "museodelprado.es", "museoreinasofia.es", "viaf.org", "bne.es", "historia-hispanica.rah.es", "id.loc.gov", "isni.org", "vocab.getty.edu",
-          "cervantesvirtual.com", "openlibrary.org", "idref.fr", "britishmuseum.org", "britannica.com", "oxfordreference.com",
+          "cervantesvirtual.com", "openlibrary.org", "idref.fr", "d-nb.info", "bnportugal.gov.pt", "britishmuseum.org", "britannica.com", "oxfordreference.com",
           "oclc.org", "wga.hu", "wikiart.org"),
     name=c("Wikipedia","Wikidata","USAL", "MNP", "MNCARS","VIAF", "BNE", "RAH", "LOC", "ISNI", "ULAN",
-           "BVMC", "OPENL", "SUDOC", "BRITISH", "BRITANNICA", "OXFORD", "WORLDCAT", "WEBGALL", "WIKIART"),
+           "BVMC", "OPENL", "SUDOC", "DNB", "BNPT", "BRITISH", "BRITANNICA", "OXFORD", "WORLDCAT", "WEBGALL", "WIKIART"),
     icon=c("https://www.wikipedia.org/static/favicon/wikipedia.ico",
            "https://www.wikidata.org/static/favicon/wikidata.ico",
            "https://sociocav.usal.es/me/pics/LogoBUSAL.png",
@@ -233,6 +244,8 @@ pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", 
            "https://sociocav.usal.es/me/pics/BVMC.png",
            "https://sociocav.usal.es/me/pics/OpenL.png",
            "https://sociocav.usal.es/me/pics/SUDOC.png",
+           "https://sociocav.usal.es/me/pics/DNB.png",
+           "https://sociocav.usal.es/me/pics/BNPT.png",
            "https://sociocav.usal.es/me/pics/BM.png",
            "https://sociocav.usal.es/me/pics/Britannica.png",
            "https://sociocav.usal.es/me/pics/Oxford.png",
@@ -240,7 +253,7 @@ pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", 
            "https://sociocav.usal.es/me/pics/WebGallery.png",
            "https://sociocav.usal.es/me/pics/WikiArt.png"),
     target=c("mainframe","mainframe","mainframe","mainframe", "mainframe","_blank","mainframe","mainframe","_blank","_blank", "_blank",
-             "_blank","mainframe","mainframe", "_blank","mainframe", "_blank", "mainframe", "_blank", "mainframe")
+             "_blank","mainframe","mainframe", "_blank", "mainframe", "_blank","mainframe", "_blank", "mainframe", "_blank", "mainframe")
   )
 
   formatterurls <- c("",
@@ -257,6 +270,8 @@ pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", 
   "https://data.cervantesvirtual.com/person/$1",
   "https://entities.oclc.org/worldcat/entity/$1",
   "https://www.idref.fr/$1",
+  "https://d-nb.info/gnd/$1",
+  "https://id.bnportugal.gov.pt/aut/catbnp/$1",
   "https://www.britishmuseum.org/collection/term/BIOG$1",
   "https://www.britannica.com/$1",
   "https://www.oxfordreference.com/display/10.1093/oi/authority.$1",
