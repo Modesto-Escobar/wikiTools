@@ -114,7 +114,7 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
   L$occupation   <- toupper2(L$occupation)
 # Inserta ----
   L$wiki <- sub("\\|.*","", L$wikipedias)
-  fieldW=""
+  fieldW=c()
   if (wikilangs!=langsorder) {
     L$Wikipedias <- checkWikis(L$wikipedias, wikilangs)
     fieldW="Wikipedias"
