@@ -86,6 +86,17 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
     }
     return(sub("^\\|", "", frame[["yeslinks"]]))
   }
+  
+  checkWikis <- function(cadena_actual, cadena_referencia) {
+    cadena_actual <- gsub("https://([a-z-]+)\\.wikipedia\\.org/wiki/[^|]+", "\\1", cadena_actual)
+    v_ref <- unlist(strsplit(cadena_referencia, "|", fixed = TRUE))
+    procesar_fila <- function(x) {
+      v_act <- unlist(strsplit(x, "|", fixed = TRUE))
+      res <- ifelse(v_ref %in% v_act, v_ref, paste0("~", v_ref))
+      return(paste(res, collapse = "|"))
+    }
+    sapply(cadena_actual, procesar_fila, USE.NAMES = FALSE)
+  }
 
   # Preparation
   L <- w_EntityInfo(Qs, mode=mode, langsorder=langsorder, wikilangs=wikilangs, nlimit=nlimit, debug=debug)
@@ -101,8 +112,13 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
 
   L$description <- toupper1(L$description)
   L$occupation   <- toupper2(L$occupation)
-
+# Inserta ----
   L$wiki <- sub("\\|.*","", L$wikipedias)
+  fieldW=""
+  if (wikilangs!=langsorder) {
+    L$Wikipedias <- checkWikis(L$wikipedias, wikilangs)
+    fieldW="Wikipedias"
+  }
   L$wikidata <- L[[1]]
 
   ## Data transformations ----
@@ -124,13 +140,13 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
              "occupation", "genre",
              "BNE", "BVMC", "RAH", "VIAF", "LOC", "SUDOC", "ISNI", "ULAN", "OPENL",
              "MNCARS", "MNP", "BRITISH", "BRITANNICA", "OXFORD", "WORLDCAT", "WEBGALL", "WIKIART",
-             "pic", "wikipedias")
+             "pic", "Wikipedias")
   L <- L[, intersect(names(L),c(fields, "entity"))]
   links <- union(links, c("wiki", "wikidata"))
   
   D <- pop_up(L, title = "label", entity="entity", wikilangs=wikilangs, links=links, info=info)
 
-  fields <- c(fields[1:12], "pic", "pop_up")
+  fields <- c(fields[1:12], fieldW, "pic", "pop_up")
   
   Dnames <- names(D)
   D <- D[,fields]
