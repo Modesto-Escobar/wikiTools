@@ -122,9 +122,9 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
   L$wikidata <- L[[1]]
 
   ## Data transformations ----
-  linksid1 <- c("BNE","BVMC", "RAH","VIAF","LOC","ISNI", "ULAN", "OPENL", "MNCARS", "MNP", "SUDOC", 
+  linksid1 <- c("BNE","BVMC", "RAH","VIAF","LOC","ISNI", "ULAN", "OPENL", "MNCARS", "MNP", "SUDOC", "DNB", "BNPT",
                 "BRITISH", "BRITANNICA", "OXFORD", "WORLDCAT", "WEBGALL", "WIKIART")
-  linksid2 <- c("bneid","bvmcid", "histhispid","viafid","locid","isnid", "ulanid", "openlid", "mncarsid", "mnpid", "sudocid",
+  linksid2 <- c("bneid","bvmcid", "histhispid","viafid","locid","isnid", "ulanid", "openlid", "mncarsid", "mnpid", "sudocid", "dnbid", "ptbnpid",
                 "bmid", "britannid", "oxfid", "worldcatid", "webgallid", "wikiartid")
   for(i in seq_along(linksid1)){
     names(L)[names(L)==linksid2[i]] <- linksid1[i]
@@ -138,7 +138,7 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
              "byear", "bplace", "bcountry",
              "dyear", "dplace", "dcountry",
              "occupation", "genre",
-             "BNE", "BVMC", "RAH", "VIAF", "LOC", "SUDOC", "ISNI", "ULAN", "OPENL",
+             "BNE", "BVMC", "RAH", "VIAF", "LOC", "SUDOC", "DNB", "BNPT", "ISNI", "ULAN", "OPENL",
              "MNCARS", "MNP", "BRITISH", "BRITANNICA", "OXFORD", "WORLDCAT", "WEBGALL", "WIKIART",
              "pic", "Wikipedias")
   L <- L[, intersect(names(L),c(fields, "entity"))]
@@ -242,10 +242,10 @@ pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", 
   data <- as.data.frame(data)
   sites <- data.frame(
     url=c("wikipedia.org","wikidata.org","brumario.usal.es", "museodelprado.es", "museoreinasofia.es", "viaf.org", "bne.es", "historia-hispanica.rah.es", "id.loc.gov", "isni.org", "vocab.getty.edu",
-          "cervantesvirtual.com", "openlibrary.org", "idref.fr", "britishmuseum.org", "britannica.com", "oxfordreference.com",
+          "cervantesvirtual.com", "openlibrary.org", "idref.fr", "d-nb.info", "bnportugal.gov.pt", "britishmuseum.org", "britannica.com", "oxfordreference.com",
           "oclc.org", "wga.hu", "wikiart.org"),
     name=c("Wikipedia","Wikidata","USAL", "MNP", "MNCARS","VIAF", "BNE", "RAH", "LOC", "ISNI", "ULAN",
-           "BVMC", "OPENL", "SUDOC", "BRITISH", "BRITANNICA", "OXFORD", "WORLDCAT", "WEBGALL", "WIKIART"),
+           "BVMC", "OPENL", "SUDOC", "DNB", "BNPT", "BRITISH", "BRITANNICA", "OXFORD", "WORLDCAT", "WEBGALL", "WIKIART"),
     icon=c("https://www.wikipedia.org/static/favicon/wikipedia.ico",
            "https://www.wikidata.org/static/favicon/wikidata.ico",
            "https://sociocav.usal.es/me/pics/LogoBUSAL.png",
@@ -260,6 +260,8 @@ pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", 
            "https://sociocav.usal.es/me/pics/BVMC.png",
            "https://sociocav.usal.es/me/pics/OpenL.png",
            "https://sociocav.usal.es/me/pics/SUDOC.png",
+           "https://sociocav.usal.es/me/pics/DNB.png",
+           "https://sociocav.usal.es/me/pics/BNPT.png",
            "https://sociocav.usal.es/me/pics/BM.png",
            "https://sociocav.usal.es/me/pics/Britannica.png",
            "https://sociocav.usal.es/me/pics/Oxford.png",
@@ -267,7 +269,7 @@ pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", 
            "https://sociocav.usal.es/me/pics/WebGallery.png",
            "https://sociocav.usal.es/me/pics/WikiArt.png"),
     target=c("mainframe","mainframe","mainframe","mainframe", "mainframe","_blank","mainframe","mainframe","_blank","_blank", "_blank",
-             "_blank","mainframe","mainframe", "_blank","mainframe", "_blank", "mainframe", "_blank", "mainframe")
+             "_blank","mainframe","mainframe", "_blank", "mainframe", "_blank","mainframe", "_blank", "mainframe", "_blank", "mainframe")
   )
 
   formatterurls <- c("",
@@ -284,6 +286,8 @@ pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", 
   "https://data.cervantesvirtual.com/person/$1",
   "https://entities.oclc.org/worldcat/entity/$1",
   "https://www.idref.fr/$1",
+  "https://d-nb.info/gnd/$1",
+  "https://id.bnportugal.gov.pt/aut/catbnp/$1",
   "https://www.britishmuseum.org/collection/term/BIOG$1",
   "https://www.britannica.com/$1",
   "https://www.oxfordreference.com/display/10.1093/oi/authority.$1",
