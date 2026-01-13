@@ -1609,7 +1609,7 @@ w_EntityInfo <- function(entity_list, mode='default', langsorder='',
     # for fields in fieldsonlyone, in which only the most referenced is taken
     fields <- c('P31', 'P18', 'P21', 'P69', 'P106', 
                 'P101', 'P135', 'P136', 'P737', 'P800', 
-                'P463', 'P166', 'P213', 'P214', 'P245', 'p648', 
+                'P463', 'P166', 'P213', 'P214', 'P245', 'P648', 
                 'P950', 'P2799', 'P4439', 'P5321', 'P13371', 'P244', 'P269',
                 'P227', 'P1005',
                 'P1711', 'P1417', 'P12582', 'P10832', 'P1882', 'P6002',

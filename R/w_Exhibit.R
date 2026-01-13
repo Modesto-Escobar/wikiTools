@@ -48,7 +48,8 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
       if(is.data.frame(entities)) stop("Frame entities has to have a Qs' field") else
         if(is.vector(entities) && grepl("Q\\d", entities[1])) Qs <- entities else
           stop("Argument entities must contain a vector of Qs")
-
+  dupBNE <- ifelse("BNE2" %in% links, TRUE, FALSE)
+  links <- gsub("BNE2","BNE", links)
   # Functions
   toupper1 <-function(text) {
     return(ifelse(is.na(text),  "", paste0(toupper(substr(text, 1, 1)),substr(text, 2, nchar(text)))))
@@ -97,7 +98,9 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
     }
     sapply(cadena_actual, procesar_fila, USE.NAMES = FALSE)
   }
-
+  
+  
+   
   # Preparation
   L <- w_EntityInfo(Qs, mode=mode, langsorder=langsorder, wikilangs=wikilangs, nlimit=nlimit, debug=debug)
   coords <- data.frame(bLong=L$bplaceLon, bLati=L$bplaceLat, dLong=L$dplaceLon, dLati=L$dplaceLat)
@@ -107,6 +110,9 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
 
   ### Image loading
   if(!is.null(imgpath)) {
+    if (!dir.exists(imgpath)) {
+      dir.create(imgpath, recursive = TRUE)
+    }
     getFiles(L[!is.na(L$pic), c("entity", "pic")], path=imgpath, ext="jpg")
   }
 
@@ -144,7 +150,7 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
   L <- L[, intersect(names(L),c(fields, "entity"))]
   links <- union(links, c("wiki", "wikidata"))
   
-  D <- pop_up(L, title = "label", entity="entity", wikilangs=wikilangs, links=links, info=info)
+  D <- pop_up(L, title = "label", entity="entity", wikilangs=wikilangs, links=links, info=info, dupBNE=dupBNE)
 
   fields <- c(fields[1:12], fieldW, "pic", "pop_up")
   
@@ -238,7 +244,36 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
 #' @author Modesto Escobar, Department of Sociology and Communication, University of Salamanca. See <https://sociocav.usal.es/blog/modesto-escobar/>
 #' @export
 pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", links=c("wikidata", "wiki"), 
-                   wikilangs="en") {
+                   wikilangs="en", dupBNE=FALSE) {
+  duplicar_bne <- function(vector_cadenas) {
+    # 1. Nueva URL base (sin https:// porque lo añadimos con \1)
+    nueva_url <- "bne.primo.exlibrisgroup.com/discovery/search?vid=34BNE_INST:CATALOGO&mode=authority&offset=0&originatingSystem=SYMPHONY&originatingSystemId="
+    # 2. Patrón
+    p1 <- "(<li><a[^>]*href=\"https://)"
+    p2 <- "(datos\\.bne\\.es/resource/)"
+    p3 <- "([^\"]+)"
+    p4 <- "(\"><img[^>]+/?>(?:\\s*)?)"
+    p5 <- "(BNE)"
+    p6 <- "(</a></li>)"
+    patron <- paste0(p1, p2, p3, p4, p5, p6)
+    # 3. Reemplazo
+    reemplazo <- paste0(
+      "\\1\\2\\3\\4\\5\\6",   # original completo, con BNE
+      "\\1",                  # copia: inicio <li><a ... href="https://
+      nueva_url,              # copia: nueva URL (sin https://)
+      "\\3",                  # copia: mismo id
+      "\\4",                  # copia: misma imagen
+      "BNE data",             # copia: texto cambiado
+      "\\6"                   # copia: cierre </a></li>
+    )
+    # 4. Ejecución
+    resultado <- gsub(
+      pattern     = patron,
+      replacement = reemplazo,
+      x           = vector_cadenas
+    )
+    return(resultado)
+  }
   data <- as.data.frame(data)
   sites <- data.frame(
     url=c("wikipedia.org","wikidata.org","brumario.usal.es", "museodelprado.es", "museoreinasofia.es", "viaf.org", "bne.es", "historia-hispanica.rah.es", "id.loc.gov", "isni.org", "vocab.getty.edu",
@@ -284,7 +319,7 @@ pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", 
   "https://isni.org/isni/$1",
   "https://vocab.getty.edu/page/ulan/$1",
   "https://data.cervantesvirtual.com/person/$1",
-  "https://entities.oclc.org/worldcat/entity/$1",
+  "https://openlibrary.org/authors/$1",
   "https://www.idref.fr/$1",
   "https://d-nb.info/gnd/$1",
   "https://id.bnportugal.gov.pt/aut/catbnp/$1",
@@ -343,6 +378,7 @@ pop_up <- function(data, title="name", title2=NULL, info=TRUE, entity="entity", 
   }
 
   linksList <- netCoin::renderLinks(data, links, NULL, "mainframe", sites=sites)
+  if (dupBNE) linksList <- duplicar_bne(linksList)
   data$links <- ifelse(is.na(data$wiki) & is.na(data$wikidata), data[['info']],
                        paste0(data[['info']], '</p><h3 style="margin-top:8px">',linksname,':</h3>', linksList))
   data$pop_up <- netCoin::get_template2(data, title=title, title2=title2, text="links")
