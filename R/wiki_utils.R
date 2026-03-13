@@ -2863,8 +2863,12 @@ m_XtoolsInfoDefault <- function(article, infotype=c("articleinfo", "prose", "lin
       cat(paste0("  INFO: Adding the number of links_in_count of the '", arts[i],"' page.\n"), file=stderr())
       b <- m_XtoolsInfo(arts[i], infotype="links", project=project,
                         redirects=FALSE)
-      d["links_in_count"] <- d["links_in_count"][[1]] + b["links_in_count"][[1]]
-      d["elapsed_time"] <- d["elapsed_time"][[1]] + b["elapsed_time"][[1]]
+      if(length(b) && length(b["links_in_count"]) && length(b["elapsed_time"])){
+        d["links_in_count"] <- d["links_in_count"][[1]] + b["links_in_count"][[1]]
+        d["elapsed_time"] <- d["elapsed_time"][[1]] + b["elapsed_time"][[1]]
+      }else{
+        cat(paste0("  INFO: Problems adding the number of links_in_count of the '", arts[i],"' page.\n"), file=stderr())
+      }
     }
   }
   if (redirects)

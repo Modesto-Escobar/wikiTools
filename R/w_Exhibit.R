@@ -231,6 +231,8 @@ w_Exhibit <- function(entities, mode="default", langsorder ="en", wikilangs = la
 #' separator. Wikipedias page titles are returned in same order as languages in
 #' this parameter. If wikilangs='' the function returns Wikipedia page titles
 #' in any language, not sorted.
+#' @param dupBNE If this is true, it provides two links to the National Library
+#' of Spain (works and authors). Otherwise, only to the authority link.
 #' @examples
 #' \dontrun{
 #' library(netCoin)

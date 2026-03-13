@@ -11,7 +11,8 @@ pop_up(
   info = TRUE,
   entity = "entity",
   links = c("wikidata", "wiki"),
-  wikilangs = "en"
+  wikilangs = "en",
+  dupBNE = FALSE
 )
 }
 \arguments{
@@ -33,6 +34,9 @@ they will be generated through 'entity' argument.}
 separator. Wikipedias page titles are returned in same order as languages in
 this parameter. If wikilangs='' the function returns Wikipedia page titles
 in any language, not sorted.}
+
+\item{dupBNE}{If this is true, it provides two links to the National Library
+of Spain (works and authors). Otherwise, only to the authority link.}
 }
 \value{
 a character vector of html formatted vignettes attached to 'data' in a column named 'pop_up'.
