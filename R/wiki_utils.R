@@ -2928,29 +2928,56 @@ m_XtoolsInfoAll <- function(article, project="en.wikipedia.org",
 #' v_AutoSuggest('Escobar, Modesto')
 #' @export
 v_AutoSuggest <- function(author) {
-  url <- "https://www.viaf.org/viaf/AutoSuggest"
+  # Quitamos las www. de la URL
+  url <- "https://viaf.org/viaf/AutoSuggest"
   query <- list(query = author)
-  if(!curl::has_internet() || httr::http_error(url,query=query)){
-    message("No internet connection or data source broken.")
+  
+  # Definimos el User-Agent localmente
+  mi_user_agent <- "wikiTools_R_package/1.0"
+  
+  # Comprobamos solo la conexión a internet (sin hacer http_error para no duplicar peticiones)
+  if (!curl::has_internet()) {
+    message("No internet connection.")
     return(NULL)
   }
-  #
-  tryCatch(
-    {
-      r <- httr::GET(url = url,
-                     httr::user_agent(user_agent),
-                     query = query)
-      httr::stop_for_status(r)
-      content <- httr::content(r, as = "text", encoding = "UTF-8")
-      d <- jsonlite::fromJSON(content, simplifyVector = FALSE)
-      # Only return (as data-frame) this columns: "term", "score", "nametype", "viafid"
-      output <- t(sapply(d$result, function(x) x[c("term", "score", "nametype", "viafid")]))
-      return(output)
-    }, error = function(e) {
-      cat(as.character(e), file = stderr())
+  
+  tryCatch({
+    # Añadimos User-Agent y forzamos que devuelva JSON
+    r <- httr::GET(
+      url = url,
+      httr::user_agent(mi_user_agent),
+      httr::add_headers(Accept = "application/json"),
+      query = query
+    )
+    
+    httr::stop_for_status(r)
+    
+    content <- httr::content(r, as = "text", encoding = "UTF-8")
+    d <- jsonlite::fromJSON(content, simplifyVector = FALSE)
+    
+    # Blindaje: Si la API no devuelve resultados (lista vacía o NULL)
+    if (is.null(d$result) || length(d$result) == 0) {
       return(NULL)
     }
-  )
+    
+    # Extraemos solo las columnas deseadas
+    output <- t(sapply(d$result, function(x) {
+      # Usamos un vector con nombres para garantizar la estructura
+      c(term = x$term, 
+        score = x$score, 
+        nametype = x$nametype, 
+        viafid = x$viafid)
+    }))
+    
+    # Lo convertimos a data.frame para que sea más fácil de usar posteriormente
+    output <- as.data.frame(output, stringsAsFactors = FALSE)
+    
+    return(output)
+    
+  }, error = function(e) {
+    cat(as.character(e), file = stderr())
+    return(NULL)
+  })
 }
 
 #' Run a CQL Query in VIAF
@@ -3006,77 +3033,156 @@ v_AutoSuggest <- function(author) {
 #' r <- v_Search(CQL_Query)
 #' }
 #' @export
-v_Search <- function(CQL_Query, mode=c('default', 'anyField', 'allmainHeadingEl',
-                                       'allNames', 'allPersonalNames', 'allTitle'),
-                     schema=c('JSON', 'brief')) {
+v_Search <- function (CQL_Query, mode = c("default", "anyField", "allmainHeadingEl", 
+                                          "allNames", "allPersonalNames", "allTitle"), 
+                      schema = c("JSON", "brief")) {
+  
   mode <- mode[1]
-  if(mode=='anyField'){
+  if (mode == "anyField") {
     CQL_Query <- paste0("cql.any = ", CQL_Query)
-  }else if(mode=='allmainHeadingEl'){
+  } else if (mode == "allmainHeadingEl") {
     CQL_Query <- paste0("local.mainHeadingEl all ", CQL_Query)
-  }else if(mode=='allNames'){
+  } else if (mode == "allNames") {
     CQL_Query <- paste0("local.names all ", CQL_Query)
-  }else if(mode=='allPersonalNames'){
+  } else if (mode == "allPersonalNames") {
     CQL_Query <- paste0("local.personalNames all ", CQL_Query)
-  }else if(mode=='allTitle'){
+  } else if (mode == "allTitle") {
     CQL_Query <- paste0("local.title all ", CQL_Query)
   }
-
+  
   schema <- schema[1]
-  if(schema=='brief')
-    recordSchema <- 'http://viaf.org/BriefVIAFCluster'
-  else
-    recordSchema <- 'info:srw/schema/1/JSON'
-
-  searchFn <- function(cql_query){
+  if (schema == "brief") {
+    recordSchema <- "http://viaf.org/BriefVIAFCluster"
+  } else {
+    recordSchema <- "http://viaf.org/VIAFCluster"
+  }
+  
+  # Función "lavadora" para quitar los prefijos XML (ns2:)
+  clean_namespaces <- function(x) {
+    if (is.list(x)) {
+      if (!is.null(names(x))) {
+        names(x) <- gsub("^[^:]+:", "", names(x))
+      }
+      x <- lapply(x, clean_namespaces)
+    }
+    return(x)
+  }
+  
+  # NUEVA: Función "escudo" para evitar que los viafID se rompan en notación científica
+  blindar_ids <- function(x) {
+    if (is.list(x)) {
+      # Si existe el campo viafID y R lo ha interpretado como número...
+      if ("viafID" %in% names(x) && is.numeric(x$viafID)) {
+        # Lo obligamos a ser texto puro sin perder precisión
+        x$viafID <- format(x$viafID, scientific = FALSE, trim = TRUE)
+      } else if ("viafID" %in% names(x)) {
+        # Por si acaso ya es texto, nos aseguramos de que siga siéndolo
+        x$viafID <- as.character(x$viafID)
+      }
+      # Viajamos recursivamente por las listas interiores
+      x <- lapply(x, blindar_ids)
+    }
+    return(x)
+  }
+  
+  searchFn <- function(cql_query) {
     maxrecords <- 250
-    url <- "https://www.viaf.org/viaf/search"
-    query <- list(httpAccept = 'application/json',
-                  maximumRecords = maxrecords,
-                  recordSchema = recordSchema,
-                  startRecord = 1,
-                  query = cql_query)
-    if(!curl::has_internet() || httr::http_error(url,query=query)){
-      message("No internet connection or data source broken.")
+    url <- "https://viaf.org/viaf/search" 
+    
+    query <- list(
+      httpAccept = "application/json", 
+      maximumRecords = maxrecords, 
+      recordSchema = recordSchema, 
+      startRecord = 1, 
+      query = cql_query
+    )
+    
+    mi_user_agent <- "wikiTools_R_package/1.0"
+    
+    if (!curl::has_internet()) {
+      message("No internet connection.")
       return(NULL)
     }
-    #
-    tryCatch(
-      {
-        output <- list()
-        while(TRUE) {
-          r <- httr::GET(url = url,
-                         httr::user_agent(user_agent),
-                         query = query)
-          httr::stop_for_status(r)
-          # cat(r$url)
-          content <- httr::content(r, as = "text", encoding = "UTF-8")
-          d <- jsonlite::fromJSON(content, simplifyVector = FALSE)
+    
+    tryCatch({
+      output <- list()
+      while (TRUE) {
+        
+        r <- httr::GET(
+          url = url, 
+          httr::user_agent(mi_user_agent),
+          httr::add_headers(Accept = "application/json"),
+          query = query
+        )
+        
+        httr::stop_for_status(r)
+        
+        content <- httr::content(r, as = "text", encoding = "UTF-8")
+        d <- jsonlite::fromJSON(content, simplifyVector = FALSE)
+        
+        # 1. Limpiamos los "ns2:"
+        d <- clean_namespaces(d)
+        
+        # 1.5. APLICAMOS LA VACUNA: Convertimos todos los viafID numéricos a texto
+        d <- blindar_ids(d)
+        
+        # 2. Reestructuramos los datos para que sean idénticos a los de la API antigua
+        if (!is.null(d$searchRetrieveResponse)) {
           nrecords <- d$searchRetrieveResponse$numberOfRecords
-          records  <- d$searchRetrieveResponse$records
-          output <- append(output, records)
-          if (length(output) >= as.integer(nrecords)) {
-            if (query$startRecord > 1)
-              cat(paste0(' INFO: Retrieved ', length(output), ' records.\n'), file = stderr())
-            return(output)
+          if (is.null(nrecords)) nrecords <- 0
+          
+          records <- d$searchRetrieveResponse$records
+          if (!is.null(records)) {
+            # --- AQUI EL TRUCO (Múltiples resultados) ---
+            # Subimos el contenido de VIAFCluster al nivel de recordData
+            records <- lapply(records, function(rec) {
+              if (!is.null(rec$record$recordData$VIAFCluster)) {
+                rec$record$recordData <- rec$record$recordData$VIAFCluster
+              }
+              return(rec)
+            })
+            output <- append(output, records)
           }
-          if (query$startRecord == 1)
-            cat(paste0("INFO: Number of records found (", nrecords,
-                       ") excedes the maximun per request API limit (", maxrecords,
-                       "). Doing sucesivelly requests.\n"), file = stderr())
-          cat(paste0(' INFO: Retrieved ', length(output), ' records.\n'), file = stderr())
-          query$startRecord <- query$startRecord + maxrecords
+        } 
+        else if (!is.null(d$VIAFCluster)) {
+          nrecords <- 1
+          # --- AQUI EL TRUCO (Un solo resultado redirigido) ---
+          # Metemos d$VIAFCluster DIRECTAMENTE en recordData, sin envoltorio extra
+          single_record <- list(
+            record = list(
+              recordData = d$VIAFCluster 
+            )
+          )
+          output <- append(output, list(single_record))
+        } 
+        else {
+          return(if(length(output) > 0) output else NULL)
         }
-      }, error = function(e) {
-        cat(as.character(e), file = stderr())
-        return(NULL)
+        
+        if (length(output) >= as.integer(nrecords)) {
+          if (query$startRecord > 1) {
+            cat(paste0(" INFO: Retrieved ", length(output), " records.\n"), file = stderr())
+          }
+          return(output)
+        }
+        
+        if (query$startRecord == 1) {
+          cat(paste0("INFO: Number of records found (", nrecords, 
+                     ") exceeds the maximun per request API limit (", maxrecords, 
+                     "). Doing successively requests.\n"), file = stderr())
+        }
+        
+        query$startRecord <- query$startRecord + maxrecords
       }
-    )
+      
+    }, error = function(e) {
+      cat(as.character(e), file = stderr())
+      return(NULL)
+    })
   }
-
+  
   return(searchFn(CQL_Query))
 }
-
 
 #' Gets record clusters
 #'
@@ -3298,25 +3404,46 @@ v_sourceId <- function(viaf, source) {
 
 # Gets Wikipedia pages (URL) from a VIAF record
 v_wikipedias <- function(viaf) {
-  if (is.null(viaf$xLinks) || is.null(viaf$xLinks$xLink))
+  # 1. Comprobamos que existan los enlaces
+  if (is.null(viaf$xLinks) || is.null(viaf$xLinks$xLink)) {
     return(NULL)
-  #
+  }
+  
   wikis <- character()
   xLinks <- viaf$xLinks$xLink
-  if (!is.null(xLinks$`#text`)) {
-    url <- xLinks[['#text']]
-    if (grepl('https?://[^.]+.wikipedia.org', url))
-      wikis <- append(wikis, url)
+  
+  # 2. Normalizamos xLinks para que siempre sea una lista y sea fácil de iterar.
+  # A veces la API devuelve un solo string en lugar de una lista si solo hay un enlace.
+  if (!is.list(xLinks)) {
+    xLinks <- as.list(xLinks)
   }
-  else {
-    for (l in xLinks) {
-      url <- l[['#text']]
-      if (grepl('https?://[^.]+.wikipedia.org', url))
-        wikis <- append(wikis, url)
+  
+  # 3. Iteramos de forma segura
+  for (l in xLinks) {
+    url <- NULL
+    
+    # Extraemos la URL dependiendo de cómo venga empaquetada hoy en día
+    if (is.character(l)) {
+      url <- l # Viene como texto directo
+    } else if (is.list(l) && !is.null(l[['#text']])) {
+      url <- l[['#text']] # Viene con el formato antiguo XML-JSON
+    } else if (is.list(l) && !is.null(l[['text']])) {
+      url <- l[['text']] # Por si acaso usan 'text' sin el '#'
+    }
+    
+    # 4. EL ESCUDO: Solo ejecutamos grepl si la url existe y tiene texto
+    if (!is.null(url) && length(url) > 0 && is.character(url)) {
+      if (grepl('https?://[^.]+\\.wikipedia\\.org', url[1])) {
+        wikis <- append(wikis, url[1])
+      }
     }
   }
-  if (length(wikis) == 0)
+  
+  # 5. Si después de todo no encontramos ninguna Wikipedia, devolvemos NULL
+  if (length(wikis) == 0) {
     return(NULL)
+  }
+  
   return(wikis)
 }
 
@@ -3332,4 +3459,158 @@ v_allinfo <- function(viaf) {
   l$coauthors <- v_coauthors(viaf)
   l$wikipedias <- v_wikipedias(viaf)
   return(l)
+}
+
+#' @title Print VIAF records to the console
+#' @description 
+#' This function takes a list of results returned by \code{v_Search()} and extracts 
+#' key information from each record (VIAF ID, sources, gender, dates, occupations, 
+#' titles, and Wikipedia links). It prints the data in a structured and readable 
+#' format to the console. It is designed to be fault-tolerant, silently handling 
+#' records that lack certain fields or present structural changes in the JSON 
+#' returned by the API.
+#' @param r A list of VIAF records. Usually, this is the object returned 
+#' by the \code{v_Search()} function.
+#' @return Prints a summary of the records to the console. Returns \code{invisible(NULL)}.
+#' @seealso \code{\link{v_Search}}, \code{\link{v_Extract}}
+#' @export
+#' @examples
+#' \dontrun{
+#' # 1. Search for an author using v_Search
+#' results <- v_Search('cql.any = "García Iranzo, Juan"')
+#' 
+#' # 2. Display the clean results on the screen
+#' showVIAF(results)
+#' }
+showVIAF <- function(registro) {
+  
+  # 1. BUSCADOR INTELIGENTE DEL NÚCLEO
+  rec <- NULL
+  if (!is.null(registro$record$recordData)) {
+    rec <- registro$record$recordData
+  } else if (is.list(registro) && length(registro) > 0 && !is.null(registro[[1]]$record$recordData)) {
+    rec <- registro[[1]]$record$recordData
+  } else {
+    message("⚠️ No se ha encontrado la ruta con los datos en este registro.")
+    return(NULL)
+  }
+  
+  # ==========================================.
+  # ELEMENTO 1: author (Data Frame)
+  # ==========================================.
+  v_id     <- if (!is.null(rec$viafID)) paste(rec$viafID, collapse = "|") else NA_character_
+  v_gender <- if (!is.null(rec$fixed$gender)) paste(rec$fixed$gender, collapse = "|") else NA_character_
+  
+  # Función interna para limpiar las fechas de forma segura
+  format_date <- function(d) {
+    if (is.null(d) || as.character(d) == "0" || as.character(d) == "") return("")
+    # Cambia "-" por "/" SOLO si está entre dos números (protege los años negativos a.C.)
+    return(gsub("(?<=[0-9])-(?=[0-9])", "/", as.character(d), perl = TRUE))
+  }
+  
+  b_date <- format_date(rec$birthDate)
+  d_date <- format_date(rec$deathDate)
+  
+  if (b_date != "" || d_date != "") {
+    v_dates <- paste0(b_date, "-", d_date)
+  } else {
+    v_dates <- NA_character_
+  }
+  
+  # Ocupaciones
+  v_occupations <- NA_character_
+  if (!is.null(rec$occupations$data)) {
+    occ_list <- unlist(lapply(rec$occupations$data, function(x) x$text))
+    v_occupations <- paste(occ_list, collapse = "|")
+  }
+  
+  df_author <- data.frame(
+    VIAF_ID     = v_id,
+    Gender      = v_gender,
+    Dates       = v_dates,
+    Occupations = v_occupations,
+    stringsAsFactors = FALSE
+  )
+  
+  # ==========================================.
+  # ELEMENTO 2: sources (Data Frame)
+  # ==========================================.
+  df_sources <- data.frame(Denominaciones = character(0), stringsAsFactors = FALSE)
+  headings <- rec$mainHeadings$data
+  
+  if (!is.null(headings)) {
+    if (!is.null(names(headings))) headings <- list(headings)
+    
+    filas_fuentes <- lapply(headings, function(h) {
+      fila <- list(Denominaciones = if (!is.null(h$text)) as.character(h$text) else NA_character_)
+      
+      sids <- h$sources$sid
+      if (!is.null(sids)) {
+        sids_flat <- unlist(sids)
+        for (s in sids_flat) {
+          partes <- strsplit(as.character(s), "\\|")[[1]]
+          if (length(partes) >= 2) {
+            codigo_inst <- partes[1]
+            id_inst <- paste(partes[-1], collapse = "|")
+            
+            if (is.null(fila[[codigo_inst]])) {
+              fila[[codigo_inst]] <- id_inst
+            } else {
+              fila[[codigo_inst]] <- paste(fila[[codigo_inst]], id_inst, sep = "|")
+            }
+          }
+        }
+      }
+      return(fila)
+    })
+    
+    todas_las_cols <- unique(unlist(lapply(filas_fuentes, names)))
+    todas_las_cols <- c("Denominaciones", setdiff(todas_las_cols, "Denominaciones"))
+    
+    df_sources <- do.call(rbind, lapply(filas_fuentes, function(f) {
+      faltan <- setdiff(todas_las_cols, names(f))
+      f[faltan] <- NA_character_
+      as.data.frame(f[todas_las_cols], stringsAsFactors = FALSE)
+    }))
+    row.names(df_sources) <- NULL
+  }
+  
+  # ==========================================.
+  # ELEMENTO 3: titles (Vector)
+  # ==========================================.
+  vec_titles <- character(0)
+  if (!is.null(rec$titles$work)) {
+    obras <- rec$titles$work
+    if (is.null(names(obras))) { 
+      vec_titles <- unlist(lapply(obras, function(w) w$title))
+    } else { 
+      vec_titles <- obras$title
+    }
+  }
+  
+  # ==========================================.
+  # ELEMENTO 4: wikipedias (Vector con nombres)
+  # ==========================================.
+  vec_wikipedias <- character(0)
+  
+  if (!is.null(rec$xLinks$xLink)) {
+    enlaces <- unlist(rec$xLinks$xLink)
+    enlaces_wiki <- enlaces[grep("wikipedia.org", enlaces, ignore.case = TRUE)]
+    
+    if (length(enlaces_wiki) > 0) {
+      idiomas <- gsub(".*//([^.]+)\\.wikipedia\\.org.*", "\\1", enlaces_wiki, ignore.case = TRUE)
+      vec_wikipedias <- enlaces_wiki
+      names(vec_wikipedias) <- idiomas
+    }
+  }
+  
+  # ==========================================.
+  # RESULTADO FINAL
+  # ==========================================.
+  return(list(
+    author     = df_author,
+    sources    = df_sources,
+    titles     = vec_titles,
+    wikipedias = vec_wikipedias
+  ))
 }
