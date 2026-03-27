@@ -316,7 +316,7 @@ v_AutoSuggest('Escobar, Modesto')
 # Note that four rows are returned, but only two different viafids.
 ```
 
-#### v_Search and showVIAF
+#### v_Search and v_Extract
 Search using CQL_Query
 
 
@@ -328,13 +328,13 @@ CQL_Query <- 'cql.any = "García Iranzo, Juan"'
 r <- v_Search(CQL_Query)
 # r contains complete VIAF records (sometimes seen as a "cluster record",
 # which is unified by combining records from many libraries around the world)
-showVIAF(r)
+v_Extract(r)
 ```
 
 Shortcut
 ```{r echo=TRUE}
 r <- v_Search("García Iranzo, Juan", mode="anyField")
-showVIAF(r)
+v_Extract(r)
 ```
 
 Search in 1xx, 4xx, 5xx fields of MARC record (local.names)
@@ -363,7 +363,7 @@ Operator is "all": search all terms
 ```{r echo=TRUE}
 CQL_Query <- 'local.personalNames all "Modesto Escobar"'
 r <- v_Search(CQL_Query)
-showVIAF(r)
+v_Extract(r)
 ```
 
 v_Search mode=allmainHeadingEl: 1xx fields of MARC record:
@@ -375,5 +375,5 @@ Search in Titles
 ```{r echo=TRUE}
 CQL_Query <- 'local.title all "Los pronósticos electorales con encuestas"'
 r <- v_Search(CQL_Query)
-showVIAF(r)
+v_Extract(r)
 ```

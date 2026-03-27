@@ -4,7 +4,7 @@
 \alias{v_Extract}
 \title{Gets information from a VIAF record}
 \usage{
-v_Extract(viaf, info, source = NULL)
+v_Extract(viaf, info = "allinfo", source = NULL)
 }
 \arguments{
 \item{viaf}{VIAF cluster record (in JSON format).}

@@ -2,70 +2,52 @@
 % Please edit documentation in R/wiki_utils.R
 \name{v_Search}
 \alias{v_Search}
-\title{Run a CQL Query in VIAF}
+\title{Search the VIAF database using CQL queries}
 \usage{
 v_Search(
   CQL_Query,
   mode = c("default", "anyField", "allmainHeadingEl", "allNames", "allPersonalNames",
     "allTitle"),
-  schema = c("JSON", "brief")
+  schema = c("VIAF", "brief")
 )
 }
 \arguments{
-\item{CQL_Query}{String with the search or a name if mode is specified.
-See https://developer.api.oclc.org/viaf-api#/Authority\%20Cluster}
+\item{CQL_Query}{A string containing the search terms or a full CQL query.}
 
-\item{mode}{apply a predefined query:
-'anyField' -> 'cql.any = "string"'
-Search preferred Name - names which are the preferred form in an authority
-record (1xx fields of the MARC records);
-'allmainHeadingEl' -> 'local.mainHeadingEl all "name"'
-Search the same as previous, but all terms are searched;
-'allNames' -> 'local.names all "name"'
-Search Names - any name preferred or alternate (1xx, 4xx, 5xx fields of the
-MARC records);
-'allPersonalNames' -> 'local.personalNames all "name"'
-Search Personal Names within the authority record (100, 400, 500 fields of
-MARC records);
-'allTitle' -> 'local.title all "title"'
-Search for titles.
-By 'default', no predefined query will be applied.}
+\item{mode}{A character string specifying the search field. Options are:
+\itemize{
+\item \code{"default"}: Uses the raw \code{CQL_Query}.
+\item \code{"anyField"}: Searches in any available field.
+\item \code{"allmainHeadingEl"}: Searches in the main heading elements.
+\item \code{"allNames"}: Searches across all name variants.
+\item \code{"allPersonalNames"}: Limits search to personal names.
+\item \code{"allTitle"}: Searches in work titles.
+}}
 
-\item{schema}{The recordSchema of the query: if 'brief' (defaults) the
-records returned are more simple. If 'JSON', then de complete cluster records
-are returned.}
+\item{schema}{A character string specifying the record detail level.
+Use \code{"VIAF"} for full clusters or \code{"brief"} for a lightweight version.}
 }
 \value{
-A list with the records found.
+An object of class \code{c("viaf", "list")}. This is a list where each
+element is an individual VIAF record (also of class \code{"viaf"}).
+Returns \code{NULL} if no records are found or if a connection error occurs.
 }
 \description{
-Run the CQL_Query using the VIAF Search API and return a list of records
-found. The search string is formed using the CQL_Query syntax of the API.
-Note that returned records use the "info:srw/schema/1/JSON" record schema,
-i.e., are complete cluster records packed in JSON format. If the number
-of records found is greater than 250 (API restrictions), successive requests
-are made.
+This function performs a search in the Virtual International Authority File (VIAF)
+database using Contextual Query Language (CQL). It handles pagination automatically
+to retrieve all matching records up to the API limits.
+}
+\details{
+The function automatically cleans XML namespaces (e.g., "ns2:") from the
+resulting JSON to provide a cleaner list structure. It also ensures that
+\code{viafID} values are treated as characters to prevent precision loss.
 }
 \examples{
 \dontrun{
-## Search in any field (cql.any)
-# Operator is "=": so search one or more terms:
-CQL_Query <- 'cql.any = "García Iranzo, Juan"'
-r <- v_Search(CQL_Query)
-# r contains complete VIAF records (sometimes seen as a "cluster record",
-# which is unified by combining records from many libraries around the world)
-# Search in 1xx, 4xx, 5xx fields of MARC record (local.names)
-# Operator is "all": search all terms
-CQL_Query <- 'local.names all "Modesto Escobar"'
-r <- v_Search(CQL_Query)
+# Search for Miguel de Cervantes
+results <- v_Search("Cervantes", mode = "allPersonalNames")
 
-# Search in 100, 400, 500 fields of MARC record (local.personalNames)
-# Operator is "all": search all terms
-CQL_Query <- 'local.personalNames all "Modesto Escobar"'
-r <- v_Search(CQL_Query)
-
-# Search in Titles
-CQL_Query <- 'local.title all "Los pronósticos electorales con encuestas"'
-r <- v_Search(CQL_Query)
+# Search for a specific title
+works <- v_Search("Don Quixote", mode = "allTitle", schema = "brief")
 }
 }

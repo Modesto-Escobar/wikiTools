@@ -2,22 +2,30 @@
 % Please edit documentation in R/wiki_utils.R
 \name{v_GetRecord}
 \alias{v_GetRecord}
-\title{Gets record clusters}
+\title{Gets record clusters using viafID or other identifier in the VIAF cluster
+record.}
 \usage{
-v_GetRecord(viafid, record_format = "viaf.json")
+v_GetRecord(sid, source = "VIAF")
 }
 \arguments{
-\item{viafid}{The VIAF identifier.}
+\item{sid}{The identifier in the authority source.}
 
-\item{record_format}{'viaf.json' (default) or others in
-https://developer.api.oclc.org/viaf-api#/Authority\%20Cluster}
+\item{source}{The code of the authority source in VIAF (i.e, BNF, BNE, ISNI...).}
 }
 \value{
-The VIAF record cluster in the format indicated in record_format.
+The VIAF record cluster in the JSON format.
 }
 \description{
-Obtains the record cluster identified by viafid from VIAF, in the format
-indicated in record_format. Note that the returned record may be a VIAF
-cluster record or a redirect/scavenged record: the function returns the
-record as is.
+Obtains the record cluster in JSON format. Other formats exists, but the more
+informative is 'application/json', so it is the only format used in this
+function. See https://developer.api.oclc.org/viaf-api
+}
+\details{
+If source='VIAF' (default) the function uses the "Read by ID" interface of
+the API. If other authority source is used, then the function use the
+localAuthorityId/authoritySourceCode interface.
+See https://developer.api.oclc.org/viaf-api
+
+Note that the returned record may be a VIAF cluster record or a
+redirect/scavenged record: the function returns the record as is.
 }
