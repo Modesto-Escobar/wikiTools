@@ -933,7 +933,7 @@ WHERE {
 #' @param Pauthority Wikidata property identifier of the database or
 #' authorities' catalog. For example, if Pauthority = "P4439", then the function
 #' searches for entities that have the identifiers in the MNCARS (Museo Nacional
-#' Centro de Arte Reina Sofía) database. Following library abbreviations for the
+#' Centro de Arte Reina Sof&iacute;a) database. Following library abbreviations for the
 #' databases can be also used in the parameter 'Pauthority':
 #'
 #' library   : VIAF, LC,   BNE , ISNI, JPG,  ULAN, BNF,  GND, DNB,
@@ -1048,7 +1048,7 @@ WHERE {
 #' @param Pauthority Wikidata property identifier of the database or
 #' authorities' catalog. For example, if Pauthority = "P4439", all entities
 #' which have an identifier in the MNCARS (Museo Nacional Centro de Arte Reina
-#' Sofía) database are returnd. Following libraries abbreviation for the
+#' Sof&iacute;a) database are returnd. Following libraries abbreviation for the
 #' databases can be also used in the parameter 'Pauthority':
 #'
 #' library   : VIAF, LC,   BNE , ISNI, JPG,  ULAN, BNF,  GND, DNB,
@@ -1078,7 +1078,7 @@ WHERE {
 #' @examples
 #' \dontrun{
 #' # Example: Pauthority=P4439 (has identifier in the Museo Nacional Centro de
-#' # Arte Reina Sofía)
+#' # Arte Reina Sof&iacute;a)
 #' w_SearchByAuthority(Pauthority="P4439", debug='count')
 #' mncars <- w_SearchByAuthority(Pauthority="P4439")
 #' mncars <- w_SearchByAuthority(Pauthority="MNCARS", langsorder = 'es|en')
@@ -1871,6 +1871,9 @@ w_EntityInfo <- function(entity_list, mode='default', langsorder='',
     if (debug!=FALSE)
       cat(paste0("INFO: Searching labels, latitude and longitude coordinates, and countries for places.\n"), file=stderr())
     places <- w_Geoloc(qidsofplaces, langsorder=langsorder, debug=debug)
+    if(is.null(places)){
+      return(NULL)
+    }
     # Set colnames in right form
     colnames(places) <- c('placeQ', 'place', 'placeLat', 'placeLon', 'countryQ', 'country')
     # create a dict of dicts for fast allocating
@@ -2330,7 +2333,7 @@ m_WikidataEntity <- function(titles, project='en.wikipedia.org',
         item <- NA
         if (anorm == page$title) {
           aerror <- TRUE
-          if (!is.null(page$invalid))   # ¿malformed title?
+          if (!is.null(page$invalid))   # malformed title?
             s <- 'invalid'
           else if (!is.null(page$missing))
             s <- 'missing'
@@ -2923,7 +2926,7 @@ m_XtoolsInfoAll <- function(article, project="en.wikipedia.org",
 #' @seealso https://developer.api.oclc.org/viaf-api#/Authority%20Cluster
 #' @examples
 #' v_AutoSuggest('Iranzo')
-#' v_AutoSuggest('Esparza, María')
+#' v_AutoSuggest('Esparza, Mar\uEDa')
 #' # Four rows, only two viafid:
 #' v_AutoSuggest('Escobar, Modesto')
 #' @export
@@ -2933,17 +2936,17 @@ v_AutoSuggest <- function(author) {
   query <- list(query = author)
   
   # Definimos el User-Agent localmente. La API indica que debe incluirse
-  # una dirección de correo entre paréntesis
+  # una direccion de correo entre parentesis
   mi_user_agent <- "wikiTools_R_package/1.0 (gas@usal.es)"
   
-  # Comprobamos solo la conexión a internet (sin hacer http_error para no duplicar peticiones)
+  # Comprobamos solo la conexion a internet (sin hacer http_error para no duplicar peticiones)
   if (!curl::has_internet()) {
     message("No internet connection.")
     return(NULL)
   }
   
   tryCatch({
-    # Añadimos User-Agent y forzamos que devuelva JSON
+    # Anadimos User-Agent y forzamos que devuelva JSON
     r <- httr::GET(
       url = url,
       httr::user_agent(mi_user_agent),
@@ -2956,7 +2959,7 @@ v_AutoSuggest <- function(author) {
     content <- httr::content(r, as = "text", encoding = "UTF-8")
     d <- jsonlite::fromJSON(content, simplifyVector = FALSE)
     
-    # Blindaje: Si la API no devuelve resultados (lista vacía o NULL)
+    # Blindaje: Si la API no devuelve resultados (lista vacia o NULL)
     if (is.null(d$result) || length(d$result) == 0) {
       return(NULL)
     }
@@ -2970,7 +2973,7 @@ v_AutoSuggest <- function(author) {
         viafid = x$viafid)
     }))
     
-    # Lo convertimos a data.frame para que sea más fácil de usar posteriormente
+    # Lo convertimos a data.frame para que sea mas facil de usar posteriormente
     output <- as.data.frame(output, stringsAsFactors = FALSE)
     
     return(output)
@@ -2992,14 +2995,14 @@ viafid_aschar <- function(viafID) {
   return(as.character(viafID))
 }
 
-# Función "lavadora" para quitar los prefijos XML (ns2:)
+# Funcion "lavadora" para quitar los prefijos XML (ns2:)
 ##
-## Para hacer que sea más limpio, lo mejor es quitar también aquellos
+## Para hacer que sea mas limpio, lo mejor es quitar tambien aquellos
 ## namespaces que empiecen por xmlns
 clean_namespaces <- function(x) {
   if (is.list(x)) {
     if (!is.null(names(x))) {
-      x <- x[!grepl("^xmlns", names(x))]           # Añadido
+      x <- x[!grepl("^xmlns", names(x))]           # Added
       names(x) <- gsub("^[^:]+:", "", names(x))
     }
     x <- lapply(x, clean_namespaces)
@@ -3236,6 +3239,7 @@ v_Search <- function(CQL_Query, mode = c("default", "anyField", "allmainHeadingE
 #' c <- v_GetRecord('02853882X', source = 'SUDOC')
 #' identical(a,b)
 #' identical(b,c)
+#' }
 #' @export
 v_GetRecord <- function(sid, source='VIAF') {
   sid <- as.character(sid)
@@ -3383,6 +3387,8 @@ v_Extract <- function(viaf, info="allinfo", source=NULL){
 #' This function relies on several internal auxiliary functions (e.g., \code{v_titles}, 
 #' \code{v_sources}, \code{v_wikipedias}) to safely extract specific fields, bypassing 
 #' empty strings or unexpected data structures often returned by the API.
+#'
+#' @importFrom stats na.omit
 #'
 #' @export
 #'
@@ -3546,7 +3552,7 @@ v_allinfo <- function(viaf) {
 }
 
 # ==============================================================================.
-# 1. FUNCIONES AUXILIARES (Protegidas contra textos vacíos)
+# 1. FUNCIONES AUXILIARES (Protegidas contra textos vacios)
 # ==============================================================================.
 v_mainName <- function(viaf) {
   if (!is.null(viaf$mainHeadings$data)) {
@@ -3588,9 +3594,10 @@ v_dates <- function(viaf, check_dateType=FALSE) {
   } else {
     dyear <- substr(viaf$deathDate, 1, 4)
   }
-  
+
+  #' @importFrom utils as.roman
   as_century <- function(year) {
-    if (year == 0)  return ("1ª m. S. I")
+    if (year == 0)  return ("1\uAA m. S. I")
     era <- if (year > 0) "D.C." else "A.C."
     x <- abs(year)
     s_num <- (x %/% 100) + 1
@@ -3601,10 +3608,10 @@ v_dates <- function(viaf, check_dateType=FALSE) {
     y_in_s <- x - (s_num - 1) * 100
     
     if (era == "D.C.") {
-      mitad <- if (y_in_s < 50) "1ª m. S. " else "2ª m. S. "
+      mitad <- if (y_in_s < 50) "1\uAA m. S. " else "2\uAA m. S. "
       return(paste0(mitad, s_rom))
     } else {
-      mitad <- if (y_in_s < 50) "2ª m. S. " else "1ª m. S. "
+      mitad <- if (y_in_s < 50) "2\uAA m. S. " else "1\uAA m. S. "
       return(paste0(mitad, s_rom, " a.C."))
     }
   }
@@ -3701,7 +3708,7 @@ v_wikipedias <- function(viaf) {
   # Aplastamos toda la estructura (lista o data frame) a un vector plano
   all_urls <- as.character(unlist(viaf$xLinks$xLink))
   
-  # Filtramos usando vectorización para capturar TODOS los enlaces
+  # Filtramos usando vectorizacion para capturar TODOS los enlaces
   wikis <- all_urls[grepl('https?://[^.]+\\.wikipedia\\.org', all_urls)]
   wikis <- unique(wikis)
   

@@ -29,3 +29,12 @@ See https://developer.api.oclc.org/viaf-api
 Note that the returned record may be a VIAF cluster record or a
 redirect/scavenged record: the function returns the record as is.
 }
+\examples{
+\dontrun{
+a <- v_GetRecord('29550309')
+b <- v_GetRecord('0000000059425637', source = 'ISNI')
+c <- v_GetRecord('02853882X', source = 'SUDOC')
+identical(a,b)
+identical(b,c)
+}
+}

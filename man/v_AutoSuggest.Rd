@@ -25,7 +25,7 @@ combining records from many libraries around the world into a single record.
 }
 \examples{
 v_AutoSuggest('Iranzo')
-v_AutoSuggest('Esparza, María')
+v_AutoSuggest('Esparza, Mar\uEDa')
 # Four rows, only two viafid:
 v_AutoSuggest('Escobar, Modesto')
 }

@@ -62,7 +62,7 @@ authorities' catalog is needed, set \code{debug}='count'.
 \examples{
 \dontrun{
 # Example: Pauthority=P4439 (has identifier in the Museo Nacional Centro de
-# Arte Reina Sofía)
+# Arte Reina Sof&iacute;a)
 w_SearchByAuthority(Pauthority="P4439", debug='count')
 mncars <- w_SearchByAuthority(Pauthority="P4439")
 mncars <- w_SearchByAuthority(Pauthority="MNCARS", langsorder = 'es|en')

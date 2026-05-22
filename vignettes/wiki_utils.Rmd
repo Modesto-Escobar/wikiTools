@@ -134,7 +134,9 @@ df <- w_SearchByLabel(string='Iranzo', langsorder='es|en', instanceof = 'Q5',
 #### aux: getting a vector of entities (`l`) to use later.
 ```{r w_SearchByLabel, echo=TRUE}
 df <- w_SearchByLabel(string='Iranzo', langsorder='es|en', mode='inlabel')
-l <- df$entity
+if(length(l)){
+  l <- df$entity
+}
 ```
 
 #### w_isInstanceOf
@@ -142,7 +144,9 @@ Check if elements in entity_list are instance of a Wikimedia class
 ```{r w_isIntanceOf, echo=TRUE}
 df <- w_isInstanceOf(entity_list=l, instanceof='Q5')
 # Not TRUE
-df[!df$instanceof_Q5,]
+if(length(df)){
+  df[!df$instanceof_Q5,]
+}
 ```
 
 #### w_Wikipedias
@@ -184,8 +188,10 @@ deleted.
 ```{r w_isValid, echo=TRUE}
 l2 <- append(l, c("Q115637688", "Q105660123"))  # Note: adding two new entities
 v <- w_isValid(l2)
-# Not valid
-v[!v$valid,]
+if(length(v)){
+  # Not valid
+  v[!v$valid,]
+}
 ```
 
 #### w_Property
@@ -207,7 +213,9 @@ mncarsQ5 <- w_SearchByAuthority(Pauthority="P4439", langsorder = 'es|en',
                                      instanceof = 'Q5')  # 1280
 # Entities are not 'human' (Q5) [see entityDescription column):
 mncars   <- w_SearchByAuthority(Pauthority="P4439", langsorder = 'es|en')
-mncars[!(mncars$entity %in% mncarsQ5$entity),]  # not instance of Q5.
+if(length(mncars) && length(mncarsQ5)){
+  mncars[!(mncars$entity %in% mncarsQ5$entity),]  # not instance of Q5.
+}
 ```
 
 #### w_EntityInfo
@@ -218,10 +226,14 @@ df <- w_EntityInfo(entity_list='Q134644', langsorder='es|en', wikilangs='es|en|f
 df <- w_EntityInfo(c('Q270510', 'Q1675466', 'Q24871'), mode='film', langsorder='es|en', wikilangs='es|en|fr')
 # Search string 'van Beethoven' inlabel
 w <- w_SearchByLabel('van Beethoven', mode='inlabel', langsorder = '', instanceof = 'Q5')
-df <- w_EntityInfo(w$entity, langsorder='en', wikilangs='en|es|fr', debug='info')
+if(length(w)){
+  df <- w_EntityInfo(w$entity, langsorder='en', wikilangs='en|es|fr', debug='info')
+}
 # Search 3D films
 w <- w_SearchByInstanceof(instanceof='Q229390', langsorder = 'en|es', debug = 'info')
-df <- w_EntityInfo(w$entity, mode="film", langsorder='en', wikilangs='en', debug='info')
+if(length(w)){
+  df <- w_EntityInfo(w$entity, mode="film", langsorder='en', wikilangs='en', debug='info')
+}
 ```
 
 
