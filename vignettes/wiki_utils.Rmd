@@ -134,7 +134,7 @@ df <- w_SearchByLabel(string='Iranzo', langsorder='es|en', instanceof = 'Q5',
 #### aux: getting a vector of entities (`l`) to use later.
 ```{r w_SearchByLabel, echo=TRUE}
 df <- w_SearchByLabel(string='Iranzo', langsorder='es|en', mode='inlabel')
-if(length(l)){
+if(length(df)){
   l <- df$entity
 }
 ```
