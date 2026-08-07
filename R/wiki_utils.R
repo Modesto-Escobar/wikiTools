@@ -3303,6 +3303,10 @@ v_GetRecord <- function(sid, source='VIAF') {
 v_Extract <- function(viaf, info="allinfo", source=NULL){
   
   # Initial validation
+  if(is.null(viaf)){
+    message("The the provided argument is NULL.")
+    return(NULL)
+  }
   if (!inherits(viaf, "viaf")) {
     stop("The class of the provided argument ('", class(viaf)[1], "') is not supported. Please provide an object of class 'viaf'.")
   }
