@@ -16,7 +16,7 @@ Authors@R: c(
     person("Ángel", "Zazo", email = "angelzazo@usal.es", role = c("aut")), 
     person("Carlos", "Prieto", email = "cprietos@usal.es", role = c("aut"), comment = c(ORCID = "0000-0001-8178-9768")),
     person("David", "Barrios", email = "metal@usal.es", role = "aut"),
-    person("Cristina", "Calvo", email = "cristinacalvolopez@usal.es", role = "aut")
+    person("Cristina", "Calvo", email = "cristina.calvo@poli.uned.es", role = "aut")
     )
 Maintainer: Modesto Escobar <modesto@usal.es> 
 Roxygen: list(markdown=TRUE)
