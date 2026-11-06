@@ -3067,9 +3067,9 @@ v_Search <- function(CQL_Query, mode = c("default", "anyField", "allmainHeadingE
   
   schema <- schema[1]
   if (schema == "brief") {
-    recordSchema <- "http://viaf.org/BriefVIAFCluster"
+    recordSchema <- "BriefVIAF"
   } else {
-    recordSchema <- "http://viaf.org/VIAFCluster"
+    recordSchema <- "VIAF"
   }
   
   # Helper function to remove XML prefixes (ns2:)
@@ -3160,7 +3160,7 @@ v_Search <- function(CQL_Query, mode = c("default", "anyField", "allmainHeadingE
         # --- THE TRICK (Multiple results) ---
         # Promote VIAFCluster content to the recordData level
         records <- lapply(records, function(rec) {
-          if (!is.null(rec$recordData$VIAFCluster)) {
+          if (is.list(rec) && !is.null(rec$recordData$VIAFCluster)) {
             rec <- rec$recordData$VIAFCluster
             
             # Careful: BriefVIAF includes two data points in $content: viafID and nameType

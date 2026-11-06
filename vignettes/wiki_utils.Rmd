@@ -1,7 +1,6 @@
 ---
 title: "wikiTools package"
-author: "Angel Zazo, Department of Computer Science and Automatics, University of Salamanca\r
-Modesto Escobar, Department of Sociology and Communication, University of Salamanca"
+author: "Angel Zazo, Department of Computer Science and Automatics, University of Salamanca; Modesto Escobar, Department of Sociology and Communication, University of Salamanca"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
